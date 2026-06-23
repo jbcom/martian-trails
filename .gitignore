@@ -5,8 +5,10 @@ node_modules/
 # Build outputs
 dist/
 build/
-android/
 ios/
+# NOTE: android/ is committed (the Capacitor native project). Its build outputs
+# (.gradle/, build/, local.properties, copied web assets) are ignored by the
+# Capacitor-generated android/.gitignore, not here.
 
 # Environment
 .env
