@@ -29,6 +29,13 @@ while queue has [ ] items: read own spec docs → use-case enumerate (if non-tri
 
 ---
 
+## Known regressions vs POC (the "must not look worse than the POC" bar)
+- **Depot renders black on the right ~75%.** Root cause: `Renderer.update()` early-returns at `if (state.mode !== "travel") return` (Renderer.ts:418), so the Underhill airlock-garage backdrop + sky are never advanced/shown in depot mode. The POC rendered the garage scene behind the glass overlay from boot. This is a SYMPTOM of the monolithic mode-gated `update()` — fix it PROPERLY during the render decomposition (per-scene render, M3/M6), not via a band-aid. Verify with a correct Safari playtest (window frontmost + `visibilityState === "visible"` BEFORE screenshotting — a hidden tab captures all-black; see [[loop-playtest-safari-not-chrome]]).
+- Other scaffold regressions (budget 10k vs 25k, dust-storm dark, 2 events vs 3, dead thermal/Hardpan, missing alarm overlay/boulder spawner) tracked in M5.
+
+## Architectural mandate (user, 2026-06-23)
+This is NOT a patch-the-POC job. Plan + decompose properly: (1) the ADDED production libraries that elevate POC→polished production game, (2) proper CODE decomposition, (3) proper CONFIG decomposition. M2–M6 below are rewritten around this after the library-stack survey lands (mean-streets/grovekeeper/cosmic-cults dialect). Architecture doc first, then build. Never patch a symptom when the structure is the cause.
+
 ## Source-of-truth references
 - Design intent: `Gemini-Red_Mars_Oregon_Trail_Game_Concept.md` (transcript — authoritative = cumulative feature list + final two turns: reject CRT, keep diegetic glassmorphic airlock outfitting). Playable POC: `red_mars_the_ares_trail.html`.
 - Dialect exemplars: `~/src/jbcom/blobolines`, `~/src/jbcom/a-good-old-fashioned-adventure`, `~/src/arcade-cabinet/{grovekeeper,cosmic-cults}`.
