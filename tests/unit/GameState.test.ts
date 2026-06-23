@@ -1,6 +1,6 @@
 import { get } from "svelte/store";
 import { beforeEach, describe, expect, it } from "vitest";
-import { STORE_ITEMS, eventLog, gameState, logMsg } from "../../src/lib/GameState";
+import { eventLog, gameState, logMsg, STORE_ITEMS } from "../../src/lib/GameState";
 
 describe("Martian Trail GameState Tests", () => {
   beforeEach(() => {
