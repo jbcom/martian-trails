@@ -51,7 +51,7 @@ This is NOT a patch-the-POC job. Plan + decompose properly: (1) the ADDED produc
 - [x] m1-name-1 Adopt the name **Martian Trail** across package.json (`name: martian-trail`), index.html `<title>`, App boot copy, README, CLAUDE.md pitch. Keep `Gemini-…md` + `red_mars_…html` as historical source files (do not rename those). [done 4792223 — README + depot title; also fixed canvas-0-height collapse; remaining black-paint bug under stuck-loop-debugger]
 
 ### m1-tool Toolchain to house baseline
-- [ ] m1-tool-1 Bump Capacitor 6→8, Biome 1.8→2.x (migrate `organizeImports`→`assist.actions.source.organizeImports`), Vitest 1.6→4.x, Node 20→22 in package.json + CI. Verify `pnpm install`, `pnpm lint`, `pnpm test` green after each bump.
+- [x] m1-tool-1 Bump ENTIRE toolchain to latest (user: "run everything to latest, stop using old packages"): Svelte 5.56, Vite 8.1, Vitest 4.1, Pixi 8.19, Capacitor 8.4, TS 6, Biome 2.5, @types/node 26. Biome 2.x config migrated + scoped. Android regenerated under Cap 8, cap:sync verified. [done c2f253f] NOTE: this surfaced intentional RED = the decomposition punch-list (NOT to be suppressed — see [[red-is-the-map-no-shortcut-green]]): Renderer.ts Pixi 7→8 API breaks (BLEND_MODES, async Application.init, beginFill→graphics API, baseTexture destroy) → fixed in render decomposition; App.svelte buyItem key narrowing → fixed in GameState refactor; ~14 biome findings (noExplicitAny untyped Pixi objects, etc) → fixed properly during decomposition.
 - [x] m1-tool-2 Fix `.env.example` `GEMINI_API_KEY` placeholder bug. [verified already correct — `GEMINI_API_KEY=your_gemini_api_key_here`; no change needed]
 
 ### m1-vite vite/test config for Pages + device
