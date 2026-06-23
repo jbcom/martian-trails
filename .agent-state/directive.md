@@ -55,11 +55,11 @@ while queue has [ ] items: read own spec docs → use-case enumerate (if non-tri
 ### m1-cap Capacitor wiring
 - [x] m1-cap-1 Add `capacitor.config.ts` (`appId: com.jbcom.martiantrail`, `appName: Martian Trail`, `webDir: dist`, `androidScheme: https`, mobile-safe-area config). Add `cap:sync`, `cap:run:android`, `android:debug` scripts. Run `pnpm cap:sync` and commit the `android/` dir. [done 9513087 — @capacitor/android@6, android/ committed, cap:sync 'Sync finished']
 
-### m1-ci CI/CD to ci → release → cd
-- [ ] m1-ci-1 Rewrite `ci.yml`: macos browser job (lint → typecheck/check → test → test:browser → build → e2e-deployed) + Android APK job (setup-java 21, setup-android, cap:sync, assembleDebug, upload artifact). SHA-pin all actions, Node 22.
-- [ ] m1-ci-2 Add `release-please.yml` (release-please-action with config + manifest).
-- [ ] m1-ci-3 Add `release.yml` (on release published: versioned web zip + build-provenance attest + APK assembleRelease attach).
-- [ ] m1-ci-4 Rewrite `cd.yml`: push:main → real Pages deploy (configure-pages → upload-pages-artifact path:dist → deploy-pages), `permissions: pages/id-token`, `concurrency: pages`.
+### m1-ci CI/CD to ci → release → cd (THREE workflows, no separate release-please — mean-streets dialect)
+- [x] m1-ci-1 `ci.yml` = PR gate: core (check/lint/test/build), browser (xvfb+chromium), e2e-smoke. SHA-pinned, Node 22. [done c64a3cd]
+- [x] m1-ci-2 `release.yml` = push:main: release-please INLINE (no separate workflow) + release-gated APK + provenance web bundle. [done c64a3cd]
+- [x] m1-ci-3 (folded into release.yml above — APK assembleRelease + clobber upload + attest-build-provenance web zip). [done c64a3cd]
+- [x] m1-ci-4 `cd.yml` = push:main: release-checks + real Pages deploy (configure-pages/upload-pages-artifact/deploy-pages) + debug APK. [done c64a3cd]
 
 ### m1-docs Doc set
 - [ ] m1-docs-1 Add `AGENTS.md` (operational doctrine: docs>tests>code, content-first, browser validation mandatory). Add `README.md`, `CHANGELOG.md`, `STANDARDS.md`. Add `docs/{ARCHITECTURE,STATE,DESIGN-SYSTEM,TESTING,DEPLOYMENT}.md`. Frontmatter per standard-repo profile.
