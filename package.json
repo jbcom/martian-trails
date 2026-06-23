@@ -1,0 +1,42 @@
+{
+  "name": "martian-trail",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "lint": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:browser": "vitest --workspace=vitest.workspace.ts",
+    "e2e": "playwright test",
+    "assets:fetch": "node scripts/fetch-itch-assets.mjs",
+    "genai:events": "tsx scripts/genai-events.ts",
+    "genai:portraits": "tsx scripts/genai-portraits.ts"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.8.3",
+    "@capacitor/cli": "^6.1.0",
+    "@playwright/test": "^1.44.1",
+    "@sveltejs/vite-plugin-svelte": "^3.1.1",
+    "@tsconfig/svelte": "^5.0.4",
+    "@types/node": "^20.14.9",
+    "jsdom": "^29.1.1",
+    "sass": "^1.77.6",
+    "svelte": "^4.2.18",
+    "svelte-check": "^3.8.1",
+    "tsx": "^4.15.7",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1",
+    "vitest": "^1.6.0"
+  },
+  "dependencies": {
+    "@capacitor/core": "^6.1.0",
+    "dotenv": "^16.4.5",
+    "pixi.js": "^7.4.2"
+  }
+}

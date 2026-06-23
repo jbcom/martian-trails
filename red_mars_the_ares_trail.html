@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Mars: The Ares Trail</title>
+    
+    <!-- Google Fonts for High-Tech Sci-Fi Typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rajdhani:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- PixiJS v7 via jsDelivr -->
+    <script src="https://cdn.jsdelivr.net/npm/pixi.js@7.x/dist/pixi.min.js"></script>
+
+    <style>
+        :root {
+            --mars-bg: #1a0b08; --mars-dark: #2c1511; --mars-red: #8a3324;
+            --mars-dust: #cc7052; --mars-sand: #e89b71; --mars-glow: rgba(232, 155, 113, 0.4);
+            --ui-bg: rgba(12, 5, 4, 0.85); --ui-border: rgba(204, 112, 82, 0.3);
+            --text-main: #f5d6c6; --text-dim: #a88b7d; --text-alert: #ff4444; --text-good: #44ffaa;
+            --font-display: 'Rajdhani', sans-serif; --font-body: 'Inter', sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #000; color: var(--text-main); font-family: var(--font-body); overflow: hidden; user-select: none; }
+        #game-container { position: relative; width: 100vw; height: 100vh; }
+        canvas { display: block; width: 100%; height: 100%; position: absolute; top: 0; left: 0; z-index: 1; }
+
+        #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; }
+        .interactive { pointer-events: auto; }
+        .hidden { display: none !important; }
+
+        /* Modernized Holographic Visual Glassmorphism */
+        .glass-panel {
+            background: linear-gradient(135deg, rgba(20, 8, 6, 0.85) 0%, rgba(10, 4, 3, 0.95) 100%);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--ui-border);
+            border-radius: 8px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(204, 112, 82, 0.1);
+        }
+
+        /* Top HUD Styling */
+        #hud { padding: 15px 30px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px;}
+        .hud-section { display: flex; flex-direction: column; gap: 8px; flex: 1; }
+        .hud-panel { padding: 12px 15px; height: 100%; border-top: 2px solid var(--mars-red); }
+        
+        h1, h2, h3 { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 2px; color: var(--mars-sand); margin-bottom: 5px;}
+        h2 { font-size: 1.1rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 5px; }
+
+        .resource-row { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px;}
+        .resource-label { font-size: 0.75rem; display: flex; justify-content: space-between; text-transform: uppercase; letter-spacing: 1px; font-weight: 600;}
+        .resource-bar-container { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); height: 6px; width: 100%; border-radius: 3px; position: relative; overflow: hidden;}
+        .resource-bar { height: 100%; background: var(--mars-dust); transition: width 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
+        .resource-bar.power { background: #4da6ff; } .resource-bar.morale { background: #b070cc; } .resource-bar.hull { background: #e6b800; }
+        
+        /* Danger Bar Animation Pulse */
+        .danger .resource-bar { background: var(--text-alert) !important; box-shadow: 0 0 8px var(--text-alert); animation: pulseBar 1s infinite alternate;}
+        @keyframes pulseBar { from { opacity: 1; } to { opacity: 0.5; } }
+
+        /* Command buttons */
+        .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+        .control-btn { background: rgba(204, 112, 82, 0.1); border: 1px solid rgba(204, 112, 82, 0.3); color: var(--mars-sand); font-family: var(--font-display); font-size: 0.85rem; padding: 8px; cursor: pointer; text-transform: uppercase; transition: all 0.2s; border-radius: 4px; font-weight: 600; letter-spacing: 1px;}
+        .control-btn:hover:not(:disabled) { background: rgba(204, 112, 82, 0.3); border-color: var(--mars-sand); color: #fff; box-shadow: 0 0 10px var(--mars-glow);}
+        .control-btn:disabled { opacity: 0.3; cursor: not-allowed; border-color: transparent; }
+        .control-btn.active { background: var(--mars-sand); color: #000; border-color: #fff; box-shadow: 0 0 15px var(--mars-glow);}
+
+        /* Logs console */
+        #log-container { background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%); padding: 40px 30px 20px 30px; height: 25vh; display: flex; flex-direction: column; justify-content: flex-end; }
+        #event-log { list-style: none; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; font-size: 0.85rem; font-family: 'Courier New', Courier, monospace; text-shadow: 1px 1px 0px #000; padding-right: 10px; }
+        #event-log::-webkit-scrollbar { width: 2px; } #event-log::-webkit-scrollbar-thumb { background: var(--mars-dust); }
+        .log-entry { opacity: 0.9; animation: slideIn 0.3s ease-out; border-left: 2px solid transparent; padding-left: 10px;}
+        .log-entry.important { color: var(--mars-sand); font-weight: bold; border-left-color: var(--mars-sand); background: rgba(232, 155, 113, 0.05);}
+        .log-entry.bad { color: var(--text-alert); border-left-color: var(--text-alert); background: rgba(255, 68, 68, 0.05);}
+        .log-entry.good { color: var(--text-good); border-left-color: var(--text-good);}
+        .log-entry.system { color: #88bbff; border-left-color: #88bbff;}
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 0.9; transform: translateX(0); } }
+
+        /* Progress Bar */
+        #progress-container { width: 100%; height: 6px; background: rgba(0,0,0,0.8); position: relative; border-bottom: 1px solid rgba(255,255,255,0.1); z-index: 15; }
+        #progress-fill { height: 100%; background: linear-gradient(90deg, var(--mars-red), var(--mars-sand)); width: 0%; transition: width 0.5s linear; }
+        #progress-rover { position: absolute; top: -9px; left: 0%; transform: translateX(-50%); width: 24px; height: 24px; transition: left 0.5s linear; filter: drop-shadow(0 0 5px var(--mars-sand)); }
+        .waypoint-marker { position: absolute; top: 0; height: 6px; width: 2px; background: rgba(255,255,255,0.5); transform: translateX(-50%); }
+
+        /* -----------------------------------------------------------------------------------------
+           DIEGETIC LOCATIONS
+           ----------------------------------------------------------------------------------------- */
+        .location-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; padding: 40px; pointer-events: none; z-index: 20;}
+        
+        .manifest-panel { 
+            width: 450px; pointer-events: auto; display: flex; flex-direction: column; 
+            border-top: 3px solid var(--mars-sand); animation: panelSlide 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        @keyframes panelSlide { from { transform: translateX(-50px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+        .manifest-header { padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .manifest-header h1 { font-size: 2.2rem; margin: 0; text-shadow: 0 0 15px rgba(232, 155, 113, 0.5); }
+        .manifest-subtitle { color: var(--text-dim); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;}
+
+        .manifest-body { padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 15px;}
+        
+        /* Payload Bar */
+        .payload-meter { background: rgba(0,0,0,0.5); padding: 15px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 10px;}
+        .payload-bar-bg { height: 8px; background: #222; border-radius: 4px; margin-top: 8px; overflow: hidden; position: relative;}
+        .payload-bar-fill { height: 100%; background: var(--text-good); width: 0%; transition: width 0.3s, background 0.3s;}
+
+        .store-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05);}
+        .store-item-info h4 { color: var(--text-main); font-size: 1rem; margin-bottom: 2px;}
+        .store-item-info span { color: var(--text-dim); font-size: 0.75rem;}
+        .store-controls { display: flex; align-items: center; gap: 12px; background: rgba(0,0,0,0.3); border-radius: 20px; padding: 2px;}
+        .store-btn { background: transparent; border: none; color: var(--mars-sand); width: 28px; height: 28px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; display: flex; justify-content: center; align-items: center; transition: 0.2s;}
+        .store-btn:hover { background: rgba(232, 155, 113, 0.2); }
+        .store-qty { width: 40px; text-align: center; font-family: var(--font-display); font-size: 1.2rem; font-weight: bold;}
+
+        /* Modals and Overlays */
+        .modal-wrapper { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 50; backdrop-filter: blur(5px);}
+        .modal-box { width: 500px; padding: 30px; border-top: 3px solid var(--mars-red); pointer-events: auto;}
+        
+        #crew-status { display: flex; flex-direction: column; gap: 4px; margin-top: 10px;}
+        .crew-member { display: flex; justify-content: space-between; padding: 8px 12px; background: rgba(0,0,0,0.3); border-radius: 4px; border-left: 2px solid var(--mars-dust); font-size: 0.85rem;}
+        .crew-dead { color: var(--text-alert); text-decoration: line-through; border-left-color: var(--text-alert); opacity: 0.5;}
+        .cond-sick { color: var(--text-alert); font-weight: bold; font-family: var(--font-display); letter-spacing: 1px; text-transform: uppercase;}
+        .cond-healthy { color: var(--text-good); font-family: var(--font-display); text-transform: uppercase;}
+        
+        #alarm-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; background: radial-gradient(circle, transparent 60%, rgba(255,0,0,0.15) 100%); opacity: 0; transition: opacity 0.5s; z-index: 5; }
+        #alarm-overlay.active { animation: alarmPulse 1.2s infinite; }
+        @keyframes alarmPulse { 0% { opacity: 0; } 50% { opacity: 1; } 100% { opacity: 0; } }
+
+        /* Settings and Logistics toggles */
+        .toggle-btn { background: rgba(0,0,0,0.5); border: 1px solid #555; color: #aaa; padding: 8px 15px; cursor: pointer; transition: 0.2s; flex: 1; font-family: var(--font-display); text-transform: uppercase; font-size: 0.9rem; border-radius: 4px;}
+        .toggle-btn:hover { background: rgba(255,255,255,0.1); }
+        .toggle-btn.active { background: var(--mars-sand); color: #000; border-color: var(--mars-sand); font-weight: bold; }
+        .toggle-group { display: flex; width: 100%; gap: 5px; margin-bottom: 15px;}
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="ui-layer">
+        
+        <div id="progress-container" class="interactive hidden">
+            <div id="progress-fill"></div><div id="waypoints-layer"></div>
+            <svg id="progress-rover" viewBox="0 0 24 24" fill="var(--mars-sand)"><path d="M19 8H5c-1.1 0-2 .9-2 2v6h2v2h2v-2h10v2h2v-2h2v-6c0-1.1-.9-2-2-2zm-1.5 6c-.83 0-1.5-.67-1.5-1.5S16.67 11 17.5 11s1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm-11 0C5.67 14 5 13.33 5 12.5S5.67 11 6.5 11 8 11.67 8 12.5 7.33 14 6.5 14zM16 6l-3-3H9v3h7z"/></svg>
+        </div>
+
+        <!-- TRAVEL HUD OVERLAY -->
+        <div id="hud" class="hidden interactive">
+            <div class="hud-section glass-panel hud-panel" style="flex: 1.5;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <h2>Ares Expedition</h2>
+                    <div style="text-align: right;">
+                        <span id="lbl-temp" style="color: #4da6ff; font-family: var(--font-display); font-size: 1.2rem; margin-right: 15px; font-weight: bold; text-shadow: 0 0 5px rgba(77, 166, 255, 0.5);">-45°C</span>
+                        <span id="lbl-day" style="color: var(--mars-sand); font-weight: bold; font-family: var(--font-display); font-size: 1.1rem; background: rgba(0,0,0,0.5); padding: 4px 10px; border-radius: 4px; box-shadow: inset 0 0 5px rgba(0,0,0,0.5);">SOL 1</span>
+                    </div>
+                </div>
+                <div class="resource-row">
+                    <div class="resource-label"><span>Crew Morale</span> <span id="lbl-morale">100%</span></div>
+                    <div class="resource-bar-container" id="cont-morale"><div id="bar-morale" class="resource-bar morale" style="width: 100%;"></div></div>
+                </div>
+                <div id="crew-status"></div>
+            </div>
+            
+            <div class="hud-section glass-panel hud-panel">
+                <h2>Vitals Payload</h2>
+                <div class="resource-row">
+                    <div class="resource-label"><span>Oxygen</span> <span id="lbl-oxygen">0 kg</span></div>
+                    <div class="resource-bar-container" id="cont-oxygen"><div id="bar-oxygen" class="resource-bar" style="width: 100%;"></div></div>
+                </div>
+                <div class="resource-row">
+                    <div class="resource-label"><span>Water</span> <span id="lbl-water">0 L</span></div>
+                    <div class="resource-bar-container" id="cont-water"><div id="bar-water" class="resource-bar" style="width: 100%;"></div></div>
+                </div>
+                <div class="resource-row">
+                    <div class="resource-label"><span>Rations</span> <span id="lbl-rations">0 kg</span></div>
+                    <div class="resource-bar-container" id="cont-rations"><div id="bar-rations" class="resource-bar" style="width: 100%;"></div></div>
+                </div>
+                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: auto; text-transform: uppercase; display: flex; justify-content: space-between; background: rgba(0,0,0,0.3); padding: 8px; border-radius: 4px;">
+                    <span>Parts: <strong id="lbl-parts" style="color: var(--text-main); font-size:1.1rem;">0</strong></span>
+                    <span>Medkits: <strong id="lbl-medkits" style="color: var(--text-main); font-size:1.1rem;">0</strong></span>
+                </div>
+            </div>
+
+            <div class="hud-section glass-panel hud-panel">
+                <div style="display: flex; justify-content: space-between;">
+                    <h2>Rover Systems</h2>
+                    <span id="lbl-terrain" style="color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase;">Smooth Regolith</span>
+                </div>
+                <div class="resource-row">
+                    <div class="resource-label"><span>Power Core</span> <span id="lbl-power">0%</span></div>
+                    <div class="resource-bar-container" id="cont-power"><div id="bar-power" class="resource-bar power" style="width: 100%;"></div></div>
+                </div>
+                <div class="resource-row" style="margin-bottom: 15px;">
+                    <div class="resource-label"><span>Hull Integrity</span> <span id="lbl-hull">100%</span></div>
+                    <div class="resource-bar-container" id="cont-hull"><div id="bar-hull" class="resource-bar hull" style="width: 100%;"></div></div>
+                </div>
+                
+                <div class="controls-grid" style="margin-top: auto;">
+                    <button id="btn-drive" class="control-btn active" onclick="toggleDrive()">Driving</button>
+                    <button id="btn-eva" class="control-btn" onclick="performEVA()">EVA Action</button>
+                    <button id="btn-repair" class="control-btn" onclick="repairHull()">Repair Hull</button>
+                    <button id="btn-heal" class="control-btn" onclick="healCrew()">Treat Crew</button>
+                    <button class="control-btn" style="grid-column: span 2; background: rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.1); color: var(--text-dim);" onclick="openLogisticsUpgrades()">Logistics & Upgrades</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="log-container" class="hidden"><ul id="event-log"></ul></div>
+        <div id="alarm-overlay"></div>
+
+        <!-- DEPOT SCREEN -->
+        <div id="screen-depot" class="location-overlay">
+            <div class="manifest-panel glass-panel">
+                <div class="manifest-header">
+                    <h1>UNDERHILL DEPOT</h1>
+                    <div class="manifest-subtitle">UNOMA Quartermaster Interface</div>
+                </div>
+                <div class="manifest-body">
+                    
+                    <div class="payload-meter">
+                        <div style="display: flex; justify-content: space-between; font-family: var(--font-display); font-size: 1.1rem; color: var(--mars-sand);">
+                            <span>Rover Payload</span>
+                            <span id="depot-payload-text">0 / 1000 kg</span>
+                        </div>
+                        <div class="payload-bar-bg"><div id="depot-payload-bar" class="payload-bar-fill"></div></div>
+                        <div style="color: var(--text-dim); font-size: 0.75rem; margin-top: 8px;">Max payload applies to O2, Water, and Rations.</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 5px;">
+                        <h3 style="margin:0; font-size: 1rem; color: var(--text-main);">Available Funds</h3>
+                        <span style="font-family: var(--font-display); font-size: 1.5rem; color: var(--text-good);" id="depot-budget">25000 CR</span>
+                    </div>
+
+                    <div id="depot-items"></div>
+
+                    <button class="control-btn active" style="margin-top: 15px; padding: 15px; font-size: 1.2rem;" id="btn-launch" onclick="launchExpedition()">Clear Airlock & Depart</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- OUTPOST DOCKED SCREEN -->
+        <div id="screen-outpost" class="location-overlay hidden" style="justify-content: flex-end;">
+            <div class="manifest-panel glass-panel">
+                <div class="manifest-header">
+                    <h1 id="outpost-title">OUTPOST</h1>
+                    <div class="manifest-subtitle">Pressurized Safe Zone</div>
+                </div>
+                <div class="manifest-body">
+                    <p style="font-size: 0.95rem; color: var(--text-main); margin-bottom: 20px;">The rover is secured in the garage. Solar arrays are automatically charging from the grid.</p>
+                    
+                    <button class="control-btn" style="padding: 15px; margin-bottom: 10px;" onclick="outpostRest()">Rest in Habitat (3 Sols)<br><span style="font-size:0.75rem; color:var(--text-dim); text-transform:none;">Fully heals crew and restores morale.</span></button>
+                    <button class="control-btn" style="padding: 15px; margin-bottom: 10px;" onclick="outpostTrade()" id="btn-outpost-trade">Access Local Exchange</button>
+                    
+                    <div id="outpost-trade-panel" class="hidden" style="background: rgba(0,0,0,0.4); padding: 15px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 15px;">
+                        <p id="trade-desc" style="color: var(--mars-sand); font-style: italic; font-size: 0.9rem; margin-bottom: 15px;"></p>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="control-btn active" style="flex: 1;" id="btn-accept-trade">Accept</button>
+                            <button class="control-btn" style="flex: 1;" onclick="document.getElementById('outpost-trade-panel').classList.add('hidden')">Decline</button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: auto;">
+                        <button class="control-btn active" style="width: 100%; padding: 15px;" onclick="departOutpost()">Cycle Airlock & Depart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LOGISTICS & UPGRADES SCREEN -->
+        <div id="screen-logistics" class="modal-wrapper interactive hidden">
+            <div class="modal-box glass-panel" style="max-width: 600px;">
+                <h2>Expedition Logistics</h2>
+                <p style="font-size: 0.90rem; color: var(--text-dim); margin-bottom: 15px;">Manage operational settings and upgrade rover sub-systems with parts.</p>
+                
+                <h3 style="font-size: 1rem; text-align: left; margin-bottom: 5px;">Pacing</h3>
+                <div class="toggle-group" id="pace-toggles">
+                    <button class="toggle-btn" onclick="setPace(1)">Steady</button>
+                    <button class="toggle-btn" onclick="setPace(1.5)">Strenuous</button>
+                    <button class="toggle-btn" onclick="setPace(2)">Grueling</button>
+                </div>
+
+                <h3 style="font-size: 1rem; text-align: left; margin-bottom: 5px;">Rationing</h3>
+                <div class="toggle-group" id="ration-toggles">
+                    <button class="toggle-btn" onclick="setRations(1)">Filling</button>
+                    <button class="toggle-btn" onclick="setRations(0.5)">Meager</button>
+                    <button class="toggle-btn" onclick="setRations(0.25)">Bare Bones</button>
+                </div>
+
+                <h3 style="font-size: 1rem; text-align: left; margin-bottom: 10px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 10px;">Rover Upgrades</h3>
+                <div style="display: flex; flex-direction: column; gap: 10px;" id="upgrades-list">
+                    <!-- Injected dynamically via JS -->
+                </div>
+
+                <div class="btn-group" style="margin-top: 20px;">
+                    <button class="control-btn active" style="width: 100%; padding: 12px;" onclick="closeLogisticsUpgrades()">Confirm Operational Adjustments</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- RANDOM ENCOUNTERS / ANOMALIES -->
+        <div id="screen-event" class="modal-wrapper interactive hidden">
+            <div class="modal-box glass-panel" style="border-top-color: var(--mars-sand);">
+                <h2 id="event-title" style="font-size: 1.8rem;">Anomaly</h2>
+                <p id="event-desc" style="color: #fff; font-size: 1.1rem;"></p>
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-top: 20px;" id="event-options"></div>
+            </div>
+        </div>
+
+        <!-- GAME OVER OVERLAY -->
+        <div id="screen-gameover" class="modal-wrapper interactive hidden">
+            <div class="modal-box glass-panel" style="border-top-color: var(--text-alert); text-align: center;">
+                <h1 style="font-size: 3rem; color: var(--text-alert); margin-bottom: 10px;">EXPEDITION LOST</h1>
+                <p id="gameover-reason" style="font-size: 1.1rem;"></p>
+                <button class="control-btn active" style="background: var(--text-alert); border: none; margin-top: 20px; color:#fff;" onclick="location.reload()">Acknowledge</button>
+            </div>
+        </div>
+        
+        <!-- VICTORY OVERLAY -->
+        <div id="screen-victory" class="modal-wrapper interactive hidden">
+            <div class="modal-box glass-panel" style="border-top-color: var(--text-good); text-align: center;">
+                <h1 style="font-size: 3rem; color: var(--text-good); margin-bottom: 10px;">KOROLEV REACHED</h1>
+                <p style="font-size: 1.1rem;">The Ares Trail is conquered. You have secured the future of the settlement.</p>
+                <div style="background: rgba(0,0,0,0.5); padding: 15px; border-radius: 4px; margin: 20px 0;">
+                    <div id="victory-stats" style="color: var(--text-dim); margin-bottom: 10px;"></div>
+                    <div style="color: var(--mars-sand); font-size: 1.8rem; font-family: var(--font-display);">UNOMA SCORE: <span id="final-score" style="color:#fff;">0</span></div>
+                </div>
+                <button class="control-btn active" onclick="location.reload()">File Official Report</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+/** 
+ * STREAMING_CHUNK:Configuring audio, state, and constants...
+ * RED MARS: THE ARES TRAIL - V7 
+ */
+
+// --- Helper Utilities Defined First for Safe Scoping ---
+function hexColor(str) { 
+    return parseInt(str.replace('#', '0x')); 
+}
+
+function generateTerrain(color, heightRatio, variance) {
+    const g = new PIXI.Graphics(); 
+    const w = app.screen.width, h = app.screen.height, baseY = h * heightRatio;
+    g.beginFill(color); 
+    g.moveTo(0, h); 
+    g.lineTo(0, baseY);
+    const pts = 20, step = w / pts; 
+    for(let i=1; i<=pts; i++) { 
+        g.lineTo(i * step, baseY - (Math.sin(i*0.8)*variance*0.5 + Math.cos(i*1.3)*variance*0.5) - variance/2); 
+    }
+    g.lineTo(w, h); 
+    g.endFill(); 
+    return g;
+}
+
+// --- Procedural Synth Engine ---
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+const sfx = {
+    playTone: (freq, type, duration, vol=0.1) => {
+        try {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            osc.connect(gain); gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        } catch(e) {}
+    },
+    click: () => sfx.playTone(800, 'sine', 0.1, 0.05),
+    error: () => sfx.playTone(150, 'sawtooth', 0.3, 0.1),
+    good: () => { sfx.playTone(400, 'sine', 0.1, 0.1); setTimeout(()=>sfx.playTone(600, 'sine', 0.2, 0.1), 100); },
+    bad: () => { sfx.playTone(300, 'square', 0.2, 0.1); setTimeout(()=>sfx.playTone(200, 'square', 0.3, 0.1), 150); },
+    alarm: () => { sfx.playTone(600, 'square', 0.2, 0.05); setTimeout(()=>sfx.playTone(400, 'square', 0.2, 0.05), 200); },
+    mech: () => { sfx.playTone(100, 'square', 0.5, 0.1); setTimeout(()=>sfx.playTone(80, 'sawtooth', 1.0, 0.1), 200); }
+};
+
+const CONSTANTS = { 
+    TOTAL_DISTANCE: 2500, 
+    BASE_SPEED: 35, 
+    MAX_CARGO: 1000, 
+    MAX_POWER_PER_RTG: 100, 
+    SOL_DURATION_MS: 3500, 
+    DRAIN: { OXYGEN: 1.0, WATER: 1.2, RATIONS: 1.2, MORALE: 1.2 }, 
+    POWER_DRAIN_DRIVING: 6 
+};
+
+const OUTPOSTS = [
+    { dist: 600, name: "Tharsis Outpost", passed: false },
+    { dist: 1300, name: "Pavonis Mons Base", passed: false },
+    { dist: 2000, name: "Noctis Labyrinthus", passed: false }
+];
+
+const TERRAIN_ZONES = [
+    { name: "Smooth Regolith", speed: 1.0, power: 1.0, hullDamage: 0.5, color: '#cc7052' },
+    { name: "Boulder Field", speed: 0.6, power: 1.5, hullDamage: 2.5, color: '#8a3324' },
+    { name: "Deep Sand", speed: 0.4, power: 1.8, hullDamage: 0.8, color: '#a85b32' }
+];
+
+const UPGRADES_CONFIG = {
+    scrubbers: { name: "Carbon Scrubbers", desc: "Cuts daily Oxygen consumption by 25%", cost: 3 },
+    suspension: { name: "Active Suspension", desc: "Reduces terrain damage by 30% and event rate", cost: 4 },
+    solar: { name: "High-Yield Solar", desc: "Boosts daily power recharge by 40% on clear sols", cost: 3 }
+};
+
+const STORE = {
+    budget: 25000,
+    items: {
+        oxygen:  { name: "Liquid O2", desc: "Life support gas [kg]", price: 10, step: 50, max: 1000, qty: 0, isBulk: true },
+        water:   { name: "Potable H2O", desc: "Drinking water [L]", price: 5, step: 50, max: 1000, qty: 0, isBulk: true },
+        rations: { name: "Rations", desc: "Dehydrated food [kg]", price: 8, step: 50, max: 1000, qty: 0, isBulk: true },
+        parts:   { name: "Machined Parts", desc: "Mechanical repairs & Upgrades", price: 250, step: 1, max: 15, qty: 0, isBulk: false },
+        medkits: { name: "Medical Kits", desc: "Treats sickness & trauma", price: 400, step: 1, max: 10, qty: 0, isBulk: false },
+        rtg:     { name: "RTG Cell", desc: "+100 Max Power Pool", price: 3000, step: 1, max: 4, qty: 1, isBulk: false }
+    }
+};
+
+let state = {
+    mode: 'depot', distance: 0, sol: 1, timeAccumulator: 0,
+    isDriving: false, pace: 1, rationLevel: 1, currentOutpost: null, tradeOffer: null,
+    upgrades: { scrubbers: false, suspension: false, solar: false },
+    terrain: TERRAIN_ZONES[0],
+    maxResources: { oxygen: 1000, water: 1000, rations: 1000, power: 100, morale: 100, hull: 100 },
+    resources: { oxygen: 0, water: 0, rations: 0, power: 0, parts: 0, medkits: 0, morale: 100, hull: 100, rtg: 1 },
+    crew: [ 
+        { id: 'john', name: 'John', role: 'Commander', alive: true, condition: 'Healthy' }, 
+        { id: 'maya', name: 'Maya', role: 'Engineer', alive: true, condition: 'Healthy' }, 
+        { id: 'frank', name: 'Frank', role: 'Geologist', alive: true, condition: 'Healthy' }, 
+        { id: 'nadia', name: 'Nadia', role: 'Botanist', alive: true, condition: 'Healthy' } 
+    ],
+    weather: 'clear', dayCycle: 0
+};
+
+// --- STREAMING_CHUNK:Initializing PixiJS elements... ---
+const app = new PIXI.Application({ resizeTo: window, backgroundColor: 0x1a0b08, antialias: true });
+document.getElementById('game-container').appendChild(app.view);
+
+const layerWorld = new PIXI.Container(); app.stage.addChild(layerWorld);
+const layerSky = new PIXI.Container(), layerStars = new PIXI.Container(), layerCelestial = new PIXI.Container(), layerMnt = new PIXI.Container(), 
+      layerDune = new PIXI.Container(), layerBaseBg = new PIXI.Container(), layerGround = new PIXI.Container(), layerTracks = new PIXI.Container(), layerObstacles = new PIXI.Container(), layerFgRocks = new PIXI.Container(),
+      layerRover = new PIXI.Container(), layerBaseFg = new PIXI.Container(), layerDust = new PIXI.Container(), layerWeather = new PIXI.Container();
+
+layerWorld.addChild(layerSky, layerStars, layerCelestial, layerMnt, layerDune, layerBaseBg, layerGround, layerTracks, layerObstacles, layerFgRocks, layerRover, layerBaseFg, layerDust, layerWeather);
+
+let skyBox, mountains = [], dunes = [], fgRocks = [], obstacles = [], envParticles = [], dustPool = [], tracksPool = [], meteors = [], steamPool = [], rover, baseAirlock;
+let sunGfx, phobosGfx, groundGfx;
+
+// --- STREAMING_CHUNK:Constructing procedural visual layers... ---
+function initGraphics() {
+    skyBox = new PIXI.Graphics(); skyBox.beginFill(0xFFFFFF); skyBox.drawRect(0, 0, app.screen.width, app.screen.height); skyBox.endFill(); layerSky.addChild(skyBox);
+    for(let i=0; i<250; i++) { 
+        const star = new PIXI.Graphics(); star.beginFill(0xFFFFFF, Math.random()*0.8+0.2); star.drawCircle(0,0, Math.random()*1.5); star.endFill(); 
+        star.x = Math.random()*app.screen.width; star.y = Math.random()*(app.screen.height*0.55); layerStars.addChild(star); 
+    }
+    
+    sunGfx = new PIXI.Graphics(); sunGfx.beginFill(0xffddaa, 1); sunGfx.drawCircle(0,0, 25); sunGfx.endFill(); sunGfx.beginFill(0xffaa55, 0.4); sunGfx.drawCircle(0,0, 60); sunGfx.endFill(); layerCelestial.addChild(sunGfx);
+    phobosGfx = new PIXI.Graphics(); phobosGfx.beginFill(0x888888); phobosGfx.drawCircle(0,0, 8); phobosGfx.endFill(); layerCelestial.addChild(phobosGfx);
+
+    for(let i=0; i<2; i++) { const m = generateTerrain(hexColor('#4a1f18'), 0.45, 250); m.x = i * app.screen.width; layerMnt.addChild(m); mountains.push(m); }
+    for(let i=0; i<2; i++) { const d = generateTerrain(hexColor('#8a3324'), 0.65, 120); d.x = i * app.screen.width; layerDune.addChild(d); dunes.push(d); }
+    
+    groundGfx = new PIXI.Graphics(); groundGfx.beginFill(0xFFFFFF); groundGfx.drawRect(0, app.screen.height - 120, app.screen.width, 120); groundGfx.endFill(); groundGfx.tint = hexColor('#cc7052'); layerGround.addChild(groundGfx);
+
+    for(let i=0; i<5; i++) { const r = new PIXI.Graphics(); r.beginFill(hexColor('#5c2a21')); r.drawCircle(0,0, Math.random()*20+10); r.endFill(); r.x = Math.random()*app.screen.width; r.y = app.screen.height-Math.random()*50-10; r.scale.y = 0.5; layerFgRocks.addChild(r); fgRocks.push(r); }
+
+    // Procedural Airlock Garage Vents and pillars
+    baseAirlock = new PIXI.Container();
+    const backWall = new PIXI.Graphics(); backWall.beginFill(0x110a08); backWall.drawRect(0, 0, app.screen.width, app.screen.height); backWall.endFill();
+    const floorP = new PIXI.Graphics(); floorP.beginFill(0x241411); floorP.drawRect(0, app.screen.height-140, app.screen.width, 140); floorP.endFill();
+    
+    const panel = new PIXI.Graphics(); 
+    panel.beginFill(0x1f120e); panel.lineStyle(2, 0x5c2a21); panel.drawRect(app.screen.width * 0.1, app.screen.height * 0.15, app.screen.width * 0.8, app.screen.height * 0.7); 
+    // Hazard Stripes
+    panel.lineStyle(0); panel.beginFill(0xcc7052, 0.15);
+    for(let stripe=0; stripe < app.screen.width; stripe += 60) {
+        panel.drawPolygon([stripe, app.screen.height * 0.15, stripe + 25, app.screen.height * 0.15, stripe + 55, app.screen.height * 0.85, stripe + 30, app.screen.height * 0.85]);
+    }
+    panel.endFill();
+
+    baseAirlock.addChild(backWall, floorP, panel);
+    layerBaseBg.addChild(baseAirlock); 
+
+    rover = createRover(); rover.x = app.screen.width * 0.25; rover.y = app.screen.height - 120; layerRover.addChild(rover);
+
+    for(let i=0; i<120; i++) { const p = new PIXI.Graphics(); p.beginFill(hexColor('#e89b71'), Math.random()*0.5); p.drawCircle(0,0, Math.random()*2+1); p.endFill(); p.x = Math.random()*app.screen.width; p.y = Math.random()*app.screen.height; p.baseVx = -(Math.random()*4+1); p.baseVy = (Math.random()-0.5); envParticles.push(p); layerWeather.addChild(p); }
+}
+
+function spawnSteam() {
+    const s = new PIXI.Graphics(); s.beginFill(0xfff5eb, 0.4); s.drawCircle(0,0, Math.random()*15+5); s.endFill();
+    s.x = app.screen.width * 0.15 + Math.random() * (app.screen.width * 0.7); s.y = app.screen.height * 0.2;
+    s.vx = Math.random() - 0.5; s.vy = Math.random() * 3 + 1; s.alpha = 1;
+    steamPool.push(s); layerBaseFg.addChild(s);
+}
+
+function spawnMeteor() {
+    const m = new PIXI.Graphics(); m.lineStyle(2, 0xffffff, 0.8); m.moveTo(0,0); m.lineTo(20, 20); 
+    m.x = Math.random() * (app.screen.width * 0.8) + (app.screen.width * 0.2); m.y = -20;
+    m.vx = -(12 + Math.random()*10); m.vy = 12 + Math.random()*10; m.alpha = 1;
+    meteors.push(m); layerCelestial.addChild(m);
+}
+
+// --- STREAMING_CHUNK:Constructing rover assets... ---
+function createRover() {
+    const r = new PIXI.Container();
+    const body = new PIXI.Graphics(); body.beginFill(0x3d3c3a); body.lineStyle(2, 0x111111); body.moveTo(15, -25); body.lineTo(130, -25); body.lineTo(150, 15); body.lineTo(-10, 15); body.closePath(); body.endFill();
+    const glass = new PIXI.Graphics(); glass.beginFill(hexColor('#e89b71'), 0.8); glass.moveTo(125, -20); glass.lineTo(142, 5); glass.lineTo(90, 5); glass.lineTo(90, -20); glass.closePath(); glass.endFill();
+    
+    // Diagnostic visual beacon
+    const beacon = new PIXI.Graphics(); beacon.beginFill(0x44ffaa, 1); beacon.drawCircle(40, -32, 4); beacon.endFill(); r.beacon = beacon;
+    
+    const beam = new PIXI.Graphics(); beam.beginFill(0xffddaa, 0.4); beam.moveTo(145, 5); beam.lineTo(800, -100); beam.lineTo(800, 100); beam.lineTo(145, 15); beam.closePath(); beam.endFill(); beam.blendMode = PIXI.BLEND_MODES.ADD; beam.alpha = 0; 
+    const drawW = (x, y) => { const w = new PIXI.Container(); const t = new PIXI.Graphics(); t.beginFill(0x1a1a1a); t.lineStyle(4, 0x000000); t.drawCircle(0, 0, 18); t.endFill(); const h = new PIXI.Graphics(); h.beginFill(0x888888); h.drawRect(-2, -18, 4, 36); h.drawRect(-18, -2, 36, 4); h.endFill(); w.addChild(t, h); w.x = x; w.y = y; return w; };
+    const w1 = drawW(15, 15), w2 = drawW(70, 15), w3 = drawW(125, 15);
+    r.addChild(beam, body, glass, beacon, w1, w2, w3); r.wheels = [w1, w2, w3]; r.beam = beam; return r;
+}
+
+initGraphics();
+
+// --- STREAMING_CHUNK:Defining Depot and Store triggers... ---
+function renderDepot() {
+    const c = document.getElementById('depot-items'); c.innerHTML = '';
+    for(const [k, i] of Object.entries(STORE.items)) {
+        c.innerHTML += `<div class="store-item"><div class="store-item-info"><h4>${i.name}</h4><span>${i.desc} - ${i.price} CR</span></div><div class="store-controls"><button class="store-btn" onclick="buy('${k}',-${i.step})">-</button><span class="store-qty">${i.qty}</span><button class="store-btn" onclick="buy('${k}',${i.step})">+</button></div></div>`;
+    }
+    updateStore();
+}
+
+function buy(k, a) {
+    const i = STORE.items[k], cost = a * i.price;
+    const currentPayload = STORE.items.oxygen.qty + STORE.items.water.qty + STORE.items.rations.qty;
+    
+    if(a > 0) {
+        if (STORE.budget < cost) return sfx.error();
+        if (i.isBulk && currentPayload + a > CONSTANTS.MAX_CARGO) return sfx.error();
+        if (i.qty + a > i.max) return sfx.error();
+        STORE.budget -= cost; i.qty += a; sfx.click();
+    } else if (a < 0) {
+        if (i.qty - Math.abs(a) >= (k==='rtg'?1:0)) { STORE.budget += Math.abs(cost); i.qty -= Math.abs(a); sfx.click(); }
+    }
+    renderDepot();
+}
+
+function updateStore() {
+    document.getElementById('depot-budget').innerText = `${STORE.budget} CR`;
+    const payload = STORE.items.oxygen.qty + STORE.items.water.qty + STORE.items.rations.qty;
+    const pct = (payload / CONSTANTS.MAX_CARGO) * 100;
+    document.getElementById('depot-payload-text').innerText = `${payload} / ${CONSTANTS.MAX_CARGO} kg`;
+    const pBar = document.getElementById('depot-payload-bar');
+    pBar.style.width = `${pct}%`;
+    pBar.style.background = pct > 90 ? 'var(--mars-sand)' : 'var(--text-good)';
+
+    const b = document.getElementById('btn-launch');
+    if(STORE.items.oxygen.qty===0||STORE.items.water.qty===0||STORE.items.rations.qty===0) { b.innerText="MISSING VITALS (WARNING)"; b.style.color="var(--text-alert)"; b.style.borderColor="var(--text-alert)"; }
+    else { b.innerText="Clear Airlock & Depart"; b.style.color="#000"; b.style.borderColor="transparent"; }
+}
+
+renderDepot();
+
+// --- STREAMING_CHUNK:Implementing airlock and base cycle transitions... ---
+function launchExpedition() {
+    sfx.mech(); 
+    hideUI();
+    ['oxygen','water','rations','parts','medkits','rtg'].forEach(k => state.resources[k] = STORE.items[k].qty);
+    state.maxResources.power = state.resources.rtg * CONSTANTS.MAX_POWER_PER_RTG; state.resources.power = state.maxResources.power; state.resources.hull = state.maxResources.hull;
+    
+    const wpLayer = document.getElementById('waypoints-layer');
+    wpLayer.innerHTML = '';
+    OUTPOSTS.forEach(wp => { const pct = (wp.dist / CONSTANTS.TOTAL_DISTANCE) * 100; wpLayer.innerHTML += `<div class="waypoint-marker" style="left: ${pct}%;"><div class="waypoint-tooltip">${wp.name}</div></div>`; });
+
+    let doorMove = 0;
+    const launchAnim = setInterval(() => {
+        baseAirlock.y -= 5; doorMove += 5;
+        if (Math.random() < 0.4) spawnSteam();
+        if(doorMove > app.screen.height) {
+            clearInterval(launchAnim);
+            baseAirlock.visible = false;
+            steamPool.forEach(s => layerBaseFg.removeChild(s));
+            steamPool = [];
+            state.mode = 'travel'; state.isDriving = true; 
+            showUI('hud'); showUI('log-container'); showUI('progress-container');
+            logMsg("ARES SYSTEM INITIALIZED. ROUTE PLOTTED.", "system");
+            logMsg("Sol 1: Left Underhill. Destination: Korolev Crater.");
+            sfx.good(); updateHUD();
+        }
+    }, 16);
+}
+
+// --- STREAMING_CHUNK:Designing outpost docking procedures... ---
+function enterOutpost(outpost) {
+    state.isDriving = false; state.mode = 'outpost'; state.currentOutpost = outpost;
+    sfx.mech(); 
+    
+    baseAirlock.y = -app.screen.height; baseAirlock.visible = true;
+    let doorMove = app.screen.height;
+    const dockAnim = setInterval(() => {
+        baseAirlock.y += 5; doorMove -= 5;
+        if (Math.random() < 0.3) spawnSteam();
+        if(doorMove <= 0) {
+            clearInterval(dockAnim);
+            baseAirlock.y = 0;
+            steamPool.forEach(s => layerBaseFg.removeChild(s));
+            steamPool = [];
+            hideUI(); showUI('screen-outpost');
+            document.getElementById('outpost-title').innerText = outpost.name;
+            
+            const trades = [
+                { text: "Trade 100 Rations for 2 Parts?", costType: 'rations', costAmt: 100, rewardType: 'parts', rewardAmt: 2 },
+                { text: "Trade 1 Medkit for Full Power & 1 Part?", costType: 'medkits', costAmt: 1, rewardType: 'parts', rewardAmt: 1, bonusPower: true },
+                { text: "Trade 150L Water for 100kg Oxygen?", costType: 'oxygen', costAmt: 100, rewardType: 'water', rewardAmt: 150 }
+            ];
+            state.tradeOffer = trades[Math.floor(Math.random() * trades.length)];
+        }
+    }, 16);
+}
+
+function outpostRest() {
+    if(state.resources.rations < 10 || state.resources.water < 10) { logMsg("Not enough vitals to rest.", "bad"); sfx.error(); return; }
+    advanceTime(3); state.resources.morale = Math.min(100, state.resources.morale + 60);
+    state.crew.forEach(c => { if(c.alive) c.condition = 'Healthy'; }); state.resources.power = state.maxResources.power;
+    logMsg(`Rested at ${state.currentOutpost.name}. Crew fully healed. Power restored.`, "good"); sfx.good(); updateHUD();
+}
+
+function outpostTrade() {
+    const p = document.getElementById('outpost-trade-panel');
+    p.classList.remove('hidden');
+    document.getElementById('trade-desc').innerText = `"${state.tradeOffer.text}"`;
+}
+
+document.getElementById('btn-accept-trade').addEventListener('click', () => {
+    const offer = state.tradeOffer;
+    if(state.resources[offer.costType] >= offer.costAmt) {
+        state.resources[offer.costType] -= offer.costAmt; state.resources[offer.rewardType] += offer.rewardAmt;
+        if(offer.bonusPower) state.resources.power = state.maxResources.power;
+        document.getElementById('outpost-trade-panel').classList.add('hidden');
+        logMsg("Trade successful.", "good"); sfx.good(); updateHUD();
+    } else { sfx.error(); }
+});
+
+function departOutpost() {
+    sfx.mech(); hideUI();
+    let doorMove = 0;
+    const launchAnim = setInterval(() => {
+        baseAirlock.y -= 5; doorMove += 5;
+        if (Math.random() < 0.4) spawnSteam();
+        if(doorMove > app.screen.height) {
+            clearInterval(launchAnim); baseAirlock.visible = false;
+            steamPool.forEach(s => layerBaseFg.removeChild(s));
+            steamPool = [];
+            state.mode = 'travel'; state.isDriving = true; 
+            showUI('hud'); showUI('log-container'); showUI('progress-container');
+            logMsg(`Departed ${state.currentOutpost.name}.`, "system");
+            sfx.good(); updateHUD();
+        }
+    }, 16);
+}
+
+// --- STREAMING_CHUNK:Configuring logistics pacing and rationing options... ---
+function openLogisticsUpgrades() {
+    state.isDriving = false;
+    updateHUD();
+    
+    // Fill upgrades container dynamically
+    const container = document.getElementById('upgrades-list');
+    container.innerHTML = '';
+    
+    for (const [key, details] of Object.entries(UPGRADES_CONFIG)) {
+        const owns = state.upgrades[key];
+        container.innerHTML += `
+            <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(0,0,0,0.3); padding:10px; border-radius:4px; border:1px solid rgba(255,255,255,0.05);">
+                <div>
+                    <h4 style="color:var(--mars-sand); font-weight:600;">${details.name}</h4>
+                    <span style="font-size:0.75rem; color:var(--text-dim);">${details.desc}</span>
+                </div>
+                <button class="control-btn" style="width:120px;" onclick="buyUpgrade('${key}')" ${disabledUpgrade(key)}>
+                    ${hasUpgrade(key) ? "Installed" : `${details.cost} Parts`}
+                </button>
+            </div>
+        `;
+    }
+    
+    updateSettingsUI();
+    showUI('screen-logistics');
+}
+
+function hasUpgrade(key) { return state.upgrades[key]; }
+function disabledUpgrade(key) {
+    if (state.upgrades[key]) return "disabled";
+    if (state.resources.parts < UPGRADES_CONFIG[key].cost) return "disabled";
+    return "";
+}
+
+function buyUpgrade(key) {
+    const cost = UPGRADES_CONFIG[key].cost;
+    if (state.resources.parts >= cost && !state.upgrades[key]) {
+        state.resources.parts -= cost;
+        state.upgrades[key] = true;
+        sfx.good();
+        logMsg(`System upgraded: ${UPGRADES_CONFIG[key].name}`, "good");
+        openLogisticsUpgrades();
+        updateHUD();
+    }
+}
+
+function closeLogisticsUpgrades() {
+    hideUI();
+    state.isDriving = true;
+    showUI('hud');
+    showUI('log-container');
+}
+
+function setPace(val) {
+    state.pace = val;
+    updateSettingsUI();
+    sfx.click();
+    logMsg(`Pacing adjusted to speed factor x${val}.`, "system");
+}
+
+function setRations(val) {
+    state.rationLevel = val;
+    updateSettingsUI();
+    sfx.click();
+    logMsg(`Dietary rationing set to ${val === 1 ? 'Filling' : val === 0.5 ? 'Meager' : 'Bare Bones'}.`, "system");
+}
+
+function updateSettingsUI() {
+    const pBtns = document.getElementById('pace-toggles').children;
+    pBtns[0].className = `toggle-btn ${state.pace === 1 ? 'active' : ''}`;
+    pBtns[1].className = `toggle-btn ${state.pace === 1.5 ? 'active' : ''}`;
+    pBtns[2].className = `toggle-btn ${state.pace === 2 ? 'active' : ''}`;
+
+    const rBtns = document.getElementById('ration-toggles').children;
+    rBtns[0].className = `toggle-btn ${state.rationLevel === 1 ? 'active' : ''}`;
+    rBtns[1].className = `toggle-btn ${state.rationLevel === 0.5 ? 'active' : ''}`;
+    rBtns[2].className = `toggle-btn ${state.rationLevel === 0.25 ? 'active' : ''}`;
+}
+
+// --- STREAMING_CHUNK:Processing travel logic and actions... ---
+function toggleDrive() {
+    state.isDriving = !state.isDriving; const btn = document.getElementById('btn-drive');
+    if(state.isDriving) { btn.innerText = "Driving"; btn.classList.add('active'); logMsg(`Resumed driving.`, "system");}
+    else { btn.innerText = "Halted"; btn.classList.remove('active'); logMsg("Rover halted.", "system"); }
+}
+
+function performEVA() {
+    if(state.isDriving) { logMsg("Must halt rover first.", "bad"); sfx.error(); return; }
+    if(state.resources.oxygen < 15) { logMsg("Insufficient O2.", "bad"); sfx.error(); return; }
+    state.resources.oxygen -= 15; advanceTime(1);
+    const roll = Math.random();
+    if(roll < 0.15) { state.resources.parts++; logMsg("EVA: Salvaged 1 Machined Part.", "good"); sfx.good();} 
+    else if (roll < 0.5) { const w = isAlive('frank') ? 100 : 50; state.resources.water = Math.min(state.maxResources.water, state.resources.water + w); logMsg(`EVA: Mined ${w}L Water.`, "good"); sfx.good();} 
+    else { logMsg("EVA returned nothing.", "bad"); sfx.bad(); if(Math.random()<0.3) { const a = state.crew.filter(c=>c.alive && c.condition==='Healthy'); if(a.length>0) { a[Math.floor(Math.random()*a.length)].condition = 'Injury'; logMsg("Tragedy: Crew injured on EVA!", "bad"); } } }
+    updateHUD();
+}
+function healCrew() {
+    if(state.isDriving) { logMsg("Must halt rover first.", "bad"); sfx.error(); return; }
+    const s = state.crew.filter(c => c.alive && c.condition !== 'Healthy');
+    if(s.length === 0 || state.resources.medkits < 1) { sfx.error(); return; }
+    state.resources.medkits--; advanceTime(1);
+    s.forEach(c => { c.condition = 'Healthy'; }); state.resources.morale = Math.min(100, state.resources.morale + 10); logMsg("Crew healed.", "good"); sfx.good(); updateHUD();
+}
+function repairHull() {
+    if(state.isDriving) { logMsg("Must halt rover first.", "bad"); sfx.error(); return; }
+    if(state.resources.parts < 1 || state.resources.hull >= 100) { sfx.error(); return; }
+    state.resources.parts--; advanceTime(0.5); const engBonus = isAlive('maya') ? 15 : 0; state.resources.hull = Math.min(100, state.resources.hull + 25 + engBonus);
+    logMsg(`Hull repaired by ${25 + engBonus}%.`, "good"); sfx.good(); updateHUD();
+}
+
+// --- STREAMING_CHUNK:Tracking resource consumption and sickness parameters... ---
+function applyConsumption() {
+    const alive = state.crew.filter(c=>c.alive).length; if (alive === 0) return;
+    const sMult = isAlive('nadia') ? 0.8 : 1.0;
+    state.resources.oxygen -= (CONSTANTS.DRAIN.OXYGEN * alive) * (state.upgrades.scrubbers?0.75:1);
+    state.resources.water -= (CONSTANTS.DRAIN.WATER * alive) * sMult;
+    state.resources.rations -= (CONSTANTS.DRAIN.RATIONS * alive) * sMult * state.rationLevel;
+    let mDrop = CONSTANTS.DRAIN.MORALE * (isAlive('john') ? 0.5 : 1.0);
+    if(state.resources.water<=0) mDrop+=15; if(state.resources.rations<=0) mDrop+=10;
+    if(state.rationLevel < 1) mDrop += (1 - state.rationLevel) * 15; if(state.pace > 1 && state.isDriving) mDrop += (state.pace - 1) * 8;
+    state.resources.morale -= mDrop;
+    ['oxygen','water','rations','morale'].forEach(r => state.resources[r] = Math.max(0, state.resources[r]));
+    
+    // Progress sickness/injuries
+    state.crew.filter(c => c.alive && c.condition !== 'Healthy').forEach(c => {
+        if(Math.random() < 0.15) { c.alive = false; logMsg(`${c.name} succumbed to ${c.condition}.`, "bad"); state.resources.morale -= 20; sfx.bad(); } 
+        else { logMsg(`${c.name} is sick: ${c.condition}.`, "bad"); state.resources.morale -= 5; }
+    });
+}
+
+function usePart() { if(isAlive('maya') && Math.random()<0.3) return true; if(state.resources.parts>0) { state.resources.parts--; return true; } return false; }
+
+const EVENTS = [
+    { title: "Crevasse Blockage", desc: "A massive fracture blocks the path.", condition: ()=>true, opts: [ { l: "Build Bridge (1 Part)", c: ()=>state.resources.parts>0, a: ()=>{ usePart(); logMsg("Bridged crevasse.", "good"); } }, { l: "Detour (3 Sols)", a: ()=>{ advanceTime(3); logMsg("Took long detour.", "bad"); } } ]},
+    { title: "Global Dust Storm", desc: "Visibility zero. Solar blocked.", condition: ()=>true, opts: [ { l: "Hunker Down", a: ()=>{ state.weather='dust_storm'; toggleDrive(); advanceTime(4); setTimeout(()=>{state.weather='clear';}, 12000); } }, { l: "Push Through", a: ()=>{ state.weather='dust_storm'; state.resources.power-=60; state.resources.hull-=15; setTimeout(()=>{state.weather='clear';}, 8000); } } ]},
+    { title: "Extreme Cold Snap", desc: "Temperature is plummeting.", condition: ()=>true, opts: [ { l: "Power Heaters", a: ()=>{ state.resources.power -= 25; } }, { l: "Conserve Power", a: ()=>{ state.resources.morale -= 20; state.crew.filter(c=>c.alive).forEach(c => { if(Math.random()<0.3) c.condition = 'Hypothermia'; }); } } ]}
+];
+
+function triggerEvent() {
+    state.mode = 'event'; state.isDriving = false; updateHUD(); sfx.error();
+    const ev = EVENTS[Math.floor(Math.random() * EVENTS.length)];
+    document.getElementById('event-title').innerText = ev.title; document.getElementById('event-desc').innerText = ev.desc;
+    const oc = document.getElementById('event-options'); oc.innerHTML = '';
+    ev.opts.forEach(o => {
+        const b = document.createElement('button'); b.className='control-btn active'; b.innerText = o.l;
+        if(o.c && !o.c()) { b.disabled = true; }
+        b.onclick = () => { o.a(); hideUI(); state.mode = 'travel'; state.isDriving = true; updateHUD(); };
+        oc.appendChild(b);
+    });
+    showUI('screen-event');
+}
+
+function advanceTime(s) { for(let i=0; i<s; i++) { state.sol++; applyConsumption(); } }
+
+function hideUI() {
+    document.querySelectorAll('.overlay-screen, .location-overlay, .modal-wrapper').forEach(s => s.classList.add('hidden'));
+}
+
+// --- STREAMING_CHUNK:Rendering live telemetry to HUD... ---
+function updateHUD() {
+    const pPct = (state.distance / CONSTANTS.TOTAL_DISTANCE) * 100;
+    document.getElementById('progress-fill').style.width = `${pPct}%`; document.getElementById('progress-rover').style.left = `${pPct}%`;
+    document.getElementById('lbl-parts').innerText = Math.floor(state.resources.parts); document.getElementById('lbl-medkits').innerText = Math.floor(state.resources.medkits); 
+    document.getElementById('lbl-day').innerText = `SOL ${state.sol}`; document.getElementById('lbl-terrain').innerText = state.terrain.name;
+
+    let temp = -60 + (Math.sin(state.dayCycle * Math.PI * 2 - Math.PI/2) * 40); if(state.weather === 'dust_storm') temp -= 20;
+    const tempEl = document.getElementById('lbl-temp'); tempEl.innerText = `${Math.floor(temp)}°C`; tempEl.style.color = temp < -70 ? '#88bbff' : (temp > -40 ? '#ffaa55' : '#f5d6c6');
+
+    ['oxygen','water','rations','power','morale','hull'].forEach(r => {
+        const v = state.resources[r], pct = (v / state.maxResources[r]) * 100;
+        let l = Math.floor(v); if(r==='oxygen'||r==='rations') l+=' kg'; else if(r==='water') l+=' L'; else l+='%';
+        document.getElementById(`lbl-${r}`).innerText = l; document.getElementById(`bar-${r}`).style.width = `${Math.min(pct,100)}%`;
+        const c = document.getElementById(`cont-${r}`); if(pct<20) c.classList.add('danger'); else c.classList.remove('danger');
+    });
+
+    const cDiv = document.getElementById('crew-status'); cDiv.innerHTML = '';
+    state.crew.forEach(c => { const sSpan = c.alive ? (c.condition === 'Healthy' ? `<span class="cond-healthy">OK</span>` : `<span class="cond-sick">${c.condition}</span>`) : `<span class="crew-dead">DEC</span>`; cDiv.innerHTML += `<div class="crew-member ${c.alive?'':'crew-dead'}"><div><span style="font-weight:600;color:var(--text-main)">${c.name}</span> <span style="color:var(--text-dim);font-size:0.7rem;text-transform:uppercase;">(${c.role})</span></div> ${sSpan}</div>`; });
+    
+    const dBtn = document.getElementById('btn-drive');
+    if(state.isDriving) { dBtn.innerText = "Driving"; dBtn.classList.add('active'); } else { dBtn.innerText = "Halted"; dBtn.classList.remove('active'); }
+}
+
+function isAlive(id) {
+    const c = state.crew.find(x => x.id === id);
+    return c && c.alive;
+}
+
+function logMsg(t, type="normal") { const ul = document.getElementById('event-log'), li = document.createElement('li'); li.className = `log-entry ${type}`; li.innerText = `> ${t}`; ul.appendChild(li); ul.scrollTop = ul.scrollHeight; }
+function gameOver(r) { state.mode = 'gameover'; document.getElementById('gameover-reason').innerText = r; sfx.bad(); showUI('screen-gameover'); }
+function victory() { 
+    state.mode = 'victory'; document.getElementById('victory-stats').innerText = `Duration: ${state.sol} Sols | Survivors: ${state.crew.filter(c=>c.alive).length}/4`; 
+    let score = 1000 + (state.crew.filter(c=>c.alive).length * 500) + Math.floor((state.resources.oxygen + state.resources.water + state.resources.rations) / 5) - (state.sol * 15);
+    document.getElementById('final-score').innerText = Math.max(0, score); sfx.good(); setTimeout(()=>sfx.good(), 300); showUI('screen-victory'); 
+}
+
+function lerpColor(a, b, amt) { const ar=a>>16, ag=a>>8&0xff, ab=a&0xff, br=b>>16, bg=b>>8&0xff, bb=b&0xff; return (ar+amt*(br-ar)<<16)+(ag+amt*(bg-ag)<<8)+(ab+amt*(bb-ab)); }
+
+// --- STREAMING_CHUNK:Starting main game update loop... ---
+app.ticker.add((delta) => {
+    const stormMult = state.weather === 'dust_storm' ? 4 : 1;
+    envParticles.forEach(p => { p.x += p.baseVx * delta * stormMult; p.y += p.baseVy * delta * (stormMult>1?3:1); if(p.x < 0) p.x = app.screen.width; if(p.y > app.screen.height) p.y = 0; if(p.y < 0) p.y = app.screen.height; });
+    
+    // Process doors steam vents
+    for(let i=steamPool.length-1; i>=0; i--) {
+        const s = steamPool[i]; s.x += s.vx; s.y += s.vy; s.alpha -= 0.01; s.scale.x += 0.05; s.scale.y += 0.05;
+        if(s.alpha <= 0) { layerBaseFg.removeChild(s); steamPool.splice(i, 1); }
+    }
+
+    if (state.mode !== 'travel') return; 
+
+    for (let i=dustPool.length-1; i>=0; i--) { const p = dustPool[i]; p.x += p.vx*delta; p.y += p.vy*delta; p.alpha -= 0.02*delta; p.scale.x += 0.05; p.scale.y += 0.05; if(p.alpha<=0) { layerDust.removeChild(p); dustPool.splice(i,1); } }
+    for(let i=tracksPool.length-1; i>=0; i--) { const speed = (CONSTANTS.BASE_SPEED / 60) * delta * state.pace * state.terrain.speed; tracksPool[i].x -= speed * 0.4; tracksPool[i].alpha -= 0.005 * delta; if(tracksPool[i].alpha <= 0) { layerTracks.removeChild(tracksPool[i]); tracksPool.splice(i,1); } }
+    for(let i=obstacles.length-1; i>=0; i--) { const speed = (CONSTANTS.BASE_SPEED / 60) * delta * state.pace * state.terrain.speed; obstacles[i].x -= speed * 0.4; if(obstacles[i].x <= -50) { layerObstacles.removeChild(obstacles[i]); obstacles.splice(i,1); } }
+    for(let i=meteors.length-1; i>=0; i--) { meteors[i].x += meteors[i].vx*delta; meteors[i].y += meteors[i].vy*delta; meteors[i].alpha -= 0.02*delta; if(meteors[i].alpha <= 0) { layerCelestial.removeChild(meteors[i]); meteors.splice(i,1); } }
+
+    state.timeAccumulator += app.ticker.deltaMS; state.dayCycle = (state.timeAccumulator / CONSTANTS.SOL_DURATION_MS);
+    const cSine = (Math.sin(state.dayCycle * Math.PI * 2 - Math.PI/2) + 1) / 2;
+    sunGfx.x = app.screen.width * state.dayCycle; sunGfx.y = (app.screen.height * 0.6) - Math.sin(state.dayCycle * Math.PI) * (app.screen.height * 0.4);
+    phobosGfx.x = app.screen.width * ((state.dayCycle * 2.5) % 1); phobosGfx.y = (app.screen.height * 0.5) - Math.sin(((state.dayCycle * 2.5) % 1) * Math.PI) * (app.screen.height * 0.3);
+
+    // Weather adjustments and meteors
+    if(state.weather === 'dust_storm') { skyBox.tint = hexColor('#3a1511'); layerStars.alpha = 0; rover.beam.alpha = 0.8; layerCelestial.alpha = 0; } 
+    else { skyBox.tint = lerpColor(hexColor('#5c2a21'), hexColor('#0a0504'), cSine); layerStars.alpha = cSine; rover.beam.alpha = cSine; layerCelestial.alpha = 1; phobosGfx.alpha = cSine; sunGfx.alpha = 1 - cSine; if(cSine > 0.8 && Math.random() < 0.005 * delta) spawnMeteor(); }
+
+    const isMoving = state.isDriving && state.resources.power > 0;
+    
+    // Play driving engine hum
+    if(isMoving && Date.now() % 200 < 20) sfx.playTone(40 + (state.pace * 10), 'sine', 0.2, 0.02);
+
+    rover.y = (app.screen.height - 120) + (isMoving ? Math.sin(Date.now() / (100 / state.pace)) * (2 * state.pace) : 0);
+    rover.beacon.tint = isMoving ? 0x44ffaa : 0xff4444;
+    groundGfx.tint = lerpColor(groundGfx.tint, hexColor(state.terrain.color), 0.02 * delta);
+
+    if (isMoving) {
+        const speed = (CONSTANTS.BASE_SPEED / 60) * delta * state.pace * state.terrain.speed;
+        mountains.forEach(m => { m.x -= speed * 0.15; if(m.x <= -app.screen.width) m.x = app.screen.width - 5; });
+        dunes.forEach(d => { d.x -= speed * 0.5; if(d.x <= -app.screen.width) d.x = app.screen.width - 5; });
+        fgRocks.forEach(r => { r.x -= speed * 1.5; if(r.x <= -50) { r.x = app.screen.width+50; r.y = app.screen.height - Math.random()*50 - 10;} });
+        rover.wheels.forEach(w => w.rotation += 0.2 * state.pace * delta);
+        if(Math.random() < (0.4 * state.pace) && state.weather !== 'dust_storm') spawnDust();
+        if(state.terrain.name === "Boulder Field" && Math.random() < 0.05 * delta * state.pace) { const obs = new PIXI.Graphics(); obs.beginFill(hexColor('#5c2a21')); obs.drawCircle(0,0, Math.random()*15+5); obs.endFill(); obs.x = app.screen.width + 50; obs.y = app.screen.height - 120 + Math.random()*20; obs.scale.y = 0.6; layerObstacles.addChild(obs); obstacles.push(obs); }
+        if(Date.now() % 100 < 40) { const track = new PIXI.Graphics(); track.beginFill(0x1a0b08, 0.4); track.drawRect(0, 0, 18, 6); track.endFill(); track.x = rover.x + 20; track.y = rover.y + 32; layerTracks.addChild(track); tracksPool.push(track); }
+
+        state.distance += speed * 0.4;
+        let hDamage = (state.terrain.hullDamage / 60) * delta * (state.pace * state.pace); if(state.upgrades.suspension) hDamage *= 0.7; state.resources.hull -= hDamage;
+        let pDrain = (CONSTANTS.POWER_DRAIN_DRIVING / 60) * delta * (state.pace * state.pace) * state.terrain.power;
+        if(state.resources.hull < 30) pDrain *= 1.5;
+        let currentTemp = -60 + (Math.sin(state.dayCycle * Math.PI * 2 - Math.PI/2) * 40); if(state.weather === 'dust_storm') currentTemp -= 20;
+        if(currentTemp < -60) { let coldDrain = (Math.abs(currentTemp + 60)) * 0.02; if(state.upgrades.thermal) coldDrain *= 0.5; pDrain += coldDrain * delta; }
+        state.resources.power -= pDrain;
+
+        // Visual screen rumble effect
+        let shakeMag = 0; if(state.pace > 1) shakeMag += (state.pace - 1) * 2; if(state.terrain.name === "Boulder Field") shakeMag += 2.5; if(state.terrain.name === "Hardpan Rock") shakeMag += 1;
+        if(shakeMag > 0) { layerWorld.x = (Math.random() - 0.5) * shakeMag; layerWorld.y = (Math.random() - 0.5) * shakeMag; } else { layerWorld.x = 0; layerWorld.y = 0; }
+        
+        if(Math.random() < 0.0005 * delta && state.distance > 100) { const newT = TERRAIN_ZONES[Math.floor(Math.random() * TERRAIN_ZONES.length)]; if(newT.name !== state.terrain.name) { state.terrain = newT; updateHUD(); } }
+
+        OUTPOSTS.forEach(wp => { if(!wp.passed && state.distance >= wp.dist) { wp.passed = true; enterOutpost(wp); } });
+        if(state.distance >= CONSTANTS.TOTAL_DISTANCE) victory();
+    }
+
+    if (state.timeAccumulator >= CONSTANTS.SOL_DURATION_MS) {
+        state.timeAccumulator -= CONSTANTS.SOL_DURATION_MS; state.sol++; applyConsumption();
+        let recharge = state.weather === 'dust_storm' ? 2 : 25; if(state.upgrades.solar && state.weather !== 'dust_storm') recharge *= 1.4;
+        if(state.resources.power < state.maxResources.power) state.resources.power = Math.min(state.maxResources.power, state.resources.power + recharge);
+
+        const alive = state.crew.filter(c=>c.alive);
+        if (alive.length>0 && state.resources.morale<=10 && Math.random()<0.1) { const v=alive[Math.floor(Math.random()*alive.length)]; v.alive=false; }
+        if (state.crew.filter(c=>c.alive).length===0) return gameOver("Expedition failed. All crew deceased.");
+        if (state.resources.oxygen<=0 && state.crew.filter(c=>c.alive).length>0) return gameOver("Life support failure. Asphyxiation.");
+        if (state.resources.hull<=0) return gameOver("Catastrophic hull failure. Rover depressurized.");
+        
+        updateHUD(); 
+        let evChance = 0.12; if(state.pace === 1.5) evChance = 0.18; if(state.pace === 2) evChance = 0.25; if(state.upgrades.suspension) evChance *= 0.5;
+        if (Math.random() < evChance && state.isDriving) triggerEvent();
+    }
+
+    // Siren alarm logic
+    const alarm = document.getElementById('alarm-overlay');
+    if((state.resources.oxygen < 100 || state.resources.water < 100 || state.resources.hull < 20) && state.mode === 'travel') { alarm.classList.add('active'); if(Date.now() % 1000 < 20) sfx.alarm(); } else { alarm.classList.remove('active'); }
+    if(Date.now() % 100 < 20) updateHUD();
+});
+
+window.onload = function() {
+    steamPool = [];
+    tracksPool = [];
+};
+</script>
+</body>
+</html>

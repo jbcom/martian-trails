@@ -1,0 +1,34 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build outputs
+dist/
+build/
+android/
+ios/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDEs/System
+.DS_Store
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Tests
+test-results/
+playwright-report/
+blob-report/
+playwright/.local-browsers/
+
+# Itch assets cache
+.itch-cache/
+src/assets/fetched/

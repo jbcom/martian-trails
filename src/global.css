@@ -1,0 +1,87 @@
+:root {
+  --mars-bg: #1a0b08;
+  --mars-dark: #2c1511;
+  --mars-red: #8a3324;
+  --mars-dust: #cc7052;
+  --mars-sand: #e89b71;
+  --mars-glow: rgba(232, 155, 113, 0.4);
+  --ui-bg: rgba(12, 5, 4, 0.85);
+  --ui-border: rgba(204, 112, 82, 0.3);
+  --text-main: #f5d6c6;
+  --text-dim: #a88b7d;
+  --text-alert: #ff4444;
+  --text-good: #44ffaa;
+  --font-display: "Rajdhani", sans-serif;
+  --font-body: "Inter", sans-serif;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #000;
+  color: var(--text-main);
+  font-family: var(--font-body);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* Glassmorphism Panels */
+.glass-panel {
+  background: linear-gradient(135deg, rgba(20, 8, 6, 0.85) 0%, rgba(10, 4, 3, 0.95) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--ui-border);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 0 15px rgba(204, 112, 82, 0.1);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--mars-sand);
+  margin-bottom: 5px;
+}
+
+/* Universal Button Styling */
+.control-btn {
+  background: rgba(204, 112, 82, 0.1);
+  border: 1px solid rgba(204, 112, 82, 0.3);
+  color: var(--mars-sand);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  padding: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+
+.control-btn:hover:not(:disabled) {
+  background: rgba(204, 112, 82, 0.3);
+  border-color: var(--mars-sand);
+  color: #fff;
+  box-shadow: 0 0 10px var(--mars-glow);
+}
+
+.control-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  border-color: transparent;
+}
+
+.control-btn.active {
+  background: var(--mars-sand);
+  color: #000;
+  border-color: #fff;
+  box-shadow: 0 0 15px var(--mars-glow);
+}
