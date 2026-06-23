@@ -41,19 +41,19 @@ while queue has [ ] items: read own spec docs → use-case enumerate (if non-tri
 ## Queue — Milestone 1: Foundation & house dialect (branch: feat/m1-foundation)
 
 ### m1-name Rename to "Martian Trail"
-- [ ] m1-name-1 Adopt the name **Martian Trail** across package.json (`name: martian-trail`), index.html `<title>`, App boot copy, README, CLAUDE.md pitch. Keep `Gemini-…md` + `red_mars_…html` as historical source files (do not rename those).
+- [x] m1-name-1 Adopt the name **Martian Trail** across package.json (`name: martian-trail`), index.html `<title>`, App boot copy, README, CLAUDE.md pitch. Keep `Gemini-…md` + `red_mars_…html` as historical source files (do not rename those). [done 4792223 — README + depot title; also fixed canvas-0-height collapse; remaining black-paint bug under stuck-loop-debugger]
 
 ### m1-tool Toolchain to house baseline
 - [ ] m1-tool-1 Bump Capacitor 6→8, Biome 1.8→2.x (migrate `organizeImports`→`assist.actions.source.organizeImports`), Vitest 1.6→4.x, Node 20→22 in package.json + CI. Verify `pnpm install`, `pnpm lint`, `pnpm test` green after each bump.
-- [ ] m1-tool-2 Fix `.env.example` `GEMINI_API_KEY` placeholder bug (currently `your_itch_api_key_here`).
+- [x] m1-tool-2 Fix `.env.example` `GEMINI_API_KEY` placeholder bug. [verified already correct — `GEMINI_API_KEY=your_gemini_api_key_here`; no change needed]
 
 ### m1-vite vite/test config for Pages + device
-- [ ] m1-vite-1 Add `base` handling to vite.config.ts (conditional on `CAPACITOR` / `GITHUB_PAGES`, default `/`, pages `/martian-trails/`). Add `build:pages` + `build:native` scripts.
+- [x] m1-vite-1 Add `base` handling to vite.config.ts (conditional on `CAPACITOR` / `GITHUB_PAGES`, default `/`, pages `/martian-trails/`). Add `build:pages` + `build:native` scripts. [done 815995e — verified all three base modes emit correct asset paths]
 - [ ] m1-vite-2 Create the real vitest browser config (`@vitest/browser-playwright`, chromium, `screenshotFailures:true`, `fileParallelism:false`, GPU/SwiftShader args, headless CI-driven). Fix `test:browser` script (currently references nonexistent `vitest.workspace.ts`). Add a `tests/browser/` smoke test that drives the real UI through the store.
 - [ ] m1-vite-3 Upgrade playwright e2e to serve the built `dist/` under the Pages subpath (agofa `serve.mjs` pattern); `trace:retain-on-failure`, `screenshot:only-on-failure`.
 
 ### m1-cap Capacitor wiring
-- [ ] m1-cap-1 Add `capacitor.config.ts` (`appId: com.jbcom.martiantrail`, `appName: Martian Trail`, `webDir: dist`, `androidScheme: https`, mobile-safe-area config). Add `cap:sync`, `cap:run:android`, `android:debug` scripts. Run `pnpm cap:sync` and commit the `android/` dir.
+- [x] m1-cap-1 Add `capacitor.config.ts` (`appId: com.jbcom.martiantrail`, `appName: Martian Trail`, `webDir: dist`, `androidScheme: https`, mobile-safe-area config). Add `cap:sync`, `cap:run:android`, `android:debug` scripts. Run `pnpm cap:sync` and commit the `android/` dir. [done 9513087 — @capacitor/android@6, android/ committed, cap:sync 'Sync finished']
 
 ### m1-ci CI/CD to ci → release → cd
 - [ ] m1-ci-1 Rewrite `ci.yml`: macos browser job (lint → typecheck/check → test → test:browser → build → e2e-deployed) + Android APK job (setup-java 21, setup-android, cap:sync, assembleDebug, upload artifact). SHA-pin all actions, Node 22.
