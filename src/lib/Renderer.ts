@@ -41,13 +41,27 @@ export class Renderer {
   private meteors: (PIXI.Graphics & { vx: number; vy: number })[] = [];
   private steamPool: (PIXI.Graphics & { vx: number; vy: number })[] = [];
 
+  private container: HTMLElement;
+
   constructor(container: HTMLElement) {
+    this.container = container;
+    // Size from the container if it has already been laid out, otherwise fall
+    // back to the viewport. An absolutely-positioned container can report a 0
+    // height during onMount before layout settles, which collapses the canvas.
+    const initialWidth = container.clientWidth || window.innerWidth;
+    const initialHeight = container.clientHeight || window.innerHeight;
     this.app = new PIXI.Application({
+      width: initialWidth,
+      height: initialHeight,
       resizeTo: container,
       backgroundColor: 0x1a0b08,
       antialias: true,
     });
     container.appendChild(this.app.view as any);
+    // Guarantee a valid backbuffer size before any geometry is generated.
+    if (this.app.screen.height === 0 || this.app.screen.width === 0) {
+      this.app.renderer.resize(initialWidth, initialHeight);
+    }
 
     this.app.stage.addChild(this.layerWorld);
     this.layerWorld.addChild(
@@ -541,6 +555,12 @@ export class Renderer {
 
   public resize() {
     this.app.resize();
+    if (this.app.screen.height === 0 || this.app.screen.width === 0) {
+      this.app.renderer.resize(
+        this.container.clientWidth || window.innerWidth,
+        this.container.clientHeight || window.innerHeight,
+      );
+    }
   }
 
   public destroy() {

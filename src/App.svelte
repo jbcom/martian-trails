@@ -648,6 +648,7 @@ function calculateFinalScore(): number {
         <div class="depot-overlay">
           <div class="manifest-panel glass-panel">
             <div class="manifest-header">
+              <span class="manifest-game-title">MARTIAN TRAIL</span>
               <h1>UNDERHILL DEPOT</h1>
               <span class="manifest-subtitle">UNOMA Quartermaster Interface</span>
             </div>
@@ -1097,6 +1098,18 @@ function calculateFinalScore(): number {
   .manifest-header {
     padding: 20px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .manifest-game-title {
+    display: block;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--mars-dust, #cc7052);
+    text-shadow: 0 0 12px rgba(204, 112, 82, 0.6);
+    margin-bottom: 4px;
   }
 
   .manifest-header h1 {

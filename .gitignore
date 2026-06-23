@@ -32,3 +32,16 @@ playwright/.local-browsers/
 # Itch assets cache
 .itch-cache/
 src/assets/fetched/
+
+# Agent-state derivable cache (directive.md + decisions.ndjson are tracked)
+.agent-state/digest.md
+.agent-state/cursor.md
+.agent-state/.indexed-sha
+.agent-state/.last-stop-sha
+.agent-state/.last-stop-fingerprint
+.agent-state/.last-compaction
+.agent-state/batch.json
+.claude/scheduled_tasks.lock
+
+# Playtest screenshot artifacts
+artifacts/
