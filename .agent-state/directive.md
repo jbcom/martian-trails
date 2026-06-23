@@ -69,60 +69,47 @@ This is NOT a patch-the-POC job. Plan + decompose properly: (1) the ADDED produc
 - [x] m1-ci-4 `cd.yml` = push:main: release-checks + real Pages deploy (configure-pages/upload-pages-artifact/deploy-pages) + debug APK. [done c64a3cd]
 
 ### m1-docs Doc set
-- [ ] m1-docs-1 Add `AGENTS.md` (operational doctrine: docs>tests>code, content-first, browser validation mandatory). Add `README.md`, `CHANGELOG.md`, `STANDARDS.md`. Add `docs/{ARCHITECTURE,STATE,DESIGN-SYSTEM,TESTING,DEPLOYMENT}.md`. Frontmatter per standard-repo profile.
+- [ ] m1-docs-1 Add `AGENTS.md` (operational doctrine: docs>tests>code, content-first, browser validation mandatory). Add `CHANGELOG.md`, `STANDARDS.md`. (`README.md` ✓, `docs/ARCHITECTURE.md` ✓, `docs/GAME-DESIGN.md` ✓ done.) Add `docs/{STATE,DESIGN-SYSTEM,TESTING,DEPLOYMENT,ART-DIRECTION}.md`. Frontmatter per standard-repo profile.
 
 ---
+
+NOTE: Milestones below are the UNIFIED production build (user mandate: it's all one effort, no shortcuts, full Oregon-Trail mechanical equivalency, real art not procedural, responsive phone/tablet/foldable). Architecture is `docs/ARCHITECTURE.md`; the loop + mechanic map is `docs/GAME-DESIGN.md`. Decomposition (M3) is the FOUNDATION the loop (M5) is built on, so it comes first; the depot-black regression is fixed by the per-screen render decomposition, not a patch.
 
 ## Queue — Milestone 2: Design system, tokens & fontography (branch: feat/m2-design)
+- [ ] m2-1 `docs/DESIGN-SYSTEM.md` + `docs/ART-DIRECTION.md`: name the visual language; decide 2D-sprite vs 3DPSX-side-view vs mix per the asset-scout report; palette seed (`--mars-bg #1a0b08 / --mars-red #8a3324 / --mars-dust #cc7052 / --mars-sand #e89b71`); motion grammar; glass-panel + critical-alarm spec; reference screenshots.
+- [ ] m2-2 Fontography: display + body (condensed techy display ~Rajdhani/Orbitron-class + clean body), via @fontsource or curated itch/Kenney Fonts (self-hosted, not Google CDN). Wire `src/styles/fonts.css`.
+- [ ] m2-3 `src/styles/tokens.css` (color/space/type/radius/glass-blur custom props) + typed `src/styles/tokens.ts` mirror + `tokens.test.ts` sync test. Migrate global.css/App styles onto tokens.
 
-### m2-design Visual language
-- [ ] m2-design-1 Write `docs/DESIGN-SYSTEM.md`: name the Martian Trail visual language (diegetic glassmorphic Mars-ops HUD), reference screenshots, palette (deep rust/ochre/iron-oxide; the POC's `--mars-bg #1a0b08 / --mars-red #8a3324 / --mars-dust #cc7052 / --mars-sand #e89b71` as the seed), motion grammar, glass-panel spec, alarm/critical states.
-- [ ] m2-design-2 Choose fontography (display + body; itch/Kenney Fonts or @fontsource — a condensed techy display like Rajdhani/Orbitron-class + a clean body). Wire `src/styles/fonts.css`.
-- [ ] m2-token Token files
-- [ ] m2-token-1 `src/styles/tokens.css` (CSS custom props: color/space/type/radius/glass-blur) + typed `src/styles/tokens.ts` mirror + `tokens.test.ts` sync test (house pattern). Migrate global.css + App.svelte styles onto tokens.
-
----
-
-## Queue — Milestone 3: src refactor to house layout (branch: feat/m3-refactor)
-
-### m3-split Split src/lib → sim/render/audio/state/content/config
-- [ ] m3-split-1 Move pure simulation (resource math, sol consumption, crew traits, terrain/thermal, scoring) into `src/sim/**` — pure TS, no DOM, no Math.random (use a seeded `createRng` facade), no `performance.now` (engine clock facade). Satisfies gates.json sim-purity.
-- [ ] m3-split-2 Move PixiJS into `src/render/**`; AudioEngine into `src/audio/**`; the Svelte store bridge into `src/state/**`; tunables into `src/config/*.json`; event/outpost/store/trade/log content into `src/content/**` (JSON, "code interprets content, never embeds it").
-- [ ] m3-split-3 Update `$lib` aliases / imports; ensure every folder has co-located tests; green build + tests + browser smoke after the move (refactor in one commit per CLAUDE.md — callers move with the module).
-
----
+## Queue — Milestone 3: Architecture decomposition — the foundation (branch: feat/m3-arch)
+Adopt the blobolines skeleton + agofa content/config + koota, on Svelte 5 / Pixi 8. This rewrites App.svelte/Renderer/GameState/AudioEngine (resolves the Pixi 7→8 + Svelte 4→5 + sim-purity red).
+- [ ] m3-1 Add production libs: `koota`, `seedrandom`, `howler`, `zod`, `@capacitor/preferences|haptics|screen-orientation|device`, `motion`. Scaffold `src/{core,engine,sim,render,state,content,config,audio,platform,styles,ui,schemas}`.
+- [ ] m3-2 `src/core` (createRng facade over seedrandom; SCREENS const→union type) + `src/engine/loop.ts` (fixed-timestep `advance()` accumulator + alpha). Unit-tested, deterministic.
+- [ ] m3-3 `src/sim/**` PURE: port resource/sol/crew-trait/terrain/thermal/scoring math into koota traits + `systems/*` + hand-ordered `tick.ts`. No pixi/svelte/DOM, no Math.random/performance.now (gates enforce). Unit tests per system.
+- [ ] m3-4 `src/render/**` on Pixi 8 (async `Application.init()`, new graphics API): per-screen render scenes (garage/depot, travel, …) reading the sim via the `state/diagnostics.ts` frame-cadence bridge. Fixes depot-black (each screen draws its own scene).
+- [ ] m3-5 `src/audio/**` howler wrapper + symbolic audio manifest (keep procedural synth as fallback until real audio lands). `src/state` Svelte store (screen/phase/settings/run-summary) + diagnostics bridge.
+- [ ] m3-6 `src/ui/**` Svelte 5 (runes) screens as the const-union router (depot/travel/outpost/event/hazard/eva/terminus/gameover), reading only the store. Delete the monolithic App.svelte `update()`-gated structure. Green build + unit + browser smoke; Safari playtest each screen (frontmost+visible).
 
 ## Queue — Milestone 4: Asset & content pipelines (branch: feat/m4-pipelines)
+- [ ] m4-1 Port the REAL two-stage itch flow from a-good-old-fashioned-adventure (owned-keys cache, ALLOW_LIST of Martian Trail's purchased packs, Bearer auth, hardened curl, raw-assets→extract, idempotent).
+- [ ] m4-2 Local `/Volumes/home/assets` curate path, correct casing (`2DLowPoly`/`2DPhotorealistic`/`Audio`); plus 3DPSX GLBs via assets-library MCP if the art direction uses them. Curate chosen scene assets → `public/assets/` + `MANIFEST.json` + integrity test (refuse unmanifested).
+- [ ] m4-3 Port the GenAI pipeline from maga-money-moves: `@google/genai`, `gemini-3.5-flash` (events), `imagen-4.0-fast-generate-001` (crew portraits), prompt/facet builders, zod validate gate, fs cache. Events→`src/content/events/*.json`; portraits→`public/assets/generated/portraits/`.
 
-### m4-itch itch downloader (real)
-- [ ] m4-itch-1 Port the real two-stage itch flow from a-good-old-fashioned-adventure (owned-keys cache via itch-library.mjs, ALLOW_LIST, Bearer auth, hardened curl, raw-assets→extract, idempotent). Decide ALLOW_LIST for Martian Trail's purchased packs.
-- [ ] m4-local Local NAS asset pipeline
-- [ ] m4-local-1 Build the `/Volumes/home/assets` copy/curate path with **correct casing** (`2DLowPoly`,`2DPhotorealistic`,`Audio`). Curate the chosen Mars assets into `public/assets/` with a `MANIFEST.json` + integrity test (`tests/unit/asset-manifest.test.ts` refusing unmanifested assets).
-### m4-genai GenAI pipeline (real)
-- [ ] m4-genai-1 Port the Gemini engine from maga-money-moves: `@google/genai`, `gemini-3.5-flash` for events, `imagen-4.0-fast-generate-001` for crew portraits, prompt/facet builders, validate gate, filesystem cache. Events→`src/content/events/*.json`; portraits→`public/assets/generated/portraits/`. Generate the 4 crew portraits (John/Maya/Frank/Nadia) + an expanded event pool.
+## Queue — Milestone 5: The complete Oregon-Trail-equivalent loop (branch: feat/m5-loop)
+Build the full loop ON the M3 structure, mechanic-by-mechanic per docs/GAME-DESIGN.md. Each = content (JSON) + sim system + render scene + UI + tests + Safari playtest.
+- [ ] m5-1 Boot → **Sponsor/difficulty select** (Oregon Trail profession analog: starting CR + score multiplier) → crew select. (POC has none — flat 25k.)
+- [ ] m5-2 **Provisioning depot** done right: 25,000 CR enforced in the store (single source of truth, kill dual-qty-mutation), payload cap, missing-vitals launch warning, content-driven stock. Fixes the budget regression.
+- [ ] m5-3 **Travel core**: pace×rations tradeoff, Sol/distance on the fixed-timestep clock, per-Sol consumption w/ crew traits, solar recharge, hull wear, terrain zones (incl. the dead-ref `Hardpan Rock` defined), thermal + heater drain, **calendar/deadline pressure** (Oregon Trail "before winter" analog).
+- [ ] m5-4 **Hazard Traverse** (RIVER-CROSSING equivalent — the signature tension decision; POC's biggest gap): a family of named impassable terrain (crevasse/chasma, dust-storm wall, regolith bog, ice sheet, canyon scarp), each a multi-option risk decision (Ford/Bridge/Detour/Winch) with a "read" gauge, distinct cost axes, and an animated consequence.
+- [ ] m5-5 **EVA Prospecting** (HUNTING equivalent — interactive minigame, not one dice roll): O₂-as-ammo clock, aimed scanner cone w/ hot-cold feedback, drill timing minigame, salvage/sample clicks, carry cap, over-stay injury roll.
+- [ ] m5-6 **Outposts/forts + supply**: dock animation, rest (heal+morale), content-driven services + trade, **colonist lore/news** (fort "news" analog). Plus Nomadic Prospector mid-trail trade encounter.
+- [ ] m5-7 **Events**: restore + expand to a real pool — Crevasse, Global Dust Storm (restore the dark dust-storm weather system + visuals), Extreme Cold Snap, Dust Devil, Solar Flare, Abandoned Cache, Seal Failure — declarative content + effects.
+- [ ] m5-8 **Crew depth**: passive traits + **active abilities** (Rally/Jury-Rig/Deep Prospect/Emergency Harvest), morale + desertion, **typed illnesses tied to cause** (Radiation←flare / Regolith Lung←dust / Fracture←grueling / Hypothermia←cold) with progression + treatment + visible portrait reactions.
+- [ ] m5-9 **Upgrades**: O2 scrubbers / suspension / high-yield solar + Micro-Hydroponics (+rations/Sol) + Aerogel Insulation as its own upgrade (un-overload `solar`).
+- [ ] m5-10 **Terminus + scoring** (UNOMA rating w/ sponsor multiplier, survivors, cargo, Sols) + **typed death/game-over** screens (tombstone analog) + **save/continue** (Capacitor preferences). High-score persistence.
 
----
-
-## Queue — Milestone 5: Game systems — fix regressions, then actualize (branch: feat/m5-systems)
-
-### m5-fix Fix scaffold regressions (single source of truth)
-- [ ] m5-fix-1 Budget: 25,000 CR, enforced inside the store (not the component); kill the dual-mutation of STORE_ITEMS.qty; unit-test the buggy budget path.
-- [ ] m5-fix-2 Restore the dust-storm weather system (state is never set in scaffold) + storm visuals; restore POC's 3 base events (Crevasse, Global Dust Storm, Extreme Cold Snap) and keep Dust Devil as a 4th.
-- [ ] m5-fix-3 Remove dead refs / define them properly: `Hardpan Rock` terrain zone, `thermal`/Aerogel upgrade as its own upgrade (un-overload `solar`). Add missing-vitals launch warning, visual critical-alarm overlay, boulder-field obstacle spawner.
-### m5-feat Actualize concept-only systems
-- [ ] m5-feat-1 Active crew abilities (Rally / Jury-Rig / Deep Prospect / Emergency Harvest) with Sol/resource costs.
-- [ ] m5-feat-2 Micro-Hydroponics (+rations/Sol) + Aerogel Insulation upgrades wired to sim.
-- [ ] m5-feat-3 Distinct disease typing tied to cause (Radiation←flare / Regolith Lung←dust / Fracture←grueling / Hypothermia←cold) with progression + death.
-- [ ] m5-feat-4 Expanded event pool (Solar Flare Outburst, Abandoned Supply Cache, Seal Failure) + Nomadic Prospector mid-trail trade encounter + colonist lore at outposts.
-
----
-
-## Queue — Milestone 6: Art/audio integration & polish (branch: feat/m6-polish)
-
-### m6-art Asset integration
-- [ ] m6-art-1 Integrate curated 2D/photoreal textures (red_sand regolith, sci-fi UI panels) + crew portraits into the render/UI; keep the diegetic glass airlock direction. Playtest each via Safari, READ screenshot vs DESIGN-SYSTEM reference.
-- [ ] m6-audio-1 Layer real audio (Sci-Fi Sounds for engine/airlock/comms, ambient music loops, win/lose jingles) alongside or replacing the procedural synth where it improves feel; audio-graph test.
-- [ ] m6-mobile-1 Mobile-first pass: touch input primary, safe-area insets, Pixel-5a render budget. Verify on-device via cap:run:android (or document the gate if no device).
-
-### m6-final Definition of done
-- [ ] m6-final-1 Full green: lint, typecheck, unit, browser, e2e-deployed, build, APK. Pages live at jonbogaty.com/martian-trails/. docs/STATE.md reflects shipped reality. App RUNS (Safari playtest, full run depot→trail→outpost→victory, screenshots read).
+## Queue — Milestone 6: Art/audio integration, responsive polish, ship (branch: feat/m6-polish)
+- [ ] m6-1 Replace procedural graphics with the curated real art (per ART-DIRECTION: 2D sprite and/or 3DPSX-side-view) across every scene — rover, garage/depot, trail backdrop, hazard terrain, EVA surface, outpost, crew portraits. Safari playtest each (frontmost+visible), READ screenshot vs DESIGN-SYSTEM reference; must not look worse than the POC.
+- [ ] m6-2 Real audio via howler: engine/airlock/comms SFX (Sci-Fi Sounds), ambient music loops, win/lose jingles, mixing/ducking; audio-graph test.
+- [ ] m6-3 **Responsive across phone / tablet / unfolded foldable**: container/viewport breakpoints, safe-area insets, touch-primary, Pixi resize to live canvas, HUD reflow (stacked→side→wide-rails). Verify each form factor via Safari at the three viewport classes + on-device cap:run:android.
+- [ ] m6-4 Juice & polish: motion transitions between screens, camera-shake, particle/weather VFX, haptics, critical-alarm overlay, loading/preload.
+- [ ] m6-final Definition of done: full green (lint, check, unit, browser, e2e-deployed, build, APK); Pages live at jonbogaty.com/martian-trails/; docs/STATE.md current; full playable run boot→sponsor→depot→trail→hazard→eva→outpost→terminus verified in Safari with screenshots read; on-device APK runs.
