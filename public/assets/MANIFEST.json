@@ -1,17 +1,32 @@
 {
   "generatedFrom": "scripts/assets.manifest.json",
   "license": "PSX packs per source itch licenses (raw-assets/); audio CC0 (Kenney). See docs/ART-DIRECTION.md.",
-  "count": 17,
+  "count": 20,
   "assets": [
+    {
+      "path": "audio/music/ambient.mp3",
+      "bytes": 2343459,
+      "sha256": "12bdff4db259506eff585cb21c6f2044c9a6803248a9f3f836ffee0c32e65db7"
+    },
     {
       "path": "audio/music/menu.ogg",
       "bytes": 307622,
       "sha256": "bf1a3b86027ae92c79f425e3f857ee9be74cbdfea46b75b668fe55489598bfbc"
     },
     {
+      "path": "audio/music/tension.mp3",
+      "bytes": 2259584,
+      "sha256": "28caa637a9d434a2f9de0525ff17e3ef2eab85547f430038073257c073128dd4"
+    },
+    {
       "path": "audio/music/trail.ogg",
       "bytes": 154248,
       "sha256": "324bb691a715a51875973079f9e0706fc81168203401725d4131d0fa1528c621"
+    },
+    {
+      "path": "audio/music/victory.mp3",
+      "bytes": 81960,
+      "sha256": "646ce9b6ba27eaa2248112c7e8f7a7d5620527cdb7406e98382b79f060b62162"
     },
     {
       "path": "audio/sfx/airlock_close.ogg",

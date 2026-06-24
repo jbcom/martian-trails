@@ -17,6 +17,9 @@ export const SFX = {
 export const MUSIC = {
   menu: "assets/audio/music/menu.ogg",
   trail: "assets/audio/music/trail.ogg",
+  tension: "assets/audio/music/tension.mp3",
+  ambient: "assets/audio/music/ambient.mp3",
+  victory: "assets/audio/music/victory.mp3",
 } as const;
 
 export type SfxId = keyof typeof SFX;

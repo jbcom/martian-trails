@@ -43,6 +43,23 @@ describe("audio reactor — game state → audio", () => {
     expect(calls).toContain("sfx:hazardSting");
   });
 
+  it("swaps to context music beds: hazard→tension, eva→ambient, terminus→victory", () => {
+    onScreen("travel");
+    calls.length = 0;
+    onScreen("hazard");
+    expect(calls).toContain("music:tension");
+
+    onScreen("travel");
+    calls.length = 0;
+    onScreen("eva");
+    expect(calls).toContain("music:ambient");
+
+    onScreen("travel");
+    calls.length = 0;
+    onScreen("terminus");
+    expect(calls).toContain("music:victory");
+  });
+
   it("ignores a no-op same-screen call", () => {
     onScreen("outpost");
     calls.length = 0;
