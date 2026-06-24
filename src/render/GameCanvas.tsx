@@ -58,7 +58,10 @@ export function GameCanvas() {
   return (
     <Canvas
       className="absolute inset-0"
-      shadows
+      // Explicit "basic" (BasicShadowMap) — hard-edged shadows suit the PSX/low-poly art
+      // direction and are cheaper than the soft default. Bare `shadows` resolves to the
+      // deprecated PCFSoftShadowMap (a Three.js console warning); naming it silences that.
+      shadows="basic"
       dpr={[1, 2]}
       gl={{ antialias: false }}
       style={{ background: colors.marsBg }}

@@ -1,16 +1,16 @@
 [
   {
-    "id": "event:solar-particle-event",
-    "title": "Solar Particle Event",
-    "description": "The orbital warning network detects an M-class solar flare. Lethal radiation will hit the rover in hours. We need to shield our living quarters immediately.",
-    "tags": ["radiation", "weather"],
+    "id": "event:solar-proton-warning",
+    "title": "Solar Proton Event Warning",
+    "description": "The orbital monitoring network reports a massive coronal mass ejection heading toward Mars. Your rover's shielding is minimal; you must decide how to shield the crew.",
+    "tags": ["solar-flare", "radiation"],
     "options": [
       {
-        "label": "Deploy heavy lead-shielded blankets",
+        "label": "Deploy lead-lined blankets internally",
         "effects": [
           {
             "target": "parts",
-            "delta": -2
+            "delta": -1
           },
           {
             "target": "power",
@@ -21,10 +21,54 @@
             "delta": 5
           }
         ],
-        "log": "We draped the heavy shielding but depleted some spare parts and rover batteries."
+        "log": "We used our spare shielding spares to line the bunk walls, keeping the radiation dosage within acceptable limits."
       },
       {
-        "label": "Bury the rover in regolith using the scoop",
+        "label": "Bury the rover in regolith",
+        "effects": [
+          {
+            "target": "power",
+            "delta": -25
+          },
+          {
+            "target": "morale",
+            "delta": -10
+          },
+          {
+            "target": "rations",
+            "delta": -15
+          }
+        ],
+        "log": "We spent hours digging and piling cold Mars dirt onto the hull. The crew is exhausted and dirty, but shielded."
+      }
+    ]
+  },
+  {
+    "id": "event:static-dust-front",
+    "title": "Static-Charged Dust Front",
+    "description": "A towering wall of red dust blocks the horizon. The triboelectric charge is throwing sparks across the cockpit glass and threatening the battery banks.",
+    "tags": ["dust-storm", "thermal"],
+    "options": [
+      {
+        "label": "Hunker down and wait it out",
+        "effects": [
+          {
+            "target": "oxygen",
+            "delta": -20
+          },
+          {
+            "target": "water",
+            "delta": -15
+          },
+          {
+            "target": "rations",
+            "delta": -15
+          }
+        ],
+        "log": "We powered down the drive motors and waited. Consumed supplies while the storm raged outside."
+      },
+      {
+        "label": "Drive through using thermal-lidar",
         "effects": [
           {
             "target": "power",
@@ -33,162 +77,620 @@
           {
             "target": "hull",
             "delta": -10
+          }
+        ],
+        "log": "We pushed through the blinding dust. Static discharges damaged some sensory hull nodes, but we made distance."
+      }
+    ]
+  },
+  {
+    "id": "event:seized-steering-actuator",
+    "title": "Seized Steering Actuator",
+    "description": "The front-left drive wheel shudders and locks up. Metal shavings contaminate the differential oil. You must repair it or limp along.",
+    "tags": ["mechanical-failure"],
+    "options": [
+      {
+        "label": "Replace with spare components",
+        "effects": [
+          {
+            "target": "parts",
+            "delta": -2
+          },
+          {
+            "target": "power",
+            "delta": -10
+          }
+        ],
+        "log": "We performed an emergency EVA and replaced the actuator. The rover steers smoothly again."
+      },
+      {
+        "label": "Lock the wheel and drag it",
+        "effects": [
+          {
+            "target": "hull",
+            "delta": -15
+          },
+          {
+            "target": "power",
+            "delta": -20
           },
           {
             "target": "morale",
             "delta": -5
           }
         ],
-        "log": "The scoop piled abrasive dust over the cabin. Hull suffered micro-scratches and battery drained."
+        "log": "We locked the wheel straight and dragged it. The extra friction is putting a massive drain on our power grid."
+      }
+    ]
+  },
+  {
+    "id": "event:abandoned-surveyor-hab",
+    "title": "Abandoned Surveyor Hab",
+    "description": "A defunct, half-buried inflatable habitat from the early exploratory era looms out of the dust. Its airlocks are long dead, but salvage remains.",
+    "tags": ["supply-cache", "scavenging"],
+    "options": [
+      {
+        "label": "Cycle airlock manually to scavenge",
+        "effects": [
+          {
+            "target": "power",
+            "delta": -10
+          },
+          {
+            "target": "parts",
+            "delta": 2
+          },
+          {
+            "target": "water",
+            "delta": 15
+          }
+        ],
+        "log": "Prying open the old airlock doors took hours, but we recovered pristine structural spares and some stored water."
       },
       {
-        "label": "Take anti-radiation meds and ride it out",
+        "label": "Blow the seal with charges",
+        "effects": [
+          {
+            "target": "hull",
+            "delta": -5
+          },
+          {
+            "target": "rations",
+            "delta": 30
+          },
+          {
+            "target": "oxygen",
+            "delta": 20
+          }
+        ],
+        "log": "We blew the inner seal. The explosion damaged our outer bumper, but we retrieved preserved high-calorie rations and compressed O2."
+      }
+    ]
+  },
+  {
+    "id": "event:micro-meteorite-breach",
+    "title": "Micro-Meteorite Hull Breach",
+    "description": "A high-velocity particle punches a millimeter-wide hole through the secondary cabin seal. A high-pitched whistle warns of atmospheric decompression.",
+    "tags": ["seal-failure"],
+    "options": [
+      {
+        "label": "Deploy emergency sealant foam",
+        "effects": [
+          {
+            "target": "parts",
+            "delta": -1
+          },
+          {
+            "target": "oxygen",
+            "delta": -5
+          }
+        ],
+        "log": "Quick reflexes. We plugged the whistling puncture with quick-curing resin, saving our air."
+      },
+      {
+        "label": "Don helmets and bleed the cabin",
+        "effects": [
+          {
+            "target": "oxygen",
+            "delta": -25
+          },
+          {
+            "target": "morale",
+            "delta": -15
+          }
+        ],
+        "log": "We depressurized the main compartment to seal it mechanically. The freezing cold and lost air shook the crew."
+      }
+    ]
+  },
+  {
+    "id": "event:ration-discrepancy",
+    "title": "Ration Discrepancy",
+    "description": "A crew member discovers that someone has been double-dipping into the nutrient paste packs. Accusations fly as cabin fever sets in.",
+    "tags": ["crew-conflict"],
+    "options": [
+      {
+        "label": "Impose strict dietary tracking",
+        "effects": [
+          {
+            "target": "morale",
+            "delta": -12
+          },
+          {
+            "target": "rations",
+            "delta": 10
+          }
+        ],
+        "log": "We locked the food dispensers behind passcode logs. The thief was stopped, but the atmosphere inside is hostile."
+      },
+      {
+        "label": "Increase rations to ease tension",
+        "effects": [
+          {
+            "target": "rations",
+            "delta": -20
+          },
+          {
+            "target": "morale",
+            "delta": 15
+          }
+        ],
+        "log": "We authorized a temporary calorie boost to calm everyone down. Spirits are higher, but our reserves took a hit."
+      }
+    ]
+  },
+  {
+    "id": "event:noctis-labyrinthus-chasm",
+    "title": "Noctis Labyrinthus Chasm",
+    "description": "Your orbital maps missed a sudden graben blocking the path. You can detour around the maze or attempt to traverse a steep, loose scree slope.",
+    "tags": ["navigation"],
+    "options": [
+      {
+        "label": "Take the long detour detour",
+        "effects": [
+          {
+            "target": "oxygen",
+            "delta": -25
+          },
+          {
+            "target": "water",
+            "delta": -20
+          },
+          {
+            "target": "rations",
+            "delta": -20
+          }
+        ],
+        "log": "We played it safe and bypassed the chasm. The detour added three days to our transit time."
+      },
+      {
+        "label": "Descend the unstable slope",
+        "effects": [
+          {
+            "target": "hull",
+            "delta": -15
+          },
+          {
+            "target": "power",
+            "delta": -10
+          },
+          {
+            "target": "morale",
+            "delta": -5
+          }
+        ],
+        "log": "We slid down the rocky scree. The suspension took a heavy beating, but we saved precious travel days."
+      }
+    ]
+  },
+  {
+    "id": "event:rtg-thermocouple-drop",
+    "title": "RTG Thermocouple Degradation",
+    "description": "The radioisotope thermoelectric generator's cooling loop is failing. Interior temperatures are dropping rapidly toward freezing.",
+    "tags": ["thermal", "mechanical-failure"],
+    "options": [
+      {
+        "label": "Reroute main battery to heaters",
+        "effects": [
+          {
+            "target": "power",
+            "delta": -35
+          },
+          {
+            "target": "morale",
+            "delta": 5
+          }
+        ],
+        "log": "We kept the cabin warm by pulling power directly from the main battery. Comfort comes at a steep electrical cost."
+      },
+      {
+        "label": "Strip insulation from cargo to patch it",
+        "effects": [
+          {
+            "target": "parts",
+            "delta": -1
+          },
+          {
+            "target": "hull",
+            "delta": -10
+          },
+          {
+            "target": "power",
+            "delta": -5
+          }
+        ],
+        "log": "We dismantled cargo bay insulation to rebuild the thermocouple shroud. The rover's shell is thinner now."
+      }
+    ]
+  },
+  {
+    "id": "event:crashed-cargo-drone",
+    "title": "Crashed Cargo Drone",
+    "description": "An old autonomous supply drone lies shattered in a shallow crater. Its lithium-sulfur battery pack appears intact, but unstable.",
+    "tags": ["scavenging"],
+    "options": [
+      {
+        "label": "Attempt hot-wire extraction",
         "effects": [
           {
             "target": "medkits",
-            "delta": -2
+            "delta": -1
           },
           {
-            "target": "morale",
-            "delta": -15
+            "target": "power",
+            "delta": 40
           }
         ],
-        "log": "We took chemical radioprotectants, but the crew suffered severe nausea and anxiety."
+        "log": "The battery sparked violently during extraction, burning a crew member's arm, but we successfully drained its charge."
+      },
+      {
+        "label": "Safely dismantle for scrap",
+        "effects": [
+          {
+            "target": "power",
+            "delta": -10
+          },
+          {
+            "target": "parts",
+            "delta": 2
+          }
+        ],
+        "log": "We took our time discharging the core safely. No energy gained, but we scored several solid replacement parts."
       }
     ]
   },
   {
-    "id": "event:electrostatic-dust-storm",
-    "title": "Electrostatic Dust Storm",
-    "description": "A towering wall of red dust blocks the sun, generating high-voltage static charges that threaten our solar arrays and navigation systems.",
-    "tags": ["dust-storm", "weather"],
+    "id": "event:condensation-on-circuits",
+    "title": "Condensation on Electronics",
+    "description": "Moisture is condensing on the cold interior hull plates, pooling near the primary life support terminal. A short-circuit is imminent.",
+    "tags": ["seal-failure", "thermal"],
     "options": [
       {
-        "label": "Deploy grounding anchors and lock down",
+        "label": "Crank the cabin dehumidifier",
+        "effects": [
+          {
+            "target": "power",
+            "delta": -20
+          },
+          {
+            "target": "water",
+            "delta": 5
+          }
+        ],
+        "log": "We ran the high-load atmospheric scrubbers. It reclaimed the vapor as liquid water, but drained our batteries."
+      },
+      {
+        "label": "Wipe down manually with rags",
+        "effects": [
+          {
+            "target": "morale",
+            "delta": -10
+          },
+          {
+            "target": "water",
+            "delta": -10
+          }
+        ],
+        "log": "We spent a miserable shift hand-drying the wiring. Much of the moisture evaporated out of the cabin vents, lost forever."
+      }
+    ]
+  },
+  {
+    "id": "event:cosmic-ray-spike",
+    "title": "Cosmic Ray Spike",
+    "description": "A high-energy galactic cosmic ray shower hits. The crew must retreat to the heavily shielded, cramped bunk area for 36 hours.",
+    "tags": ["radiation", "crew-conflict"],
+    "options": [
+      {
+        "label": "Maintain strict, cramped isolation",
+        "effects": [
+          {
+            "target": "morale",
+            "delta": -15
+          },
+          {
+            "target": "rations",
+            "delta": -5
+          }
+        ],
+        "log": "Thirty-six hours of absolute confinement in the crawlspace. Tempers flared, but everyone stayed healthy."
+      },
+      {
+        "label": "Run essential checks during storm",
+        "effects": [
+          {
+            "target": "medkits",
+            "delta": -1
+          },
+          {
+            "target": "power",
+            "delta": 10
+          }
+        ],
+        "log": "We took turns in the cabin to optimize the engine's power cycle. The radiation dose required iodine treatments afterward."
+      }
+    ]
+  },
+  {
+    "id": "event:sensor-blindness",
+    "title": "Dust-Induced Sensor Blindness",
+    "description": "Fine, iron-rich dust has coated the external optical sensors, rendering your automated pathfinding useless. You are driving blind.",
+    "tags": ["dust-storm", "navigation"],
+    "options": [
+      {
+        "label": "Perform manual EVA cleaning",
+        "effects": [
+          {
+            "target": "oxygen",
+            "delta": -15
+          },
+          {
+            "target": "medkits",
+            "delta": -1
+          }
+        ],
+        "log": "An astronaut slipped in the zero-visibility dust storm while cleaning. They cleared the sensors but sprained an ankle."
+      },
+      {
+        "label": "Switch to blind dead-reckoning",
+        "effects": [
+          {
+            "target": "power",
+            "delta": -15
+          },
+          {
+            "target": "hull",
+            "delta": -12
+          }
+        ],
+        "log": "We navigated by gyros and wheel encoders. We clipped a hidden boulder in the dark, damaging the outer frame."
+      }
+    ]
+  },
+  {
+    "id": "event:co2-scrubber-saturated",
+    "title": "CO2 Scrubber Saturated",
+    "description": "The primary zeolite CO2 scrubbers have saturated early. Carbon dioxide levels in the cabin are beginning to climb.",
+    "tags": ["mechanical-failure"],
+    "options": [
+      {
+        "label": "Bake out zeolite using heaters",
         "effects": [
           {
             "target": "power",
             "delta": -25
           },
           {
-            "target": "rations",
-            "delta": -15
-          },
-          {
-            "target": "water",
-            "delta": -15
+            "target": "oxygen",
+            "delta": -5
           }
         ],
-        "log": "We anchored safely and waited out the storm, but consumed valuable rations and water."
+        "log": "We ran the emergency thermal cycle on the carbon scrubbers, purging the CO2 but burning a lot of electrical power."
       },
       {
-        "label": "Push through the storm using active radar",
+        "label": "Replace with chemical cartridges",
         "effects": [
           {
-            "target": "hull",
-            "delta": -15
-          },
-          {
-            "target": "power",
-            "delta": -10
+            "target": "parts",
+            "delta": -1
           },
           {
             "target": "morale",
-            "delta": -10
+            "delta": -5
           }
         ],
-        "log": "Static discharges scorched the outer hull sensors, rattling the crew's nerves."
+        "log": "We broke into our stockpile of consumable chemical canisters. It saved power, but diminished our repair reserve."
       }
     ]
   },
   {
-    "id": "event:seized-drive-axle",
-    "title": "Seized Drive Axle",
-    "description": "A grinding shriek echoes from the rear chassis. Fine basaltic dust has bypassed the seals and locked the rear-left drive axle.",
-    "tags": ["mechanical-failure"],
+    "id": "event:buried-ice-deposit",
+    "title": "Buried Water Ice Deposit",
+    "description": "A radar scan indicates a pure glacial lens of water ice just two meters below the sandy regolith. Digging will require heavy drill power.",
+    "tags": ["supply-cache"],
     "options": [
       {
-        "label": "Perform an EVA to replace the drive gears",
+        "label": "Run the high-draw thermal drill",
+        "effects": [
+          {
+            "target": "water",
+            "delta": 40
+          },
+          {
+            "target": "power",
+            "delta": -30
+          }
+        ],
+        "log": "We ran the drill at maximum depth. We extracted pure, frozen Martian water, but the power cells are nearly flat."
+      },
+      {
+        "label": "Bypass to conserve rover energy",
+        "effects": [
+          {
+            "target": "power",
+            "delta": 10
+          },
+          {
+            "target": "water",
+            "delta": -10
+          }
+        ],
+        "log": "We marked the spot and drove on. We saved our batteries, but our hydration levels are dropping."
+      }
+    ]
+  },
+  {
+    "id": "event:claustrophobic-breakdown",
+    "title": "The Claustrophobic Breakdown",
+    "description": "One of your technicians locks themselves in the storage alcove, claiming they can hear the martian wind screaming through the hull.",
+    "tags": ["crew-conflict"],
+    "options": [
+      {
+        "label": "Administer a heavy sedative",
+        "effects": [
+          {
+            "target": "medkits",
+            "delta": -1
+          },
+          {
+            "target": "morale",
+            "delta": 10
+          }
+        ],
+        "log": "We used our medical reserves to sedate the technician. The cabin is peaceful again, though one hand is out of commission."
+      },
+      {
+        "label": "Spend hours talking them down",
+        "effects": [
+          {
+            "target": "morale",
+            "delta": -10
+          },
+          {
+            "target": "rations",
+            "delta": -10
+          }
+        ],
+        "log": "We talked through the intercom until they calmed down. The delay cost us valuable travel time and food rations."
+      }
+    ]
+  },
+  {
+    "id": "event:sinking-sand-trap",
+    "title": "Sinking Sand Trap",
+    "description": "The rover drives into a pocket of ultra-fine, dehydrated dust. The wheels spin uselessly, sinking deeper into the martian soil.",
+    "tags": ["navigation", "mechanical-failure"],
+    "options": [
+      {
+        "label": "Deploy high-friction recovery tracks",
         "effects": [
           {
             "target": "parts",
-            "delta": -2
+            "delta": -1
           },
+          {
+            "target": "power",
+            "delta": -15
+          }
+        ],
+        "log": "We slipped tread-plates under the tires. The plates warped and broke, but we managed to crawl out of the sand trap."
+      },
+      {
+        "label": "Vent tire pressure to crawl out",
+        "effects": [
           {
             "target": "oxygen",
             "delta": -20
           },
           {
-            "target": "morale",
-            "delta": -10
-          }
-        ],
-        "log": "A grueling four-hour EVA in the cold replaced the gears but exhausted our oxygen and crew."
-      },
-      {
-        "label": "Weld the axle locked and drag the wheel",
-        "effects": [
-          {
-            "target": "power",
-            "delta": -25
-          },
-          {
             "target": "hull",
-            "delta": -15
+            "delta": -8
           }
         ],
-        "log": "Dragging the dead wheel drains our batteries rapidly and stresses the chassis."
+        "log": "We bled nitrogen from our tire tanks to widen the tread. We got out, but our emergency gas system is depleted."
       }
     ]
   },
   {
-    "id": "event:abandoned-science-station",
-    "title": "Abandoned Science Station",
-    "description": "We spot the half-buried domes of an old, decommissioned automated science depot. Its airlock is breached, but supplies might remain inside.",
-    "tags": ["supply-cache"],
+    "id": "event:sub-zero-battery-freeze",
+    "title": "Sub-Zero Battery Freeze",
+    "description": "The external temperature has plunged to -110C. The primary battery compartment heater is struggling to maintain operating threshold.",
+    "tags": ["thermal"],
     "options": [
       {
-        "label": "Thoroughly scavenge the ruins",
+        "label": "Dump excess power to core warmers",
         "effects": [
+          {
+            "target": "power",
+            "delta": -40
+          },
+          {
+            "target": "hull",
+            "delta": 5
+          }
+        ],
+        "log": "We bypassed the safety relays to dump charge directly into the thermal blankets, preserving battery health."
+      },
+      {
+        "label": "Insulate with thermal suits",
+        "effects": [
+          {
+            "target": "parts",
+            "delta": -1
+          },
+          {
+            "target": "morale",
+            "delta": -15
+          }
+        ],
+        "log": "We stuffed spare thermal EVA liners into the battery casing. It worked, but the crew is furious about losing backup gear."
+      }
+    ]
+  },
+  {
+    "id": "event:irradiated-pioneer-probe",
+    "title": "Irradiated Pioneer Lander",
+    "description": "You stumble across a historical probe from the 1970s. Its radioisotope heating unit is leaking radiation, but contains rare-earth elements.",
+    "tags": ["scavenging", "radiation"],
+    "options": [
+      {
+        "label": "Perform quick salvage of components",
+        "effects": [
+          {
+            "target": "medkits",
+            "delta": -1
+          },
           {
             "target": "parts",
             "delta": 3
-          },
-          {
-            "target": "oxygen",
-            "delta": 15
-          },
-          {
-            "target": "power",
-            "delta": -15
           }
         ],
-        "log": "We recovered valuable spare components and oxygen, but the search drained power."
+        "log": "We harvested the old circuit boards. The radiation dose required us to use anti-rad medication from our supply."
       },
       {
-        "label": "Recover only the heavy batteries",
+        "label": "Keep your distance and bypass",
         "effects": [
           {
-            "target": "power",
-            "delta": 40
+            "target": "morale",
+            "delta": 5
           },
           {
-            "target": "hull",
-            "delta": -10
+            "target": "power",
+            "delta": -5
           }
         ],
-        "log": "We hauled the heavy carbon batteries back, slightly denting our exterior airlock frame."
+        "log": "We chose health over scraps. Driving around the hot zone cost a bit of fuel, but the crew felt respected."
       }
     ]
   },
   {
-    "id": "event:airlock-gasket-leak",
-    "title": "Airlock Gasket Leak",
-    "description": "A high-pitched hiss warns of pressure loss. The primary airlock seal is degrading rapidly, venting atmosphere into the void.",
+    "id": "event:airlock-interlock-glitch",
+    "title": "Airlock Interlock Glitch",
+    "description": "An electronic glitch prevents the inner airlock door from sealing completely during pressure equalization. Air is venting slowly.",
     "tags": ["seal-failure"],
     "options": [
       {
-        "label": "Apply emergency liquid sealant",
+        "label": "Force the manual override crank",
         "effects": [
           {
             "target": "parts",
@@ -197,307 +699,215 @@
           {
             "target": "oxygen",
             "delta": -10
-          },
-          {
-            "target": "water",
-            "delta": -5
           }
         ],
-        "log": "We patched the leak quickly, but lost some air and ruined a multi-purpose polymer sealant kit."
+        "log": "We sheared off the manual backup lock pin forcing the latch shut, but we successfully stopped the leak."
       },
       {
-        "label": "Let the airlock depressurize and bypass it",
+        "label": "Perform a hot-swap of the circuit",
         "effects": [
           {
-            "target": "oxygen",
-            "delta": -35
-          },
-          {
-            "target": "morale",
+            "target": "power",
             "delta": -15
           },
           {
-            "target": "power",
-            "delta": -10
+            "target": "oxygen",
+            "delta": -25
           }
         ],
-        "log": "Venting the airlock saved the seal but cost a massive chunk of our breathable air supply."
+        "log": "We bypassed the electronics. The slow work allowed more cabin air to escape into the thin Martian atmosphere."
       }
     ]
   },
   {
-    "id": "event:clogged-life-support-filter",
-    "title": "Clogged CO2 Scrubber",
-    "description": "Dust intrusion from the storm has bypassed the external intakes, clogging the primary amine CO2 scrubbers. Carbon dioxide levels are rising.",
-    "tags": ["dust-storm", "mechanical-failure"],
+    "id": "event:geomagnetic-induction",
+    "title": "Induced Grid Currents",
+    "description": "The planetary magnetic field lines shake from a solar impact, inducing dangerous currents in the rover's electrical grid.",
+    "tags": ["solar-flare", "power"],
     "options": [
       {
-        "label": "Flush the filters with recycled water",
+        "label": "Shunt excess current to ground spike",
         "effects": [
           {
-            "target": "water",
-            "delta": -20
+            "target": "power",
+            "delta": -30
           },
           {
-            "target": "oxygen",
+            "target": "hull",
             "delta": 5
           }
         ],
-        "log": "We flushed the amine beds. CO2 levels dropped, but we lost twenty liters of reusable water."
+        "log": "We drove a metal rod into the soil to bleed off the surge. It cost us a massive chunk of stored electricity."
       },
       {
-        "label": "Swap in a replacement scrubber cartridge",
+        "label": "Allow surge protectors to pop",
         "effects": [
           {
             "target": "parts",
             "delta": -2
           },
           {
-            "target": "morale",
-            "delta": 5
-          }
-        ],
-        "log": "We installed our last spare cartridge, immediately restoring cabin air quality."
-      }
-    ]
-  },
-  {
-    "id": "event:buried-cargo-lander",
-    "title": "Buried Cargo Lander",
-    "description": "The radar pings a metallic anomaly beneath three meters of loose sand. It matches the signature of a lost uncrewed supply lander.",
-    "tags": ["supply-cache"],
-    "options": [
-      {
-        "label": "Excavate using the rover's heater-grid",
-        "effects": [
-          {
             "target": "power",
-            "delta": -35
-          },
-          {
-            "target": "rations",
-            "delta": 30
-          },
-          {
-            "target": "water",
-            "delta": 30
-          }
-        ],
-        "log": "Thermal melting of frozen crust consumed massive power, but revealed pristine rations and water."
-      },
-      {
-        "label": "Manually dig with hand tools",
-        "effects": [
-          {
-            "target": "oxygen",
-            "delta": -15
-          },
-          {
-            "target": "morale",
-            "delta": -20
-          },
-          {
-            "target": "parts",
-            "delta": 1
-          }
-        ],
-        "log": "The crew dug for six exhausting hours. We found some parts, but morale plummeted from fatigue."
-      }
-    ]
-  },
-  {
-    "id": "event:cabin-window-micro-fracture",
-    "title": "Cabin Window Micro-Fracture",
-    "description": "A microscopic pebble kicked up by the storm has starred the thick polycarbonate viewport. Structural integrity is dropping.",
-    "tags": ["seal-failure"],
-    "options": [
-      {
-        "label": "Depressurize cabin and apply structural epoxy",
-        "effects": [
-          {
-            "target": "oxygen",
-            "delta": -25
-          },
-          {
-            "target": "morale",
-            "delta": -10
-          },
-          {
-            "target": "parts",
-            "delta": -1
-          }
-        ],
-        "log": "Applying epoxy required venting the cabin. The patch holds, but we are cold and low on air."
-      },
-      {
-        "label": "Bolt an opaque aluminum cover over window",
-        "effects": [
-          {
-            "target": "hull",
-            "delta": 10
-          },
-          {
-            "target": "morale",
-            "delta": -20
-          },
-          {
-            "target": "parts",
-            "delta": -1
-          }
-        ],
-        "log": "The window is secure, but the crew is now entombed in absolute darkness, spiking anxiety."
-      }
-    ]
-  },
-  {
-    "id": "event:cosmic-ray-bombardment",
-    "title": "Cosmic Ray Bombardment",
-    "description": "A spike in galactic cosmic rays is detected. The rover's active magnetic shield is struggling to deflect the high-energy iron nuclei.",
-    "tags": ["radiation"],
-    "options": [
-      {
-        "label": "Overclock the magnetic shield generator",
-        "effects": [
-          {
-            "target": "power",
-            "delta": -30
-          },
-          {
-            "target": "hull",
-            "delta": -10
-          }
-        ],
-        "log": "We boosted the shields. It deflected the radiation but melted several secondary power conduits."
-      },
-      {
-        "label": "Retreat into the shielded sleeping bunks",
-        "effects": [
-          {
-            "target": "rations",
-            "delta": -15
-          },
-          {
-            "target": "water",
-            "delta": -15
-          },
-          {
-            "target": "morale",
-            "delta": -10
-          }
-        ],
-        "log": "The crew huddled in the cramped bunks for 36 hours. We used up rations while making zero progress."
-      }
-    ]
-  },
-  {
-    "id": "event:coolant-loop-rupture",
-    "title": "Coolant Loop Rupture",
-    "description": "A vital pipe in the radioisotope thermoelectric generator's coolant loop has burst, leaking hot glycol onto the main batteries.",
-    "tags": ["mechanical-failure"],
-    "options": [
-      {
-        "label": "Shut down the heater to patch the pipe",
-        "effects": [
-          {
-            "target": "morale",
-            "delta": -15
-          },
-          {
-            "target": "water",
-            "delta": -10
-          },
-          {
-            "target": "parts",
-            "delta": -1
-          }
-        ],
-        "log": "We patched the leak, but cabin temperatures plummeted, freezing some of our water."
-      },
-      {
-        "label": "Use the backup pump to isolate the leak",
-        "effects": [
-          {
-            "target": "power",
-            "delta": -25
-          },
-          {
-            "target": "hull",
-            "delta": -15
-          }
-        ],
-        "log": "Isolating the leak saved our water, but the thermal spike damaged adjacent electrical systems."
-      }
-    ]
-  },
-  {
-    "id": "event:discarded-ascent-stage",
-    "title": "Discarded Ascent Stage",
-    "description": "We stumble upon the hollow shell of an old crewed ascent stage. The interior has been stripped, but the fuel cells remain.",
-    "tags": ["supply-cache"],
-    "options": [
-      {
-        "label": "Drain the fuel cell water-byproducts",
-        "effects": [
-          {
-            "target": "water",
-            "delta": 40
-          },
-          {
-            "target": "morale",
             "delta": -5
           }
         ],
-        "log": "We siphoned forty liters of stale, slightly metallic-tasting water from the ancient fuel cells."
-      },
-      {
-        "label": "Salvage the gold-foil insulation",
-        "effects": [
-          {
-            "target": "hull",
-            "delta": 15
-          },
-          {
-            "target": "oxygen",
-            "delta": -10
-          }
-        ],
-        "log": "We wrapped our vulnerable external cabling in salvaged thermal insulation, strengthening our hull."
+        "log": "The breakers blew as designed, protecting our primary battery banks but burning out two major distribution boards."
       }
     ]
   },
   {
-    "id": "event:hydroponics-bay-leak",
-    "title": "Hydroponics Bay Leak",
-    "description": "The sealing flange on the experimental micro-green incubator has failed. Dry Martian air is desorbing the moisture from our crops.",
-    "tags": ["seal-failure"],
+    "id": "event:water-ration-protest",
+    "title": "The Water Ration Protest",
+    "description": "The crew discovers a slow leak in a greywater line. A debate erupts: should they cut personal hygiene use or drink recycled urine?",
+    "tags": ["crew-conflict"],
     "options": [
       {
-        "label": "Flood the chamber with emergency nitrogen",
+        "label": "Enforce strict hygiene ban",
         "effects": [
           {
-            "target": "rations",
+            "target": "morale",
+            "delta": -18
+          },
+          {
+            "target": "water",
+            "delta": 15
+          }
+        ],
+        "log": "No washing. The crew smells terrible and spirits are at an all-time low, but we preserved our drinking water."
+      },
+      {
+        "label": "Run aggressive purification cycles",
+        "effects": [
+          {
+            "target": "power",
+            "delta": -25
+          },
+          {
+            "target": "water",
+            "delta": -10
+          }
+        ],
+        "log": "We ran high-heat distillation to clean the contaminated graywater. It drank our battery power dry."
+      }
+    ]
+  },
+  {
+    "id": "event:crater-rim-route",
+    "title": "Crater Rim Route",
+    "description": "A massive impact crater blocks the direct path. You can climb the steep, rocky rim or circle around the vast ejecta blanket.",
+    "tags": ["navigation"],
+    "options": [
+      {
+        "label": "Climb the steep rocky rim",
+        "effects": [
+          {
+            "target": "hull",
+            "delta": -15
+          },
+          {
+            "target": "power",
+            "delta": -15
+          }
+        ],
+        "log": "We crawled up the basalt rocks. The grinding vibration shook the main cabin and drained our motors."
+      },
+      {
+        "label": "Circle the broad ejecta blanket",
+        "effects": [
+          {
+            "target": "oxygen",
             "delta": -20
+          },
+          {
+            "target": "water",
+            "delta": -15
+          },
+          {
+            "target": "rations",
+            "delta": -15
+          }
+        ],
+        "log": "We chose the flat, easy detour. It was completely safe, but ate up two whole days of life support consumables."
+      }
+    ]
+  },
+  {
+    "id": "event:evaporative-cooling-leak",
+    "title": "Evaporative Cooling Leak",
+    "description": "A crack in the environmental system's evaporator line causes precious water to flash-freeze and sublimate into the vacuum.",
+    "tags": ["thermal", "mechanical-failure"],
+    "options": [
+      {
+        "label": "Seal the leak with vacuum tape",
+        "effects": [
+          {
+            "target": "parts",
+            "delta": -1
+          },
+          {
+            "target": "water",
+            "delta": -15
+          }
+        ],
+        "log": "We patched the line quickly during an EVA. We lost some coolant water, but saved the overall thermal loop."
+      },
+      {
+        "label": "Bypass the external evaporator loop",
+        "effects": [
+          {
+            "target": "morale",
+            "delta": -12
+          },
+          {
+            "target": "power",
+            "delta": -20
+          }
+        ],
+        "log": "We rerouted the loop internally. No water was lost, but the cabin is hot, stuffy, and the cabin fans are working overtime."
+      }
+    ]
+  },
+  {
+    "id": "event:crashed-drop-pod",
+    "title": "Crashed Orbital Drop Pod",
+    "description": "A heavily charred cargo pod lies half-buried in a dune. Its tracking beacon is dead, but the internal lockers are intact.",
+    "tags": ["scavenging", "supply-cache"],
+    "options": [
+      {
+        "label": "Pry open safe with mechanical tools",
+        "effects": [
+          {
+            "target": "parts",
+            "delta": 2
+          },
+          {
+            "target": "rations",
+            "delta": 25
+          },
+          {
+            "target": "power",
+            "delta": -15
+          }
+        ],
+        "log": "Hours of grinding and leverage finally cracked the locking plates, yielding high-density survival rations."
+      },
+      {
+        "label": "Cut open seals with plasma torch",
+        "effects": [
+          {
+            "target": "medkits",
+            "delta": 2
+          },
+          {
+            "target": "oxygen",
+            "delta": 20
           },
           {
             "target": "parts",
             "delta": -1
           }
         ],
-        "log": "Nitrogen purge saved the system, but the shock killed half of the edible green crops."
-      },
-      {
-        "label": "Redirect drinking water to maintain humidity",
-        "effects": [
-          {
-            "target": "water",
-            "delta": -30
-          },
-          {
-            "target": "rations",
-            "delta": 10
-          }
-        ],
-        "log": "We sacrificed thirty liters of drinking water to save the harvest, gaining fresh rations."
+        "log": "The plasma torch ate our spare nozzles, but we sliced through the container, finding medical kits and pressurized gas."
       }
     ]
   }

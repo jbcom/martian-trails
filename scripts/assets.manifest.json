@@ -33,7 +33,10 @@
     ],
     "music": [
       { "from": "Audio/Music Loops/Loops/Space Cadet.ogg", "to": "music/menu.ogg" },
-      { "from": "Audio/Music Loops/Loops/Mission Plausible.ogg", "to": "music/trail.ogg" }
+      { "from": "Audio/Music Loops/Loops/Mission Plausible.ogg", "to": "music/trail.ogg" },
+      { "from": "tension.mp3", "to": "music/tension.mp3", "root": "raw-assets/audio-converted" },
+      { "from": "ambient.mp3", "to": "music/ambient.mp3", "root": "raw-assets/audio-converted" },
+      { "from": "victory.mp3", "to": "music/victory.mp3", "root": "raw-assets/audio-converted" }
     ]
   }
 }

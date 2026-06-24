@@ -39,7 +39,10 @@ const sectionRoots = {
   audio: manifest.audioRoot ? resolve(root, manifest.audioRoot) : sourceRoot,
 };
 
-const rootFor = (section) => sectionRoots[section] ?? sourceRoot;
+// Resolve an entry's source root: a per-entry `root` (repo-relative) wins, else
+// the section root. Lets a few converted/derived assets live in raw-assets/.
+const rootFor = (entry) =>
+  entry.root ? resolve(root, entry.root) : (sectionRoots[entry.section] ?? sourceRoot);
 
 const usedRoots = [...new Set(Object.values(sectionRoots))];
 for (const r of usedRoots) {
@@ -60,7 +63,7 @@ for (const section of ["models", "audio"]) {
 
 // Pass 1: validate every source exists BEFORE copying anything, so a missing
 // asset never leaves a partial copy or a manifest that doesn't match disk.
-const missing = entries.filter((e) => !existsSync(join(rootFor(e.section), e.from)));
+const missing = entries.filter((e) => !existsSync(join(rootFor(e), e.from)));
 if (missing.length > 0) {
   for (const e of missing) console.error(`MISSING source: ${e.from}`);
   console.error(`\n${missing.length} source asset(s) missing — aborting (nothing copied).`);
@@ -71,7 +74,7 @@ if (missing.length > 0) {
 const records = [];
 let copied = 0;
 for (const e of entries) {
-  const src = join(rootFor(e.section), e.from);
+  const src = join(rootFor(e), e.from);
   const rel = `${e.section}/${e.to}`;
   const dest = join(outRoot, rel);
   const bytes = readFileSync(src);

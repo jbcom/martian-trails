@@ -37,26 +37,29 @@ export const CREW_FACETS: CrewFacet[] = [
     id: "maya",
     name: "Maya",
     role: "Engineer",
-    look: "dark hair tied back, a tool-harness over the suit, an engineer's focused expression",
+    look: "a tool-harness over the suit, grease-smudged plating, a multitool clipped at the collar",
   },
   {
     id: "frank",
     name: "Frank",
     role: "Geologist",
-    look: "broad bearded man, sun-darkened skin, sample-scanner clipped to collar",
+    look: "a rugged dust-caked suit, a sample-scanner clipped to the collar, rock-core tubes on the chest rig",
   },
   {
     id: "nadia",
     name: "Nadia",
     role: "Botanist",
-    look: "close-cropped hair, a faint green grow-light cast, a botanist's quiet resolve",
+    look: "a faint green grow-light cast on the visor, seed-vials on the suit, a soil-probe at the belt",
   },
 ];
 
 export function buildPortraitPrompt(facet: CrewFacet): string {
+  // Framed as game character concept art with the helmet on / visor up — a
+  // stylized game asset, not a photo of a person (which keeps the image model's
+  // person-generation policy from declining, while staying on-theme for EVA crew).
   return (
-    `Portrait of ${facet.name}, the ${facet.role} of a Mars colonization rover crew — ` +
-    `${facet.look}, wearing a worn pressurized EVA suit with the helmet off, ${SIGNATURE_STYLE} ${STYLE_NEGATIVE}`
+    `Video-game character concept art of the ${facet.role} of a Mars colonization rover crew, ` +
+    `wearing a worn pressurized EVA helmet with the visor up — ${facet.look}. ${SIGNATURE_STYLE} ${STYLE_NEGATIVE}`
   );
 }
 

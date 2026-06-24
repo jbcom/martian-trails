@@ -8,8 +8,8 @@ import type { Screen } from "@/core/screens";
  * the engine hum loops only while driving; modals duck the bed.
  */
 
-/** Music bed per screen (menu vs the trail). Modals/hazards keep the trail bed. */
-function musicFor(screen: Screen): "menu" | "trail" | null {
+/** Music bed per screen. Hazard/EVA swap to a tense ambient bed; terminus plays a win sting. */
+function musicFor(screen: Screen): "menu" | "trail" | "tension" | "ambient" | "victory" | null {
   switch (screen) {
     case "boot":
     case "sponsor":
@@ -17,12 +17,17 @@ function musicFor(screen: Screen): "menu" | "trail" | null {
     case "depot":
     case "travel":
     case "event":
+      return "trail";
     case "hazard":
+      return "tension"; // the signature risk decision gets its own tense bed
     case "eva":
+      return "ambient"; // the lonely surface walk
     case "outpost":
       return "trail";
+    case "terminus":
+      return "victory"; // a triumphant sting on a successful run
     default:
-      return null; // terminus/gameover: let the bed fade, leave silence for the result
+      return null; // gameover: silence for the loss
   }
 }
 

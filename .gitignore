@@ -47,6 +47,7 @@ src/assets/fetched/
 .agent-state/.last-compaction
 .agent-state/batch.json
 .claude/scheduled_tasks.lock
+.claude/state/
 
 # Playtest screenshot artifacts
 artifacts/

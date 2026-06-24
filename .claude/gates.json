@@ -8,7 +8,7 @@
     },
     {
       "when_changed": ["src/audio/**"],
-      "require_changed": ["tests/audio/**", "tests/browser/**"],
+      "require_changed": ["tests/audio/**", "tests/browser/**", "tests/unit/audio-*.test.ts"],
       "block_message": "Audio change without audio graph test."
     },
     {

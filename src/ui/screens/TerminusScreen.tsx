@@ -4,6 +4,7 @@ import { run } from "@/sim/run";
 import { computeScore } from "@/sim/systems/scoring";
 import { useGameStore } from "@/state/store";
 import { GlassPanel } from "@/ui/components/GlassPanel";
+import { HallOfRecords } from "@/ui/components/HallOfRecords";
 
 /** Map a final score to a prestige tier (the design's "Areologist First Class" tone). */
 function prestigeTier(score: number): string {
@@ -33,6 +34,9 @@ function Row({ label, value }: { label: string; value: string }) {
 export function TerminusScreen() {
   const goTo = useGameStore((s) => s.goTo);
   const snap = run.snapshot();
+  // The board reads reactively from the store; useRunPersistence banks this won run on entering
+  // terminus and pushes the updated board into the store, so it appears with no fetch race here.
+  const scores = useGameStore((s) => s.highScores);
 
   const res = (snap?.resources ?? null) as {
     oxygen: number;
@@ -102,6 +106,8 @@ export function TerminusScreen() {
         <Row label={`Hoarded resources ÷${s.resourceDivisor}`} value={`+${resourceBank}`} />
         <Row label={`Sol penalty ×${s.perSol}`} value={`Sol ${sol} → −${sol * s.perSol}`} />
         <Row label="Sponsor multiplier" value={`×${scoreMultiplier}`} />
+
+        <HallOfRecords scores={scores} className="mt-5" />
 
         <button
           type="button"
