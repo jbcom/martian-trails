@@ -1,0 +1,32 @@
+[
+  {
+    "outpost": "Tharsis Outpost",
+    "lines": [
+      "The atmospheric pressure is dropping fast. If those barometers aren't lying, we're in for a massive static storm over the western ridge.",
+      "Water reclamation at Noctis has been failing. Buy extra scrubbers here, or you'll be drinking your own recycled sweat within a week.",
+      "Avoid the direct path through Noctis Labyrinthus if you're hauling heavy cargo. The crevasse bridges are unstable after the last tremor.",
+      "CO2 sublimation rates are up this quarter, but don't take your mask off. The partial pressure will still kill you in under forty seconds.",
+      "A private scout rig went silent near Olympus. Some say they hit a lava tube collapse, others swear they ran out of spare hydrogen."
+    ]
+  },
+  {
+    "outpost": "Pavonis Mons Base",
+    "lines": [
+      "Solar activity is spiking. If you're heading downslope toward the plains, make sure your habitat's electromagnetic shielding is fully charged.",
+      "The hydroponic bay here is down to soy-paste rations again. If you've got real dried fruit or coffee, you can trade it for premium spare parts.",
+      "They say the automated seed-drones are finally planting lichen in the low basin, but the soil toxicity is still melting the root systems.",
+      "Watch the descent path. Glacial ice sheets under the dust layer are sublimating, creating invisible sinkholes that can swallow a rover whole.",
+      "The surveyor team returned from the eastern rift with empty sample crates and pale faces. They won't talk about what they found down there."
+    ]
+  },
+  {
+    "outpost": "Noctis Labyrinthus",
+    "lines": [
+      "GPS signals are completely useless inside the canyon system. If you don't have inertial guidance backups, you'll be driving in circles.",
+      "There's a methane leak in Sector 4. One spark from a bad rover battery, and you'll vaporize your entire caravan.",
+      "The temperature plunges sixty degrees in the shadow of the canyon walls. Keep your heating elements running, or the fuel lines will freeze.",
+      "Found a stripped chassis from the '84 survey run. Leftovers were picked clean, but the hull plating was torn from the inside out.",
+      "Early morning fog in the ravines is getting thicker. It's mostly frozen CO2 and silica dust, so don't let it clog your intake filters."
+    ]
+  }
+]

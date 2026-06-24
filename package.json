@@ -23,7 +23,8 @@
     "itch:library": "node scripts/itch-library.mjs",
     "assets:fetch": "node scripts/fetch-itch-assets.mjs",
     "genai:events": "tsx scripts/genai-events.ts",
-    "genai:portraits": "tsx scripts/genai-portraits.ts"
+    "genai:portraits": "tsx scripts/genai-portraits.ts",
+    "genai:lore": "tsx scripts/genai-lore.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.1",
