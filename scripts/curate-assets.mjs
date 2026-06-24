@@ -19,7 +19,14 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const dry = process.argv.includes("--dry");
 
-const manifest = JSON.parse(readFileSync(join(root, "scripts/assets.manifest.json"), "utf8"));
+const manifestSrc = join(root, "scripts/assets.manifest.json");
+let manifest;
+try {
+  manifest = JSON.parse(readFileSync(manifestSrc, "utf8"));
+} catch (err) {
+  console.error(`Failed to read/parse ${manifestSrc}: ${err.message}`);
+  process.exit(1);
+}
 const sourceRoot = process.env.LOCAL_ASSET_DIR || manifest.sourceRoot;
 const outRoot = join(root, "public/assets");
 
@@ -39,18 +46,22 @@ for (const section of ["models", "audio"]) {
   }
 }
 
+// Pass 1: validate every source exists BEFORE copying anything, so a missing
+// asset never leaves a partial copy or a manifest that doesn't match disk.
+const missing = entries.filter((e) => !existsSync(join(sourceRoot, e.from)));
+if (missing.length > 0) {
+  for (const e of missing) console.error(`MISSING source: ${e.from}`);
+  console.error(`\n${missing.length} source asset(s) missing — aborting (nothing copied).`);
+  process.exit(1);
+}
+
+// Pass 2: copy + record.
 const records = [];
 let copied = 0;
-let missing = 0;
 for (const e of entries) {
   const src = join(sourceRoot, e.from);
   const rel = `${e.section}/${e.to}`;
   const dest = join(outRoot, rel);
-  if (!existsSync(src)) {
-    console.error(`MISSING source: ${e.from}`);
-    missing++;
-    continue;
-  }
   const bytes = readFileSync(src);
   const sha256 = createHash("sha256").update(bytes).digest("hex");
   if (!dry) {
@@ -59,11 +70,6 @@ for (const e of entries) {
   }
   records.push({ path: rel, bytes: bytes.length, sha256 });
   copied++;
-}
-
-if (missing > 0) {
-  console.error(`\n${missing} source asset(s) missing — aborting.`);
-  process.exit(1);
 }
 
 records.sort((a, b) => a.path.localeCompare(b.path));

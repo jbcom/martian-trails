@@ -9,6 +9,7 @@ const manifestPath = join(assetsRoot, "MANIFEST.json");
 type Record = { path: string; bytes: number; sha256: string };
 
 function walk(dir: string, acc: string[] = []): string[] {
+  if (!existsSync(dir)) return acc;
   for (const name of readdirSync(dir)) {
     const full = join(dir, name);
     if (statSync(full).isDirectory()) walk(full, acc);
@@ -17,14 +18,21 @@ function walk(dir: string, acc: string[] = []): string[] {
   return acc;
 }
 
+function loadManifest(): { assets: Record[] } {
+  const raw = readFileSync(manifestPath, "utf8");
+  try {
+    return JSON.parse(raw) as { assets: Record[] };
+  } catch (err) {
+    throw new Error(`public/assets/MANIFEST.json is not valid JSON: ${(err as Error).message}`);
+  }
+}
+
 describe("public/assets integrity", () => {
   it("has a MANIFEST.json", () => {
-    expect(existsSync(manifestPath)).toBe(true);
+    expect(existsSync(manifestPath), "run `pnpm assets:curate` to generate it").toBe(true);
   });
 
-  const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as {
-    assets: Record[];
-  };
+  const manifest = loadManifest();
   const manifested = new Set(manifest.assets.map((a) => a.path));
 
   it("every manifested asset exists with the recorded size + hash", () => {
