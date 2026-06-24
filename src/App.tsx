@@ -1,5 +1,6 @@
 import { GameCanvas } from "@/render/GameCanvas";
 import { Router } from "@/ui/Router";
+import { useRunPersistence } from "@/ui/useRunPersistence";
 import { useSettingsSync } from "@/ui/useSettingsSync";
 
 /**
@@ -15,6 +16,8 @@ import { useSettingsSync } from "@/ui/useSettingsSync";
 export function App() {
   // Keep the audio-mute + haptics subsystems in lockstep with the store settings.
   useSettingsSync();
+  // Persist the in-progress run (resume on refresh) + bank won runs to the Hall of Records.
+  useRunPersistence();
   return (
     <div className="relative h-dvh w-full overflow-hidden bg-mars-bg text-mars-sand">
       <GameCanvas />

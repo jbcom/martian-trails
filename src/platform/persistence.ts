@@ -37,5 +37,27 @@ export const highScoreSchema = z.object({
   sol: z.number(),
   survivors: z.number(),
   seed: z.string(),
+  /** The mission sponsor id the run was flown under (UNOMA / consortium / …). */
+  sponsorId: z.string().default("unoma"),
+  /** Epoch-ms the run was banked, for the board's date column. */
+  date: z.number().default(0),
 });
 export const highScoresSchema = z.array(highScoreSchema);
+
+export type HighScore = z.infer<typeof highScoreSchema>;
+
+/** Max entries the Hall of Records keeps (top N by score, descending). */
+export const HIGH_SCORE_CAP = 10;
+
+/**
+ * Pure high-score table insert: append the entry, sort by score descending, and cap to
+ * the top N. Kept pure (no I/O) so it round-trips in a unit test; the run controller
+ * persists the result via `persistence.save`.
+ */
+export function insertHighScore(
+  table: readonly HighScore[],
+  entry: HighScore,
+  cap = HIGH_SCORE_CAP,
+): HighScore[] {
+  return [...table, entry].sort((a, b) => b.score - a.score).slice(0, cap);
+}

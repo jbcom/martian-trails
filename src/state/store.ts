@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { DEFAULT_SPONSOR } from "@/content/sponsors";
 import type { Screen } from "@/core/screens";
+import type { HighScore } from "@/platform/persistence";
 
 /**
  * UI-cadence store (human cadence). Holds the current screen, settings, and the
@@ -21,6 +22,12 @@ export interface GameStore {
   /** The chosen mission sponsor id (the Oregon Trail profession analog). */
   sponsorId: string;
   settings: Settings;
+  /**
+   * The Hall of Records board (top UNOMA ratings), mirrored from persistence so the boot menu
+   * and the terminus screen render it reactively. Source of truth is @capacitor/preferences;
+   * this is the live cache the save-game layer refreshes (load on boot, push on a won run).
+   */
+  highScores: HighScore[];
 
   goTo: (screen: Screen) => void;
   /** Title → sponsor select: seed the run and present the sponsor cards. */
@@ -28,6 +35,8 @@ export interface GameStore {
   /** Sponsor select → depot: lock in the sponsor (its budget seeds the depot). */
   chooseSponsor: (sponsorId: string) => void;
   setSetting: <K extends keyof Settings>(key: K, value: Settings[K]) => void;
+  /** Replace the cached high-score board (called by the save-game layer after load/bank). */
+  setHighScores: (scores: HighScore[]) => void;
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -41,6 +50,7 @@ export const useGameStore = create<GameStore>((set) => ({
   seed: null,
   sponsorId: DEFAULT_SPONSOR.id,
   settings: { ...DEFAULT_SETTINGS },
+  highScores: [],
 
   goTo: (screen) => set({ screen }),
   // "Begin" now routes to the sponsor-select screen (the profession choice), not
@@ -48,4 +58,5 @@ export const useGameStore = create<GameStore>((set) => ({
   startRun: (seed) => set({ seed, screen: "sponsor" }),
   chooseSponsor: (sponsorId) => set({ sponsorId, screen: "depot" }),
   setSetting: (key, value) => set((s) => ({ settings: { ...s.settings, [key]: value } })),
+  setHighScores: (highScores) => set({ highScores }),
 }));

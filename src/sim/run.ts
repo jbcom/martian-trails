@@ -2,9 +2,11 @@ import { createWorld, type Entity, type World } from "koota";
 import { config } from "@/config";
 import { allEvents } from "@/content/events";
 import type { Rng } from "@/core/rng";
+import { createRng } from "@/core/rng";
 import type { Effect, TrailEvent } from "@/schemas/event";
 import type { Hazard } from "@/schemas/hazard";
 import type { TradeOffer } from "@/schemas/outpost";
+import type { RunSave } from "@/schemas/save";
 import { abilityBlock, abilityForCrew, cooldownRemaining, resolveAbility } from "@/sim/abilities";
 import {
   applyInjury,
@@ -31,7 +33,9 @@ import {
   RngSource,
   SolClock,
   Sponsor,
+  Terrain,
   Travel,
+  Upgrades,
   Weather,
 } from "@/sim/traits";
 import { bumpShake, getDiagnostics, resetDiagnostics } from "@/state/diagnostics";
@@ -162,6 +166,135 @@ class Run {
     this.pendingOutpost = null;
     this.dockedOutposts.clear();
     this.hullWasCritical = false;
+    resetDiagnostics();
+    this.publish();
+  }
+
+  /**
+   * Capture the full resumable run state into a plain-JSON `RunSave` (m7). Snapshots the
+   * expedition entity's serializable traits plus the controller's progression bookkeeping
+   * (which events/hazards/outposts have fired, the event-clock cursor). The live rng streams
+   * are NOT captured — the live trait values are the truth, so resume continues from exact
+   * state. Returns null when there's no live run to save.
+   */
+  serialize(): RunSave | null {
+    const e = this.entity;
+    if (!e) return null;
+    const res = e.get(Resources);
+    const maxRes = e.get(MaxResources);
+    const pos = e.get(Position);
+    const travel = e.get(Travel);
+    const terrain = e.get(Terrain);
+    const weather = e.get(Weather);
+    const outcome = e.get(Outcome);
+    const crew = e.get(Crew);
+    const upgrades = e.get(Upgrades);
+    const sponsor = e.get(Sponsor);
+    const cooldowns = e.get(AbilityCooldowns);
+    const solClock = e.get(SolClock);
+    if (!res || !maxRes || !pos || !travel || !terrain || !weather || !outcome) return null;
+
+    return {
+      version: 1,
+      seed: e.get(RngSource)?.seed.replace(/^expedition:/, "") ?? "",
+      savedAt: Date.now(),
+      resources: {
+        oxygen: res.oxygen,
+        water: res.water,
+        rations: res.rations,
+        power: res.power,
+        parts: res.parts,
+        medkits: res.medkits,
+        morale: res.morale,
+        hull: res.hull,
+        rtg: res.rtg,
+      },
+      maxResources: {
+        oxygen: maxRes.oxygen,
+        water: maxRes.water,
+        rations: maxRes.rations,
+        power: maxRes.power,
+        morale: maxRes.morale,
+        hull: maxRes.hull,
+      },
+      position: { distance: pos.distance, sol: pos.sol, nextOutpost: pos.nextOutpost },
+      travel: { pace: travel.pace, rationLevel: travel.rationLevel, driving: travel.driving },
+      terrain: { zone: terrain.zone },
+      weather: { kind: weather.kind },
+      outcome: { status: outcome.status, reason: outcome.reason, score: outcome.score },
+      crew: (crew ?? []).map((c) => ({
+        id: c.id,
+        alive: c.alive,
+        condition: c.condition,
+        severity: c.severity,
+      })),
+      upgrades: { ...(upgrades ?? {}) },
+      sponsor: { scoreMultiplier: sponsor?.scoreMultiplier ?? 1 },
+      abilityCooldowns: { ...(cooldowns ?? {}) },
+      solClock: { accumulator: solClock?.accumulator ?? 0 },
+      progress: {
+        lastEventSol: this.lastEventSol,
+        seenEvents: [...this.seenEvents],
+        resolvedHazards: [...this.resolvedHazards],
+        dockedOutposts: [...this.dockedOutposts],
+        evaCount: this.evaCount,
+      },
+    };
+  }
+
+  /**
+   * Restore a run from a `RunSave` (m7). Spawns a fresh world seeded from the save (so the
+   * rng streams are re-forked deterministically), then overwrites every persisted trait with
+   * the saved live values and replays the controller's progression bookkeeping. The result is
+   * deterministic-equivalent: the same seed + the same applied history yields the same future.
+   * Any decision that was pending at save time is intentionally dropped (the rover resumes
+   * parked on the trail), keeping resume robust against a corrupt mid-decision capture.
+   */
+  restore(save: RunSave): void {
+    this.world?.destroy();
+    this.world = createWorld();
+    const e = spawnExpedition(this.world, save.seed);
+    this.entity = e;
+
+    e.set(Resources, { ...save.resources });
+    e.set(MaxResources, { ...save.maxResources });
+    e.set(Position, { ...save.position });
+    e.set(Travel, { ...save.travel });
+    e.set(Terrain, { ...save.terrain });
+    e.set(Weather, { ...save.weather });
+    e.set(Outcome, { ...save.outcome });
+    e.set(
+      Crew,
+      save.crew.map((c) => ({ ...c })),
+    );
+    e.set(Upgrades, { ...save.upgrades });
+    e.set(Sponsor, { ...save.sponsor });
+    e.set(AbilityCooldowns, { ...save.abilityCooldowns });
+    e.set(SolClock, { ...save.solClock });
+
+    // Re-fork the controller's dedicated streams from the restored seed (deterministic).
+    const rng = e.get(RngSource) ?? createRng(`expedition:${save.seed}`);
+    this.eventRng = rng.fork("events");
+    this.hazardRng = rng.fork("hazards");
+    this.evaRng = rng.fork("eva");
+
+    this.driving = false;
+    this.lastEventSol = save.progress.lastEventSol;
+    this.seenEvents = new Set(save.progress.seenEvents);
+    this.resolvedHazards = new Set(save.progress.resolvedHazards);
+    this.dockedOutposts = new Set(save.progress.dockedOutposts);
+    this.evaCount = save.progress.evaCount;
+
+    // A run resumes parked on the trail — any pending decision/EVA at save time is dropped.
+    this.pendingEvent = null;
+    this.pendingHazard = null;
+    this.hazardRead = 0;
+    this.lastHazardResult = null;
+    this.eva = null;
+    this.evaYieldPrimed = false;
+    this.pendingOutpost = null;
+    this.hullWasCritical = false;
+
     resetDiagnostics();
     this.publish();
   }

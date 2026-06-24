@@ -18,6 +18,7 @@ import {
   upgradesCreditCost,
 } from "@/sim/loadout";
 import { run } from "@/sim/run";
+import { clearRun } from "@/state/savegame";
 import { useGameStore } from "@/state/store";
 import { GlassPanel } from "@/ui/components/GlassPanel";
 
@@ -165,6 +166,8 @@ export function DepotScreen() {
     if (!canDepart) return;
     void tapLight();
     audio.unlock();
+    // A fresh expedition supersedes any stale in-progress save (the autosave then re-arms).
+    void clearRun();
     run.start(
       seed ?? `ares-${Date.now().toString(36)}`,
       buildLoadout(cart, upgrades, scoreMultiplier),

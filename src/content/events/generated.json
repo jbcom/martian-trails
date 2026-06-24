@@ -3,10 +3,7 @@
     "id": "event:solar-proton-warning",
     "title": "Solar Proton Event Warning",
     "description": "The orbital monitoring network reports a massive coronal mass ejection heading toward Mars. Your rover's shielding is minimal; you must decide how to shield the crew.",
-    "tags": [
-      "solar-flare",
-      "radiation"
-    ],
+    "tags": ["solar-flare", "radiation"],
     "options": [
       {
         "label": "Deploy lead-lined blankets internally",
@@ -50,10 +47,7 @@
     "id": "event:static-dust-front",
     "title": "Static-Charged Dust Front",
     "description": "A towering wall of red dust blocks the horizon. The triboelectric charge is throwing sparks across the cockpit glass and threatening the battery banks.",
-    "tags": [
-      "dust-storm",
-      "thermal"
-    ],
+    "tags": ["dust-storm", "thermal"],
     "options": [
       {
         "label": "Hunker down and wait it out",
@@ -93,9 +87,7 @@
     "id": "event:seized-steering-actuator",
     "title": "Seized Steering Actuator",
     "description": "The front-left drive wheel shudders and locks up. Metal shavings contaminate the differential oil. You must repair it or limp along.",
-    "tags": [
-      "mechanical-failure"
-    ],
+    "tags": ["mechanical-failure"],
     "options": [
       {
         "label": "Replace with spare components",
@@ -135,10 +127,7 @@
     "id": "event:abandoned-surveyor-hab",
     "title": "Abandoned Surveyor Hab",
     "description": "A defunct, half-buried inflatable habitat from the early exploratory era looms out of the dust. Its airlocks are long dead, but salvage remains.",
-    "tags": [
-      "supply-cache",
-      "scavenging"
-    ],
+    "tags": ["supply-cache", "scavenging"],
     "options": [
       {
         "label": "Cycle airlock manually to scavenge",
@@ -182,9 +171,7 @@
     "id": "event:micro-meteorite-breach",
     "title": "Micro-Meteorite Hull Breach",
     "description": "A high-velocity particle punches a millimeter-wide hole through the secondary cabin seal. A high-pitched whistle warns of atmospheric decompression.",
-    "tags": [
-      "seal-failure"
-    ],
+    "tags": ["seal-failure"],
     "options": [
       {
         "label": "Deploy emergency sealant foam",
@@ -220,9 +207,7 @@
     "id": "event:ration-discrepancy",
     "title": "Ration Discrepancy",
     "description": "A crew member discovers that someone has been double-dipping into the nutrient paste packs. Accusations fly as cabin fever sets in.",
-    "tags": [
-      "crew-conflict"
-    ],
+    "tags": ["crew-conflict"],
     "options": [
       {
         "label": "Impose strict dietary tracking",
@@ -258,9 +243,7 @@
     "id": "event:noctis-labyrinthus-chasm",
     "title": "Noctis Labyrinthus Chasm",
     "description": "Your orbital maps missed a sudden graben blocking the path. You can detour around the maze or attempt to traverse a steep, loose scree slope.",
-    "tags": [
-      "navigation"
-    ],
+    "tags": ["navigation"],
     "options": [
       {
         "label": "Take the long detour detour",
@@ -304,10 +287,7 @@
     "id": "event:rtg-thermocouple-drop",
     "title": "RTG Thermocouple Degradation",
     "description": "The radioisotope thermoelectric generator's cooling loop is failing. Interior temperatures are dropping rapidly toward freezing.",
-    "tags": [
-      "thermal",
-      "mechanical-failure"
-    ],
+    "tags": ["thermal", "mechanical-failure"],
     "options": [
       {
         "label": "Reroute main battery to heaters",
@@ -347,9 +327,7 @@
     "id": "event:crashed-cargo-drone",
     "title": "Crashed Cargo Drone",
     "description": "An old autonomous supply drone lies shattered in a shallow crater. Its lithium-sulfur battery pack appears intact, but unstable.",
-    "tags": [
-      "scavenging"
-    ],
+    "tags": ["scavenging"],
     "options": [
       {
         "label": "Attempt hot-wire extraction",
@@ -385,10 +363,7 @@
     "id": "event:condensation-on-circuits",
     "title": "Condensation on Electronics",
     "description": "Moisture is condensing on the cold interior hull plates, pooling near the primary life support terminal. A short-circuit is imminent.",
-    "tags": [
-      "seal-failure",
-      "thermal"
-    ],
+    "tags": ["seal-failure", "thermal"],
     "options": [
       {
         "label": "Crank the cabin dehumidifier",
@@ -424,10 +399,7 @@
     "id": "event:cosmic-ray-spike",
     "title": "Cosmic Ray Spike",
     "description": "A high-energy galactic cosmic ray shower hits. The crew must retreat to the heavily shielded, cramped bunk area for 36 hours.",
-    "tags": [
-      "radiation",
-      "crew-conflict"
-    ],
+    "tags": ["radiation", "crew-conflict"],
     "options": [
       {
         "label": "Maintain strict, cramped isolation",
@@ -463,10 +435,7 @@
     "id": "event:sensor-blindness",
     "title": "Dust-Induced Sensor Blindness",
     "description": "Fine, iron-rich dust has coated the external optical sensors, rendering your automated pathfinding useless. You are driving blind.",
-    "tags": [
-      "dust-storm",
-      "navigation"
-    ],
+    "tags": ["dust-storm", "navigation"],
     "options": [
       {
         "label": "Perform manual EVA cleaning",
@@ -502,9 +471,7 @@
     "id": "event:co2-scrubber-saturated",
     "title": "CO2 Scrubber Saturated",
     "description": "The primary zeolite CO2 scrubbers have saturated early. Carbon dioxide levels in the cabin are beginning to climb.",
-    "tags": [
-      "mechanical-failure"
-    ],
+    "tags": ["mechanical-failure"],
     "options": [
       {
         "label": "Bake out zeolite using heaters",
@@ -540,9 +507,7 @@
     "id": "event:buried-ice-deposit",
     "title": "Buried Water Ice Deposit",
     "description": "A radar scan indicates a pure glacial lens of water ice just two meters below the sandy regolith. Digging will require heavy drill power.",
-    "tags": [
-      "supply-cache"
-    ],
+    "tags": ["supply-cache"],
     "options": [
       {
         "label": "Run the high-draw thermal drill",
@@ -578,9 +543,7 @@
     "id": "event:claustrophobic-breakdown",
     "title": "The Claustrophobic Breakdown",
     "description": "One of your technicians locks themselves in the storage alcove, claiming they can hear the martian wind screaming through the hull.",
-    "tags": [
-      "crew-conflict"
-    ],
+    "tags": ["crew-conflict"],
     "options": [
       {
         "label": "Administer a heavy sedative",
@@ -616,10 +579,7 @@
     "id": "event:sinking-sand-trap",
     "title": "Sinking Sand Trap",
     "description": "The rover drives into a pocket of ultra-fine, dehydrated dust. The wheels spin uselessly, sinking deeper into the martian soil.",
-    "tags": [
-      "navigation",
-      "mechanical-failure"
-    ],
+    "tags": ["navigation", "mechanical-failure"],
     "options": [
       {
         "label": "Deploy high-friction recovery tracks",
@@ -655,9 +615,7 @@
     "id": "event:sub-zero-battery-freeze",
     "title": "Sub-Zero Battery Freeze",
     "description": "The external temperature has plunged to -110C. The primary battery compartment heater is struggling to maintain operating threshold.",
-    "tags": [
-      "thermal"
-    ],
+    "tags": ["thermal"],
     "options": [
       {
         "label": "Dump excess power to core warmers",
@@ -693,10 +651,7 @@
     "id": "event:irradiated-pioneer-probe",
     "title": "Irradiated Pioneer Lander",
     "description": "You stumble across a historical probe from the 1970s. Its radioisotope heating unit is leaking radiation, but contains rare-earth elements.",
-    "tags": [
-      "scavenging",
-      "radiation"
-    ],
+    "tags": ["scavenging", "radiation"],
     "options": [
       {
         "label": "Perform quick salvage of components",
@@ -732,9 +687,7 @@
     "id": "event:airlock-interlock-glitch",
     "title": "Airlock Interlock Glitch",
     "description": "An electronic glitch prevents the inner airlock door from sealing completely during pressure equalization. Air is venting slowly.",
-    "tags": [
-      "seal-failure"
-    ],
+    "tags": ["seal-failure"],
     "options": [
       {
         "label": "Force the manual override crank",
@@ -770,10 +723,7 @@
     "id": "event:geomagnetic-induction",
     "title": "Induced Grid Currents",
     "description": "The planetary magnetic field lines shake from a solar impact, inducing dangerous currents in the rover's electrical grid.",
-    "tags": [
-      "solar-flare",
-      "power"
-    ],
+    "tags": ["solar-flare", "power"],
     "options": [
       {
         "label": "Shunt excess current to ground spike",
@@ -809,9 +759,7 @@
     "id": "event:water-ration-protest",
     "title": "The Water Ration Protest",
     "description": "The crew discovers a slow leak in a greywater line. A debate erupts: should they cut personal hygiene use or drink recycled urine?",
-    "tags": [
-      "crew-conflict"
-    ],
+    "tags": ["crew-conflict"],
     "options": [
       {
         "label": "Enforce strict hygiene ban",
@@ -847,9 +795,7 @@
     "id": "event:crater-rim-route",
     "title": "Crater Rim Route",
     "description": "A massive impact crater blocks the direct path. You can climb the steep, rocky rim or circle around the vast ejecta blanket.",
-    "tags": [
-      "navigation"
-    ],
+    "tags": ["navigation"],
     "options": [
       {
         "label": "Climb the steep rocky rim",
@@ -889,10 +835,7 @@
     "id": "event:evaporative-cooling-leak",
     "title": "Evaporative Cooling Leak",
     "description": "A crack in the environmental system's evaporator line causes precious water to flash-freeze and sublimate into the vacuum.",
-    "tags": [
-      "thermal",
-      "mechanical-failure"
-    ],
+    "tags": ["thermal", "mechanical-failure"],
     "options": [
       {
         "label": "Seal the leak with vacuum tape",
@@ -928,10 +871,7 @@
     "id": "event:crashed-drop-pod",
     "title": "Crashed Orbital Drop Pod",
     "description": "A heavily charred cargo pod lies half-buried in a dune. Its tracking beacon is dead, but the internal lockers are intact.",
-    "tags": [
-      "scavenging",
-      "supply-cache"
-    ],
+    "tags": ["scavenging", "supply-cache"],
     "options": [
       {
         "label": "Pry open safe with mechanical tools",
