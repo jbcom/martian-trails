@@ -1,15 +1,19 @@
 import path from "node:path";
-import { svelte } from "@sveltejs/vite-plugin-svelte";
+import react from "@vitejs/plugin-react";
 import { defineConfig } from "vitest/config";
 
+// Node/jsdom unit tests — the pure src/sim systems, config loaders, scoring,
+// RNG determinism. Browser component tests use vitest.browser.config.ts.
 export default defineConfig({
-  plugins: [svelte({ hot: !process.env.VITEST })],
+  plugins: [react()],
   test: {
-    include: ["tests/unit/**/*.{test,spec}.ts"],
+    include: ["tests/unit/**/*.{test,spec}.{ts,tsx}", "src/**/*.{test,spec}.{ts,tsx}"],
+    exclude: ["tests/browser/**", "tests/e2e/**", "node_modules", "dist", "android"],
     environment: "jsdom",
+  },
+  resolve: {
     alias: {
-      $lib: path.resolve(__dirname, "./src/lib"),
-      $assets: path.resolve(__dirname, "./src/assets"),
+      "@": path.resolve(__dirname, "./src"),
     },
   },
 });

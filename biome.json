@@ -18,6 +18,9 @@
       "!red_mars_the_ares_trail.html"
     ]
   },
+  "css": {
+    "parser": { "tailwindDirectives": true }
+  },
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "linter": {
     "enabled": true,
