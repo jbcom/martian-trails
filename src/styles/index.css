@@ -22,3 +22,28 @@ body {
 canvas {
   display: block;
 }
+
+/*
+ * Critical-alarm vignette pulse (docs/DESIGN-SYSTEM.md §States — Critical, "1s ease
+ * alternate"). AlarmOverlay attaches `.animate-alarm-pulse`; reduced-motion holds the
+ * vignette steady instead (handled in the component, and belt-and-braces here).
+ */
+@keyframes alarm-pulse {
+  0% {
+    opacity: 0.45;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.animate-alarm-pulse {
+  animation: alarm-pulse 1s ease-in-out infinite alternate;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-alarm-pulse {
+    animation: none;
+    opacity: 0.85;
+  }
+}

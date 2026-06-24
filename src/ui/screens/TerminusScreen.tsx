@@ -60,7 +60,7 @@ export function TerminusScreen() {
     : 0;
 
   return (
-    <div className="grid h-full place-items-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="grid h-full place-items-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
       <GlassPanel
         className="w-full max-w-md p-6"
         motionProps={{

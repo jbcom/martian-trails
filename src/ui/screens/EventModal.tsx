@@ -31,7 +31,7 @@ export function EventModal({ event }: { event?: TrailEvent }) {
   }
 
   return (
-    <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-black/60 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="pointer-events-auto absolute inset-0 grid place-items-center bg-black/60 p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
       <GlassPanel
         className="w-full max-w-lg p-5"
         motionProps={{

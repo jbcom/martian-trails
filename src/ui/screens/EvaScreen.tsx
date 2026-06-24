@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { config } from "@/config";
+import { tapLight } from "@/platform/haptics";
 import { isCarryFull, type ScanHeat } from "@/sim/eva";
 import { run } from "@/sim/run";
 import { useGameStore } from "@/state/store";
@@ -65,6 +66,7 @@ export function EvaScreen() {
       setCells((c) => ({ ...c, [key]: { ...c[key], heat } }));
       if (heat === "hot") setFlash("Deposit nearby — switch to Drill");
     } else {
+      void tapLight();
       const hit = run.evaDrill(x, y);
       setCells((c) => ({
         ...c,
@@ -89,7 +91,7 @@ export function EvaScreen() {
         : "var(--color-ok)";
 
   return (
-    <div className="pointer-events-none flex h-full flex-col justify-between gap-3 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="pointer-events-none flex h-full flex-col justify-between gap-3 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))]">
       {/* Top: O₂ clock + haul tally. */}
       <GlassPanel
         className="pointer-events-auto p-3"

@@ -1,5 +1,6 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { notifyError, tapLight } from "@/platform/haptics";
 import type { HazardEffect, HazardOption } from "@/schemas/hazard";
 import { type HazardResult, scaledWeight } from "@/sim/hazard";
 import { run } from "@/sim/run";
@@ -164,7 +165,12 @@ export function HazardScreen() {
 
   function choose(optionId: string) {
     const r = run.resolveHazard(optionId);
-    if (r) setResult(r);
+    if (r) {
+      // A failed traverse gets the heavy error buzz; a clean/partial crossing a light tap.
+      if (r.tier === "fail") void notifyError();
+      else void tapLight();
+      setResult(r);
+    }
   }
 
   function resume() {
@@ -193,7 +199,7 @@ export function HazardScreen() {
   }
 
   return (
-    <div className="pointer-events-none flex h-full items-end justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:items-center">
+    <div className="pointer-events-none flex h-full items-end justify-center p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] sm:items-center">
       <GlassPanel
         className="pointer-events-auto w-full max-w-lg p-5"
         motionProps={{

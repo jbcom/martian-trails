@@ -1,6 +1,8 @@
 import { OrthographicCamera } from "@react-three/drei";
+import { useFrame, useThree } from "@react-three/fiber";
 import { useEffect, useRef } from "react";
 import type { OrthographicCamera as ThreeOrthoCamera } from "three";
+import { getDiagnostics } from "@/state/diagnostics";
 import { colorsHex } from "@/styles/tokens";
 
 /**
@@ -11,8 +13,15 @@ import { colorsHex } from "@/styles/tokens";
  * world->pixel scale of the ortho frustum; the modest downward tilt comes from
  * the camera's Y lift plus the lookAt target.
  */
-export function SideCamera({ zoom = 42 }: { zoom?: number }) {
+export function SideCamera({ zoom }: { zoom?: number }) {
   const ref = useRef<ThreeOrthoCamera>(null);
+  const size = useThree((s) => s.size);
+
+  // Responsive zoom: an ortho camera at a fixed zoom crops the scene on a narrow phone
+  // (too few world-units fit across) and floats it on a wide foldable. Scale the zoom with
+  // the live viewport width so the rover + props frame consistently across phone → foldable.
+  // Caller can still pin a zoom (tests); otherwise derive it from the width.
+  const responsiveZoom = zoom ?? zoomForWidth(size.width);
 
   useEffect(() => {
     // Aim at the scene's visual centre (a touch above the ground plane) so the
@@ -20,17 +29,70 @@ export function SideCamera({ zoom = 42 }: { zoom?: number }) {
     ref.current?.lookAt(0, 1.5, 0);
   }, []);
 
+  // Keep the zoom in sync as the window resizes (foldable unfold, orientation change).
+  useEffect(() => {
+    if (ref.current) {
+      ref.current.zoom = responsiveZoom;
+      ref.current.updateProjectionMatrix();
+    }
+  }, [responsiveZoom]);
+
   return (
     <OrthographicCamera
       ref={ref}
       makeDefault
       // Slightly to the +X side, raised for the downward tilt, pulled back on +Z.
       position={[5, 4.5, 18]}
-      zoom={zoom}
+      zoom={responsiveZoom}
       near={-100}
       far={200}
     />
   );
+}
+
+/**
+ * Map a viewport width (CSS px) to an ortho zoom that holds the framing. A phone (~390px)
+ * needs a smaller zoom so more world fits across; a foldable (~1280px) a larger one so the
+ * scene isn't tiny. Tuned so the rover + nearest props always read; clamped at both ends so
+ * extreme sizes don't blow the framing out.
+ */
+export function zoomForWidth(width: number): number {
+  // Reference: width 820 (tablet) → zoom 42 (the original tuned value).
+  const z = (width / 820) * 42;
+  return Math.max(28, Math.min(58, z));
+}
+
+/**
+ * Camera shake on impactful beats. Reads `diagnostics.shake` (bumped by the run controller on
+ * hazard-fail / hull-critical) and offsets the active camera by a decaying random jitter, then
+ * decays the trauma toward 0. Render-only; never writes back to the sim. Suppressed when
+ * reduced-motion is on (the offset collapses to 0).
+ */
+export function CameraShake({ reducedMotion = false }: { reducedMotion?: boolean }) {
+  const camera = useThree((s) => s.camera);
+  // The camera's rest position (so we always shake AROUND it, never drift).
+  const base = useRef<[number, number, number] | null>(null);
+
+  useFrame((_, delta) => {
+    if (!base.current) base.current = [camera.position.x, camera.position.y, camera.position.z];
+    const [bx, by, bz] = base.current;
+    const d = getDiagnostics();
+
+    if (reducedMotion || d.shake <= 0.001) {
+      camera.position.set(bx, by, bz);
+      d.shake = 0;
+      return;
+    }
+
+    // Trauma² gives a punchier knock that falls off fast (Squirrel Eiserloh's curve).
+    const mag = d.shake * d.shake;
+    const amp = 0.9 * mag;
+    camera.position.set(bx + (Math.random() * 2 - 1) * amp, by + (Math.random() * 2 - 1) * amp, bz);
+    // Decay ~2.5/s so a hard knock settles in well under a second.
+    d.shake = Math.max(0, d.shake - delta * 2.5);
+  });
+
+  return null;
 }
 
 /**

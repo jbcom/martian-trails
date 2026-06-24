@@ -1,5 +1,6 @@
 import { GameCanvas } from "@/render/GameCanvas";
 import { Router } from "@/ui/Router";
+import { useSettingsSync } from "@/ui/useSettingsSync";
 
 /**
  * Application shell. Mounts the R3F render layer (GameCanvas — side-3D ortho scene
@@ -12,8 +13,10 @@ import { Router } from "@/ui/Router";
  * procedural stand-ins).
  */
 export function App() {
+  // Keep the audio-mute + haptics subsystems in lockstep with the store settings.
+  useSettingsSync();
   return (
-    <div className="relative h-dvh w-dvw overflow-hidden bg-mars-bg text-mars-sand">
+    <div className="relative h-dvh w-full overflow-hidden bg-mars-bg text-mars-sand">
       <GameCanvas />
       <Router />
     </div>

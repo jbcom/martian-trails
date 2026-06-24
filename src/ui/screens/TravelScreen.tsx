@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { config } from "@/config";
+import { tapLight } from "@/platform/haptics";
 import { type RunSnapshot, run } from "@/sim/run";
 import { useGameStore } from "@/state/store";
 import { Gauge } from "@/ui/components/Gauge";
@@ -40,8 +41,12 @@ function CrewPortrait({ id, alive }: { id: string; alive: boolean }) {
  * method on the singleton run controller (not a React hook), but its name matches the linter's
  * hook-naming heuristic — the ignore is a true false-positive, not a rules-of-hooks violation.
  */
-// biome-ignore lint/correctness/useHookAtTopLevel: run.useAbility is a controller method, not a React hook.
-const activateAbility = (crewId: string): boolean => run.useAbility(crewId);
+const activateAbility = (crewId: string): boolean => {
+  // biome-ignore lint/correctness/useHookAtTopLevel: run.useAbility is a controller method, not a React hook.
+  const fired = run.useAbility(crewId);
+  if (fired) void tapLight();
+  return fired;
+};
 
 /** Human label for an ability block reason. */
 function blockLabel(blocked: "dead" | "cooldown" | "afford" | null, cooldown: number): string {
@@ -237,7 +242,7 @@ export function TravelScreen() {
     : `Sol ${snap.sol} — rover halted at ${Math.round(snap.distance)} km. Awaiting orders.`;
 
   return (
-    <div className="pointer-events-none flex h-full flex-col justify-between gap-3 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+    <div className="pointer-events-none flex h-full flex-col justify-between gap-3 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))]">
       {/* Top: progress + Sol counter. */}
       <GlassPanel
         className="pointer-events-auto p-3"
@@ -301,7 +306,10 @@ export function TravelScreen() {
           </div>
           <button
             type="button"
-            onClick={() => run.setDriving(!snap.driving)}
+            onClick={() => {
+              void tapLight();
+              run.setDriving(!snap.driving);
+            }}
             className="mt-1 min-h-[44px] rounded border font-display text-sm uppercase tracking-[0.18em] transition-colors"
             style={{
               borderColor: snap.driving ? "var(--color-alert)" : "var(--color-ok)",

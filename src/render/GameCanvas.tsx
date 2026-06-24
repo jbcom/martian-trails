@@ -1,9 +1,10 @@
 import { Canvas } from "@react-three/fiber";
 import { Bloom, EffectComposer, Noise, Vignette } from "@react-three/postprocessing";
 import { useEffect } from "react";
+import { audio } from "@/audio/engine";
 import type { Screen } from "@/core/screens";
 import { preloadModels } from "@/render/assets/models";
-import { SideCamera } from "@/render/camera";
+import { CameraShake, SideCamera } from "@/render/camera";
 import { DepotScene } from "@/render/scenes/DepotScene";
 import { EvaScene } from "@/render/scenes/EvaScene";
 import { HazardScene } from "@/render/scenes/HazardScene";
@@ -11,6 +12,7 @@ import { OutpostScene } from "@/render/scenes/OutpostScene";
 import { TravelScene } from "@/render/scenes/TravelScene";
 import { useGameStore } from "@/state/store";
 import { colors } from "@/styles/tokens";
+import { useReducedMotion } from "@/ui/useReducedMotion";
 
 /**
  * Maps the active screen (UI cadence, from the zustand store) to its R3F scene.
@@ -44,9 +46,13 @@ function SceneForScreen({ screen }: { screen: Screen }) {
  */
 export function GameCanvas() {
   const screen = useGameStore((s) => s.screen);
+  const reducedMotion = useReducedMotion();
 
+  // Preload all scene GLBs + warm the SFX cache up front so the first paint of each scene and
+  // the first sting aren't a fetch-on-demand hitch (docs: extend preload to all models + audio).
   useEffect(() => {
     preloadModels();
+    audio.preload();
   }, []);
 
   return (
@@ -58,6 +64,7 @@ export function GameCanvas() {
       style={{ background: colors.marsBg }}
     >
       <SideCamera />
+      <CameraShake reducedMotion={reducedMotion} />
       <SceneForScreen screen={screen} />
       <EffectComposer>
         <Bloom intensity={0.5} luminanceThreshold={0.65} luminanceSmoothing={0.3} mipmapBlur />

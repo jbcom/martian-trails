@@ -82,7 +82,7 @@ export function SponsorScreen() {
   const sponsors = allSponsors();
 
   return (
-    <div className="flex h-full flex-col gap-5 p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="flex h-full flex-col gap-5 p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
       <motion.div
         initial={{ y: -12, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
