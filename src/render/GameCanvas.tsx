@@ -5,6 +5,8 @@ import type { Screen } from "@/core/screens";
 import { preloadModels } from "@/render/assets/models";
 import { SideCamera } from "@/render/camera";
 import { DepotScene } from "@/render/scenes/DepotScene";
+import { EvaScene } from "@/render/scenes/EvaScene";
+import { HazardScene } from "@/render/scenes/HazardScene";
 import { TravelScene } from "@/render/scenes/TravelScene";
 import { useGameStore } from "@/state/store";
 import { colors } from "@/styles/tokens";
@@ -21,6 +23,10 @@ function SceneForScreen({ screen }: { screen: Screen }) {
     case "travel":
     case "event":
       return <TravelScene />;
+    case "hazard":
+      return <HazardScene />;
+    case "eva":
+      return <EvaScene />;
     default:
       return <DepotScene />;
   }

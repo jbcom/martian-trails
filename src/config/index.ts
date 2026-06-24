@@ -23,8 +23,12 @@ import {
   type UpgradesConfig,
   upgradesSchema,
 } from "@/schemas/config";
+import { type EvaConfig, evaSchema } from "@/schemas/eva";
+import { type HazardsConfig, hazardsFileSchema } from "@/schemas/hazard";
 import { type IllnessConfig, illnessSchema } from "@/schemas/illness";
 import crewJson from "./crew.json";
+import evaJson from "./eva.json";
+import hazardsJson from "./hazards.json";
 import illnessJson from "./illness.json";
 import resourcesJson from "./resources.json";
 import scoringJson from "./scoring.json";
@@ -50,6 +54,8 @@ export const upgrades: UpgradesConfig = load("upgrades", upgradesSchema, upgrade
 export const store: StoreConfig = load("store", storeSchema, storeJson);
 export const scoring: ScoringConfig = load("scoring", scoringSchema, scoringJson);
 export const illness: IllnessConfig = load("illness", illnessSchema, illnessJson);
+export const hazards: HazardsConfig = load("hazards", hazardsFileSchema, hazardsJson);
+export const eva: EvaConfig = load("eva", evaSchema, evaJson);
 
 /** The complete validated config bundle, handy for factories and tests. */
 export const config = {
@@ -61,6 +67,8 @@ export const config = {
   store,
   scoring,
   illness,
+  hazards,
+  eva,
 } as const;
 
 export type Config = typeof config;

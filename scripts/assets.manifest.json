@@ -7,6 +7,7 @@
   "models": {
     "rover": [{ "from": "rover.glb", "to": "rover/rover.glb" }],
     "crew": [{ "from": "astronaut.glb", "to": "crew/astronaut.glb" }],
+    "terrain": [{ "from": "rocks.glb", "to": "terrain/rocks.glb" }],
     "outpost": [
       { "from": "machinery_1.glb", "to": "outpost/machinery_1.glb" },
       { "from": "machinery_3.glb", "to": "outpost/machinery_3.glb" }

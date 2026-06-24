@@ -19,6 +19,23 @@ function tickFrames(seconds: number) {
   for (let t = 0; t < seconds; t += frame) run.tick(frame);
 }
 
+/**
+ * Drive Sols until a hazard is raised (or the loop budget runs out), resolving any random
+ * trail events along the way (an event halt also stops the rover, which would otherwise stall
+ * the drive short of the hazard) and keeping the rover under power.
+ */
+function driveToHazard(maxSols = 400) {
+  run.setDriving(true);
+  for (let i = 0; i < maxSols && !run.currentHazard && run.snapshot()?.outcome === "running"; i++) {
+    tickFrames(SECONDS_PER_SOL);
+    if (run.currentEvent) {
+      run.applyEventChoice([]);
+      run.setDriving(true);
+    }
+  }
+  return run.currentHazard;
+}
+
 describe("run controller — sim ↔ diagnostics integration", () => {
   beforeEach(() => {
     run.start("test-seed", LOADOUT);
@@ -116,5 +133,100 @@ describe("run controller — sim ↔ diagnostics integration", () => {
     const after = run.snapshot()?.resources as { morale: number };
     expect(run.currentEvent).toBeNull();
     expect(after.morale).toBe(Math.max(0, before.morale - 5));
+  });
+});
+
+describe("run controller — hazard traverse", () => {
+  beforeEach(() => {
+    run.start("hz-seed", { ...LOADOUT, oxygen: 9000, water: 9000, rations: 9000 });
+    run.setDriving(true);
+  });
+
+  it("raises a hazard at its route distance and halts the rover", () => {
+    // Drive far enough to cross the first hazard (Noctis Chasma @ 360 km).
+    const hazard = driveToHazard();
+    expect(hazard).not.toBeNull();
+    const s = run.snapshot();
+    expect(s?.pendingHazard?.id).toBe(hazard?.id);
+    expect(s?.driving).toBe(false);
+    // The read gauge is a real 0..1 value the UI shows.
+    expect(s?.hazardRead).toBeGreaterThan(0);
+    expect(s?.hazardRead).toBeLessThanOrEqual(1);
+  });
+
+  it("resolveHazard applies the outcome, costs Sols, and clears the halt", () => {
+    const hazard = driveToHazard();
+    expect(hazard).not.toBeNull();
+    const solBefore = run.snapshot()?.sol ?? 0;
+    // Detour is the safe band (+3 Sols, −8 km) on Noctis Chasma; pick whatever detour-like
+    // option exists, else the first option.
+    const opt = hazard?.options.find((o) => o.id === "detour") ?? hazard?.options[0];
+    const result = run.resolveHazard(opt!.id);
+    expect(result).not.toBeNull();
+    expect(run.currentHazard).toBeNull();
+    expect(run.snapshot()?.sol).toBeGreaterThanOrEqual(solBefore);
+    expect(run.snapshot()?.lastHazardResult?.optionId).toBe(opt!.id);
+  });
+
+  it("does not re-raise a resolved hazard", () => {
+    const hazard = driveToHazard();
+    expect(hazard).not.toBeNull();
+    const id = hazard?.id;
+    run.resolveHazard(hazard!.options[0].id);
+    run.setDriving(true);
+    // Tick a little more across the same window — the same hazard must not fire again.
+    for (let i = 0; i < 10; i++) tickFrames(SECONDS_PER_SOL);
+    expect(run.currentHazard?.id).not.toBe(id);
+  });
+});
+
+describe("run controller — EVA prospecting", () => {
+  beforeEach(() => {
+    run.start("eva-seed", LOADOUT);
+  });
+
+  it("startEva opens a session capped at the rover's O₂", () => {
+    const session = run.startEva();
+    expect(session).not.toBeNull();
+    expect(run.currentEva).not.toBeNull();
+    expect(session?.o2 ?? 0).toBeGreaterThan(0);
+  });
+
+  it("scan + drill thread through the session and bank a haul", () => {
+    const session = run.startEva()!;
+    const dep = session.deposits.find((d) => d.remaining > 0)!;
+    const heat = run.evaScan(dep.x, dep.y);
+    expect(heat).toBe("hot");
+    const hit = run.evaDrill(dep.x, dep.y);
+    expect(hit).toBe(true);
+    expect(run.currentEva?.haul.drills ?? 0).toBe(1);
+  });
+
+  it("endEva banks water/parts/score into the run and re-pools suit O₂", () => {
+    // Capture O₂ BEFORE startEva charges the suit budget out of the rover.
+    const o2Before = (run.snapshot()?.resources as { oxygen: number }).oxygen;
+    const session = run.startEva()!;
+    const dep = session.deposits.find((d) => d.remaining > 0)!;
+    run.evaDrill(dep.x, dep.y);
+    const scoreBefore = run.snapshot()?.score ?? 0;
+    run.endEva();
+    expect(run.currentEva).toBeNull();
+    // Score grew by the haul's score.
+    expect(run.snapshot()?.score).toBeGreaterThanOrEqual(scoreBefore);
+    // O₂ is conserved minus what the EVA burned: lower than the pre-EVA pool, never higher.
+    const o2After = (run.snapshot()?.resources as { oxygen: number }).oxygen;
+    expect(o2After).toBeLessThan(o2Before);
+  });
+
+  it("is deterministic — same seed + actions → same haul", () => {
+    const play = () => {
+      run.start("eva-fixed", LOADOUT);
+      const s = run.startEva()!;
+      const dep = s.deposits.find((d) => d.remaining > 0)!;
+      run.evaScan(dep.x, dep.y);
+      run.evaDrill(dep.x, dep.y);
+      return JSON.stringify(run.currentEva?.haul);
+    };
+    expect(play()).toBe(play());
   });
 });

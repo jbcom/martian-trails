@@ -1,5 +1,6 @@
 import { config } from "@/config";
 import { type RunSnapshot, run } from "@/sim/run";
+import { useGameStore } from "@/state/store";
 import { Gauge } from "@/ui/components/Gauge";
 import { GlassPanel } from "@/ui/components/GlassPanel";
 import { useRun } from "@/ui/useRun";
@@ -101,6 +102,7 @@ function powerMax(res: RunSnapshot["resources"]): number {
  */
 export function TravelScreen() {
   const snap = useRun();
+  const goTo = useGameStore((s) => s.goTo);
   if (!snap?.resources) {
     return (
       <div className="grid h-full place-items-center">
@@ -199,6 +201,24 @@ export function TravelScreen() {
           >
             {snap.driving ? "Halt Rover" : "Drive"}
           </button>
+          {/* EVA prospecting is available only while halted (suit up off the move). */}
+          {!snap.driving && (
+            <button
+              type="button"
+              onClick={() => {
+                run.startEva();
+                goTo("eva");
+              }}
+              className="min-h-[44px] rounded border font-display text-sm uppercase tracking-[0.18em] transition-colors"
+              style={{
+                borderColor: "var(--color-mars-dust)",
+                color: "var(--color-mars-dust)",
+                background: "rgba(204,112,82,0.1)",
+              }}
+            >
+              Prospect (EVA)
+            </button>
+          )}
           <p className="font-mono text-[0.65rem] leading-snug text-mars-sand/70">{log}</p>
         </GlassPanel>
       </div>

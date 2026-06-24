@@ -91,6 +91,11 @@ function routeFromSnapshot(s: RunSnapshot, current: Screen, goTo: (screen: Scree
     goTo("gameover");
     return;
   }
+  // A hazard on the road takes precedence — route to the traverse screen.
+  if (s.pendingHazard && current === "travel") {
+    goTo("hazard");
+    return;
+  }
   if (s.pendingEvent && current === "travel") {
     goTo("event");
   }

@@ -3,8 +3,10 @@ import type { Screen } from "@/core/screens";
 import { useGameStore } from "@/state/store";
 import { BootScreen } from "@/ui/screens/BootScreen";
 import { DepotScreen } from "@/ui/screens/DepotScreen";
+import { EvaScreen } from "@/ui/screens/EvaScreen";
 import { EventModal } from "@/ui/screens/EventModal";
 import { GameOverScreen } from "@/ui/screens/GameOverScreen";
+import { HazardScreen } from "@/ui/screens/HazardScreen";
 import { TerminusScreen } from "@/ui/screens/TerminusScreen";
 import { TravelScreen } from "@/ui/screens/TravelScreen";
 
@@ -30,6 +32,10 @@ function ScreenForScreen({ screen }: { screen: Screen }) {
           <EventModal />
         </>
       );
+    case "hazard":
+      return <HazardScreen />;
+    case "eva":
+      return <EvaScreen />;
     case "terminus":
       return <TerminusScreen />;
     case "gameover":

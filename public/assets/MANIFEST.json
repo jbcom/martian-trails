@@ -1,7 +1,7 @@
 {
   "generatedFrom": "scripts/assets.manifest.json",
   "license": "PSX packs per source itch licenses (raw-assets/); audio CC0 (Kenney). See docs/ART-DIRECTION.md.",
-  "count": 16,
+  "count": 17,
   "assets": [
     {
       "path": "audio/music/menu.ogg",
@@ -82,6 +82,11 @@
       "path": "models/rover/rover.glb",
       "bytes": 584592,
       "sha256": "20297eba651e944ec9af7099531ca3a279fbb2bfc05dbe823c35cecf383842c0"
+    },
+    {
+      "path": "models/terrain/rocks.glb",
+      "bytes": 39124,
+      "sha256": "81982c3dc835fda4113111297c48b250e55740eba805642785354434abf9dc3c"
     }
   ]
 }

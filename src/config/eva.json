@@ -1,0 +1,44 @@
+{
+  "o2Budget": 100,
+  "scanCost": 6,
+  "drillCost": 10,
+  "ambientDrainPerAction": 2,
+  "carryCap": 100,
+  "gridSize": 6,
+  "depositCount": 7,
+  "injuryChancePerAction": 0.18,
+  "injuryO2Threshold": 25,
+  "haulMoraleBonus": 6,
+  "deposits": [
+    {
+      "id": "ice",
+      "name": "Subsurface Ice",
+      "resource": "water",
+      "yield": 40,
+      "score": 20,
+      "mass": 34,
+      "weight": 5,
+      "capacity": 2
+    },
+    {
+      "id": "ore",
+      "name": "Metal Ore",
+      "resource": "parts",
+      "yield": 1,
+      "score": 30,
+      "mass": 28,
+      "weight": 3,
+      "capacity": 2
+    },
+    {
+      "id": "sample",
+      "name": "Mineral Sample",
+      "resource": "none",
+      "yield": 0,
+      "score": 60,
+      "mass": 8,
+      "weight": 4,
+      "capacity": 1
+    }
+  ]
+}
