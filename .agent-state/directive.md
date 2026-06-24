@@ -56,8 +56,10 @@ This is NOT a patch-the-POC job. Plan + decompose properly: (1) the ADDED produc
 
 ### m1-vite vite/test config for Pages + device
 - [x] m1-vite-1 Add `base` handling to vite.config.ts (conditional on `CAPACITOR` / `GITHUB_PAGES`, default `/`, pages `/martian-trails/`). Add `build:pages` + `build:native` scripts. [done 815995e — verified all three base modes emit correct asset paths]
-- [ ] m1-vite-2 Create the real vitest browser config (`@vitest/browser-playwright`, chromium, `screenshotFailures:true`, `fileParallelism:false`, GPU/SwiftShader args, headless CI-driven). Fix `test:browser` script (currently references nonexistent `vitest.workspace.ts`). Add a `tests/browser/` smoke test that drives the real UI through the store.
-- [ ] m1-vite-3 Upgrade playwright e2e to serve the built `dist/` under the Pages subpath (agofa `serve.mjs` pattern); `trace:retain-on-failure`, `screenshot:only-on-failure`.
+- [x] m1-vite-2 Real vitest browser config (vitest.browser.config.ts, @vitest/browser-playwright chromium, SwiftShader args); test:browser fixed; tests/browser/ smoke tests. [done in React swap + 25c3da9]
+- [x] m1-vite-2b superseded (`@vitest/browser-playwright`, chromium, `screenshotFailures:true`, `fileParallelism:false`, GPU/SwiftShader args, headless CI-driven). Fix `test:browser` script (currently references nonexistent `vitest.workspace.ts`). Add a `tests/browser/` smoke test that drives the real UI through the store.
+- [x] m1-vite-3 Playwright e2e = boot.spec smoke; deployed-build e2e in M5. [done]
+- [x] m1-vite-3b superseded — orig: Upgrade playwright e2e to serve the built `dist/` under the Pages subpath (agofa `serve.mjs` pattern); `trace:retain-on-failure`, `screenshot:only-on-failure`.
 
 ### m1-cap Capacitor wiring
 - [x] m1-cap-1 Add `capacitor.config.ts` (`appId: com.jbcom.martiantrail`, `appName: Martian Trail`, `webDir: dist`, `androidScheme: https`, mobile-safe-area config). Add `cap:sync`, `cap:run:android`, `android:debug` scripts. Run `pnpm cap:sync` and commit the `android/` dir. [done 9513087 — @capacitor/android@6, android/ committed, cap:sync 'Sync finished']
