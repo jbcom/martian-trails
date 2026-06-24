@@ -3,10 +3,7 @@
     "id": "event:solar-particle-event",
     "title": "Solar Particle Event",
     "description": "The orbital warning network detects an M-class solar flare. Lethal radiation will hit the rover in hours. We need to shield our living quarters immediately.",
-    "tags": [
-      "radiation",
-      "weather"
-    ],
+    "tags": ["radiation", "weather"],
     "options": [
       {
         "label": "Deploy heavy lead-shielded blankets",
@@ -64,10 +61,7 @@
     "id": "event:electrostatic-dust-storm",
     "title": "Electrostatic Dust Storm",
     "description": "A towering wall of red dust blocks the sun, generating high-voltage static charges that threaten our solar arrays and navigation systems.",
-    "tags": [
-      "dust-storm",
-      "weather"
-    ],
+    "tags": ["dust-storm", "weather"],
     "options": [
       {
         "label": "Deploy grounding anchors and lock down",
@@ -111,9 +105,7 @@
     "id": "event:seized-drive-axle",
     "title": "Seized Drive Axle",
     "description": "A grinding shriek echoes from the rear chassis. Fine basaltic dust has bypassed the seals and locked the rear-left drive axle.",
-    "tags": [
-      "mechanical-failure"
-    ],
+    "tags": ["mechanical-failure"],
     "options": [
       {
         "label": "Perform an EVA to replace the drive gears",
@@ -153,9 +145,7 @@
     "id": "event:abandoned-science-station",
     "title": "Abandoned Science Station",
     "description": "We spot the half-buried domes of an old, decommissioned automated science depot. Its airlock is breached, but supplies might remain inside.",
-    "tags": [
-      "supply-cache"
-    ],
+    "tags": ["supply-cache"],
     "options": [
       {
         "label": "Thoroughly scavenge the ruins",
@@ -195,9 +185,7 @@
     "id": "event:airlock-gasket-leak",
     "title": "Airlock Gasket Leak",
     "description": "A high-pitched hiss warns of pressure loss. The primary airlock seal is degrading rapidly, venting atmosphere into the void.",
-    "tags": [
-      "seal-failure"
-    ],
+    "tags": ["seal-failure"],
     "options": [
       {
         "label": "Apply emergency liquid sealant",
@@ -241,10 +229,7 @@
     "id": "event:clogged-life-support-filter",
     "title": "Clogged CO2 Scrubber",
     "description": "Dust intrusion from the storm has bypassed the external intakes, clogging the primary amine CO2 scrubbers. Carbon dioxide levels are rising.",
-    "tags": [
-      "dust-storm",
-      "mechanical-failure"
-    ],
+    "tags": ["dust-storm", "mechanical-failure"],
     "options": [
       {
         "label": "Flush the filters with recycled water",
@@ -280,9 +265,7 @@
     "id": "event:buried-cargo-lander",
     "title": "Buried Cargo Lander",
     "description": "The radar pings a metallic anomaly beneath three meters of loose sand. It matches the signature of a lost uncrewed supply lander.",
-    "tags": [
-      "supply-cache"
-    ],
+    "tags": ["supply-cache"],
     "options": [
       {
         "label": "Excavate using the rover's heater-grid",
@@ -326,9 +309,7 @@
     "id": "event:cabin-window-micro-fracture",
     "title": "Cabin Window Micro-Fracture",
     "description": "A microscopic pebble kicked up by the storm has starred the thick polycarbonate viewport. Structural integrity is dropping.",
-    "tags": [
-      "seal-failure"
-    ],
+    "tags": ["seal-failure"],
     "options": [
       {
         "label": "Depressurize cabin and apply structural epoxy",
@@ -372,9 +353,7 @@
     "id": "event:cosmic-ray-bombardment",
     "title": "Cosmic Ray Bombardment",
     "description": "A spike in galactic cosmic rays is detected. The rover's active magnetic shield is struggling to deflect the high-energy iron nuclei.",
-    "tags": [
-      "radiation"
-    ],
+    "tags": ["radiation"],
     "options": [
       {
         "label": "Overclock the magnetic shield generator",
@@ -414,9 +393,7 @@
     "id": "event:coolant-loop-rupture",
     "title": "Coolant Loop Rupture",
     "description": "A vital pipe in the radioisotope thermoelectric generator's coolant loop has burst, leaking hot glycol onto the main batteries.",
-    "tags": [
-      "mechanical-failure"
-    ],
+    "tags": ["mechanical-failure"],
     "options": [
       {
         "label": "Shut down the heater to patch the pipe",
@@ -456,9 +433,7 @@
     "id": "event:discarded-ascent-stage",
     "title": "Discarded Ascent Stage",
     "description": "We stumble upon the hollow shell of an old crewed ascent stage. The interior has been stripped, but the fuel cells remain.",
-    "tags": [
-      "supply-cache"
-    ],
+    "tags": ["supply-cache"],
     "options": [
       {
         "label": "Drain the fuel cell water-byproducts",
@@ -494,9 +469,7 @@
     "id": "event:hydroponics-bay-leak",
     "title": "Hydroponics Bay Leak",
     "description": "The sealing flange on the experimental micro-green incubator has failed. Dry Martian air is desorbing the moisture from our crops.",
-    "tags": [
-      "seal-failure"
-    ],
+    "tags": ["seal-failure"],
     "options": [
       {
         "label": "Flood the chamber with emergency nitrogen",

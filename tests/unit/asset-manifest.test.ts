@@ -47,10 +47,13 @@ describe("public/assets integrity", () => {
     }
   });
 
-  it("no unmanifested files under public/assets (except MANIFEST.json)", () => {
+  it("no unmanifested files under public/assets (except MANIFEST.json + GenAI output)", () => {
     const onDisk = walk(assetsRoot)
       .map((f) => relative(assetsRoot, f).split(/[/\\]/).join("/"))
-      .filter((p) => p !== "MANIFEST.json");
+      .filter((p) => p !== "MANIFEST.json")
+      // GenAI output (crew portraits) is produced by the genai pipeline, not the
+      // curation manifest — it has its own provenance, so exclude it here.
+      .filter((p) => !p.startsWith("generated/"));
     const stray = onDisk.filter((p) => !manifested.has(p));
     expect(stray, `unmanifested assets: ${stray.join(", ")}`).toEqual([]);
   });
