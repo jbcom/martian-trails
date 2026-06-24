@@ -114,7 +114,7 @@ Build the full loop ON the M3 structure, mechanic-by-mechanic per docs/GAME-DESI
 
 ## Queue — Milestone 6: Art/audio integration, responsive polish, ship (branch: feat/m6-polish)
 - [ ] m6-1 Real PSX art across every NEW scene (hazard/EVA/outpost surfaces) once M5 builds them — curate + convert + scale, Safari playtest each. (Depot/travel scenes + meshy rover already real, no placeholders — done in M3.)
-- [ ] m6-2 Real audio via howler: engine/airlock/comms SFX (Sci-Fi Sounds), ambient music loops, win/lose jingles, mixing/ducking; audio-graph test.
+- [x] m6-2 State-reactive howler audio layer (reactor.ts: music beds, ducking, stings, engine hum) [done 3f28bcc]. Orig: Real audio via howler: engine/airlock/comms SFX (Sci-Fi Sounds), ambient music loops, win/lose jingles, mixing/ducking; audio-graph test.
 - [ ] m6-3 **Responsive across phone / tablet / unfolded foldable**: container/viewport breakpoints, safe-area insets, touch-primary, Pixi resize to live canvas, HUD reflow (stacked→side→wide-rails). Verify each form factor via Safari at the three viewport classes + on-device cap:run:android.
 - [ ] m6-4 Juice & polish: motion transitions between screens, camera-shake, particle/weather VFX, haptics, critical-alarm overlay, loading/preload.
 - [ ] m6-final Definition of done: full green (lint, check, unit, browser, e2e-deployed, build, APK); Pages live at jonbogaty.com/martian-trails/; docs/STATE.md current; full playable run boot→sponsor→depot→trail→hazard→eva→outpost→terminus verified in Safari with screenshots read; on-device APK runs.
