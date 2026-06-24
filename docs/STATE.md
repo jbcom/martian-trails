@@ -44,18 +44,10 @@ Traverse → EVA Prospecting → outpost stops → terminus / game-over.**
   encounter engine + yuka steering slice, Underhill depot social hub, recruitable fallible
   co-driver, outpost veteran/liaison advice pairs, and roadside trader/stranded/scavenger/rival
   encounters. Squash-merged into `main` as `3706474`.
-
-## In progress — Milestone 9 final closeout
-Local branch: `feat/m9-closeout`.
-
-- **Post-merge proof**: Release, CD, and Push-on-main workflows are green for `main@3706474`.
-- **M8-6 Event director**: `src/sim/eventDirector.ts` replaces uniform event selection with
-  pure desirability scoring. The seeded pace chance still decides whether an event fires; the event
-  selected now follows live pressure such as thin vitals, brittle hull/parts, morale, weather, and
-  navigation stress.
-- **M8-7 NPC mood**: `src/sim/npcMood.ts` adds bounded fuzzy variables for greed, desperation,
-  and aggression, feeding roadside NPC selection through authored `goalWeights` while preserving
-  same-seed determinism.
+- **M9 — Final closeout** (#9): post-M8 Release/CD proof for `main@3706474`; M8-6 event
+  director (`src/sim/eventDirector.ts`) replacing uniform event selection with live-pressure
+  desirability scoring; M8-7 NPC mood (`src/sim/npcMood.ts`) adding bounded greed, desperation,
+  and aggression to roadside NPC selection while preserving same-seed determinism.
 
 ### Art / content
 3D-PSX side-view (Kenney/pixel rejected). Real curated PSX assets (astronaut, machinery, rocks,
@@ -77,6 +69,5 @@ expands the seeded trail encounter pool from trader-only to trader, stranded hau
 and rival expedition roadside NPCs; each new bank has effect-bearing choices and decline paths,
 and the existing in-scene Encounter trait still handles halt/respond/resume.
 
-## Next
-M9 final closeout PR: run full local/browser verification, open the active PR, resolve review
-threads, then squash-merge once green.
+## Queue
+The continuous directive queue is closed through M9.

@@ -144,8 +144,8 @@ The slices below build on feat/m8-encounters (cut AFTER M7 ships). Each: Docs→
   - Remote PR feedback check 2026-06-24: PR #8 thread-aware review fetch returned `review_threads: []`. Bot quota comments were conversation comments, not unresolved review threads.
   - Publication complete 2026-06-24: staged/committed/pushed `feat/m8-encounters`, opened PR #8 active/ready-for-review per user preference, fixed remote browser + visual-sweep CI, then squash-merged #8 into `main` as `3706474`.
 
-## Queue — Milestone 9: Final closeout (branch: feat/m9-closeout) — ACTIVE
+## Queue — Milestone 9: Final closeout (branch: feat/m9-closeout) — DONE, PR #9
 - [x] m9-1 Squash-merge M8 PR #8 and fast-forward local `main` to `3706474`.
 - [x] m9-2 Prove post-merge Release/CD/Push-on-main workflows green for `3706474`.
 - [x] m9-3 Implement the remaining M8 event-director and NPC-mood gates as deterministic pure sim scoring.
-- [ ] m9-final Definition of done: docs current, full local green, browser-visible proof refreshed where UI changed, active PR opened, review threads resolved, squash-merge once green.
+- [x] m9-final [done — PR #9 payload fully proven: local `check`, `lint`, `test` (302), `test:browser` (36), `build`, `e2e`, `e2e:visual`; remote `core`, `browser`, `e2e-smoke`, `visual-sweep`, CodeQL, Amazon Q, and CodeRabbit green; thread-aware review fetch returned `review_threads: []`; screenshots read for phone berth, foldable travel HUD, and tablet depot terminal].
