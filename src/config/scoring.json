@@ -1,0 +1,7 @@
+{
+  "base": 1000,
+  "perSurvivor": 500,
+  "resourceDivisor": 5,
+  "perSol": 15,
+  "floor": 0
+}
