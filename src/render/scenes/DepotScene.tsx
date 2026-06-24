@@ -22,13 +22,8 @@ export function DepotScene() {
       <Sky />
       <Ground />
 
-      {/* Hero rover, parked broadside to camera, length along X. */}
-      <Model
-        url={MODELS.rover}
-        position={[-1.5, 0, 0]}
-        rotation={[0, Math.PI / 2, 0]}
-        scale={0.6}
-      />
+      {/* Hero rover (meshy Mars rover), parked facing right (direction of travel). */}
+      <Model url={MODELS.rover} position={[-1.5, 0, 0]} rotation={[0, 0, 0]} scale={3.5} />
 
       {/* Outpost generator + secondary machinery, set back behind the rover. */}
       <Model url={MODELS.machinery3} position={[6.5, 0, -3]} rotation={[0, -0.4, 0]} scale={0.7} />

@@ -5,6 +5,7 @@ import { Ground } from "@/render/assets/Ground";
 import { Model } from "@/render/assets/Model";
 import { MODELS } from "@/render/assets/models";
 import { Sky } from "@/render/assets/Sky";
+import { WheelDust } from "@/render/assets/WheelDust";
 import { MarsLighting } from "@/render/camera";
 import { getDiagnostics } from "@/state/diagnostics";
 
@@ -30,6 +31,8 @@ function DrivingRover() {
   return (
     <group ref={ref}>
       <Model url={MODELS.rover} position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]} scale={0.6} />
+      {/* Fine regolith dust at the wheelbase — sells motion + masks static wheels. */}
+      <WheelDust origin={[0.2, 0.05, 0.3]} width={1.8} />
     </group>
   );
 }

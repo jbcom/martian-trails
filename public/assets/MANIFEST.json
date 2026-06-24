@@ -80,8 +80,8 @@
     },
     {
       "path": "models/rover/rover.glb",
-      "bytes": 40480,
-      "sha256": "1d55d1c4542f26c536198ff895c848dc01421e383f7e9de228ec5b81786c9a88"
+      "bytes": 584592,
+      "sha256": "20297eba651e944ec9af7099531ca3a279fbb2bfc05dbe823c35cecf383842c0"
     }
   ]
 }
