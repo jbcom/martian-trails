@@ -48,12 +48,12 @@ export function BootScreen() {
   }
 
   return (
-    <div className="grid h-full place-items-center overflow-y-auto px-6 py-[max(2rem,env(safe-area-inset-top))] pb-[max(3rem,env(safe-area-inset-bottom))]">
+    <div className="flex h-full flex-col items-center justify-center overflow-y-auto px-6 py-[max(2rem,env(safe-area-inset-top))] pb-[max(3rem,env(safe-area-inset-bottom))]">
       <motion.div
         initial={{ y: 12, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.1, duration: 0.4 }}
-        className="flex w-full max-w-sm flex-col items-center gap-6 text-center"
+        className="flex w-full max-w-sm flex-shrink-0 flex-col items-center gap-6 text-center"
       >
         <div>
           <h1 className="font-display text-5xl font-bold tracking-[0.3em] text-mars-dust drop-shadow-[0_0_18px_rgba(204,112,82,0.5)]">

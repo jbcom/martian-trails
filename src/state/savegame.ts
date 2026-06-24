@@ -27,10 +27,10 @@ const HIGH_SCORES_KEY = "highscores";
  * Called on each Sol advance, on screen changes into/out of travel, and on visibilitychange /
  * pagehide so a refresh mid-run never loses the expedition.
  */
-export async function saveRun(): Promise<void> {
+export async function saveRun(): Promise<boolean> {
   const snapshot = run.serialize();
-  if (snapshot?.outcome.status !== "running") return;
-  await save(RUN_KEY, snapshot);
+  if (snapshot?.outcome.status !== "running") return false;
+  return save(RUN_KEY, snapshot);
 }
 
 /** Load the saved run (zod-validated; corrupt/stale → null). */
@@ -62,7 +62,10 @@ export async function loadHighScores(): Promise<HighScore[]> {
 export async function recordHighScore(entry: HighScore): Promise<HighScore[]> {
   const table = await load<HighScore[]>(HIGH_SCORES_KEY, highScoresSchema, []);
   const next = insertHighScore(table, entry);
-  await save(HIGH_SCORES_KEY, next);
+  // Push into the store first so the board renders the new entry even if the persistent write
+  // fails (quota) — the player at least sees their rating this session. The persisted copy is
+  // best-effort; save() logs on failure rather than throwing into a void-fired effect.
   useGameStore.getState().setHighScores(next);
+  await save(HIGH_SCORES_KEY, next);
   return next;
 }

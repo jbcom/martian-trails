@@ -23,18 +23,22 @@ export function useRunPersistence(): void {
   useEffect(() => {
     if (screen === "terminus") {
       const snap = run.snapshot();
-      if (snap && snap.outcome === "won") {
-        const survivors = snap.crew.filter((c) => c.alive).length;
-        void recordHighScore({
-          score: snap.score,
-          sol: snap.sol,
-          survivors,
-          seed: useGameStore.getState().seed ?? "",
-          sponsorId,
-          date: Date.now(),
-        });
-      }
-      void clearRun();
+      void (async () => {
+        // Bank the won score BEFORE clearing the resumable run, and only clear once banking
+        // resolves — otherwise a storage error would drop the run while losing the score.
+        if (snap && snap.outcome === "won") {
+          const survivors = snap.crew.filter((c) => c.alive).length;
+          await recordHighScore({
+            score: snap.score,
+            sol: snap.sol,
+            survivors,
+            seed: useGameStore.getState().seed ?? "",
+            sponsorId,
+            date: Date.now(),
+          });
+        }
+        await clearRun();
+      })();
       return;
     }
     if (screen === "gameover") {

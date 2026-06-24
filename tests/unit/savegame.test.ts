@@ -92,6 +92,28 @@ describe("run save — serialize / restore round-trip", () => {
     expect(s?.pendingOutpost).toBeNull();
     expect(s?.driving).toBe(false);
   });
+
+  it("persists the primed Deep Prospect buff across save/restore (banked, not pending)", () => {
+    // Frank's "Deep Prospect" primes the next EVA for a 1.5× haul at the cost of a 5-Sol cooldown.
+    // The buff is banked state (paid for) — a refresh between priming and the EVA must NOT drop it.
+    const primed = run.useAbility("frank");
+    expect(primed).toBe(true);
+    const save = run.serialize();
+    expect(save?.progress.evaYieldPrimed).toBe(true);
+
+    // Restore into a fresh world and confirm the flag survived the round-trip.
+    run.restore(save!);
+    expect(run.serialize()?.progress.evaYieldPrimed).toBe(true);
+  });
+
+  it("back-fills evaYieldPrimed=false for a pre-existing save missing the field", () => {
+    const save = run.serialize()!;
+    // Simulate an older save written before the field existed.
+    const legacy = JSON.parse(JSON.stringify(save));
+    delete legacy.progress.evaYieldPrimed;
+    const parsed = runSaveSchema.parse(legacy);
+    expect(parsed.progress.evaYieldPrimed).toBe(false);
+  });
 });
 
 describe("high-score table — insert / sort / cap", () => {

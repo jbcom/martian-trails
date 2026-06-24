@@ -18,7 +18,6 @@ import {
   upgradesCreditCost,
 } from "@/sim/loadout";
 import { run } from "@/sim/run";
-import { clearRun } from "@/state/savegame";
 import { useGameStore } from "@/state/store";
 import { GlassPanel } from "@/ui/components/GlassPanel";
 
@@ -166,8 +165,10 @@ export function DepotScreen() {
     if (!canDepart) return;
     void tapLight();
     audio.unlock();
-    // A fresh expedition supersedes any stale in-progress save (the autosave then re-arms).
-    void clearRun();
+    // A fresh expedition supersedes any stale in-progress save. We do NOT clearRun() here: the
+    // travel-screen autosave effect immediately writes the fresh run to the same key, so an
+    // explicit remove is redundant and races the save on native (the remove could resolve after
+    // the set, deleting the just-saved run). Overwrite-in-place is the correct, race-free path.
     run.start(
       seed ?? `ares-${Date.now().toString(36)}`,
       buildLoadout(cart, upgrades, scoreMultiplier),

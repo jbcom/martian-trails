@@ -87,6 +87,12 @@ export const runSaveSchema = z.object({
     resolvedHazards: z.array(z.string()),
     dockedOutposts: z.array(z.string()),
     evaCount: z.number(),
+    /**
+     * Geologist "Deep Prospect" one-shot buff: charged (cooldown spent) but not yet drained at
+     * EVA end. Persisted so a refresh between priming and the EVA doesn't silently drop the
+     * paid-for 1.5× haul. `.default(false)` back-fills older saves cleanly.
+     */
+    evaYieldPrimed: z.boolean().default(false),
   }),
 });
 

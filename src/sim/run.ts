@@ -238,6 +238,7 @@ class Run {
         resolvedHazards: [...this.resolvedHazards],
         dockedOutposts: [...this.dockedOutposts],
         evaCount: this.evaCount,
+        evaYieldPrimed: this.evaYieldPrimed,
       },
     };
   }
@@ -284,6 +285,9 @@ class Run {
     this.resolvedHazards = new Set(save.progress.resolvedHazards);
     this.dockedOutposts = new Set(save.progress.dockedOutposts);
     this.evaCount = save.progress.evaCount;
+    // Banked (not pending) state: the Deep Prospect buff was paid for with a cooldown, so it
+    // survives a refresh. Restored from the save, not reset.
+    this.evaYieldPrimed = save.progress.evaYieldPrimed;
 
     // A run resumes parked on the trail — any pending decision/EVA at save time is dropped.
     this.pendingEvent = null;
@@ -291,7 +295,6 @@ class Run {
     this.hazardRead = 0;
     this.lastHazardResult = null;
     this.eva = null;
-    this.evaYieldPrimed = false;
     this.pendingOutpost = null;
     this.hullWasCritical = false;
 

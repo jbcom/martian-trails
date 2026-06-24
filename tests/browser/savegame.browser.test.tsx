@@ -75,6 +75,78 @@ describe("save / continue + Hall of Records (real browser)", () => {
     expect(await findByText(/no expeditions on record/i)).toBeTruthy();
   });
 
+  it("displays EVERY row of a full board on boot — no entry clipped off-screen", async () => {
+    // A full board (cap = 10) is the worst case for vertical fit. DOM-presence is NOT enough:
+    // the boot layout must keep every row reachable inside the scroll viewport, not centered off
+    // the scroll origin (the m7-2 layout bug — `place-items-center` on a scroll container pushed
+    // the content's top negative when it overflowed, making the top rows unreachable / the bottom
+    // row clipped). This test fails against that bug and passes against the flex/scroll fix.
+    //
+    // Reproduce the real constraint: pin the mount to a short (phone-class) viewport so the board
+    // genuinely overflows. `h-dvh` in the App shell resolves to THIS box's height.
+    const host = document.createElement("div");
+    host.style.height = "600px";
+    host.style.width = "390px";
+    host.style.position = "relative";
+    document.body.appendChild(host);
+
+    const board = Array.from({ length: 10 }, (_, i) => ({
+      score: 5000 - i * 317,
+      sol: 10 + i,
+      survivors: (4 - (i % 5) + 5) % 5 || 1,
+      seed: `seed-${i}`,
+      sponsorId: ["unoma", "consortium", "solex"][i % 3],
+      date: 1_700_000_000_000 + i * 86_400_000,
+    }));
+    localStorage.setItem("CapacitorStorage.highscores", JSON.stringify(board));
+
+    const { findByText, container, unmount } = render(<App />, { container: host });
+    cleanup = () => {
+      unmount();
+      host.remove();
+    };
+    await findByText(String(board[9].score));
+
+    const rows = Array.from(container.querySelectorAll<HTMLElement>("ol li"));
+    expect(rows.length).toBe(10);
+
+    // Find the actual scroll container (overflow-y:auto, content taller than its client box).
+    const scroller = Array.from(container.querySelectorAll<HTMLElement>("*")).find(
+      (el) =>
+        el.scrollHeight - el.clientHeight > 4 && /Hall of Records/i.test(el.textContent ?? ""),
+    );
+    expect(
+      scroller,
+      "boot content should overflow at a 600px viewport (else the test is vacuous)",
+    ).toBeTruthy();
+
+    // Every row must be REACHABLE inside the scroll content: its top within [0, scrollHeight] and
+    // its bottom within scrollHeight. The bug centered overflowing content, pushing the first rows
+    // to a NEGATIVE offsetTop (unreachable above the scroll origin) — caught by the `>= 0` assert.
+    const root = scroller as HTMLElement;
+    const rootRect = root.getBoundingClientRect();
+    for (const row of rows) {
+      const rowRect = row.getBoundingClientRect();
+      const topWithinContent = rowRect.top - rootRect.top + root.scrollTop;
+      expect(
+        topWithinContent,
+        `row "${row.textContent?.trim()}" not above scroll origin`,
+      ).toBeGreaterThanOrEqual(-1);
+      expect(
+        topWithinContent + row.offsetHeight,
+        `row "${row.textContent?.trim()}" bottom must be reachable within scroll content`,
+      ).toBeLessThanOrEqual(root.scrollHeight + 1);
+      expect(row.offsetHeight, "row must be laid out, not collapsed").toBeGreaterThan(0);
+    }
+
+    // Each row's full text is present (sponsor + survivors + sol + score), not truncated away.
+    for (const b of board) {
+      const match = rows.find((row) => (row.textContent ?? "").includes(String(b.score)));
+      expect(match, `row for score ${b.score} should render`).toBeTruthy();
+      expect(match?.textContent).toContain(`Sol ${b.sol}`);
+    }
+  });
+
   it("finishing a won run banks the score and the menu shows it on the board", async () => {
     // Restore a near-goal run so a single Sol crests Korolev (winning organically is many Sols).
     run.start("victory-seed", LOADOUT);
