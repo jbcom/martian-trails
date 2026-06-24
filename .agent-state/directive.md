@@ -90,9 +90,9 @@ Stack swap DONE (one effort, cheapest moment): **React 19 + R3F + drei + @react-
 - [ ] m3-6 `src/ui/**` React screens as the const-union router (depot/travel/outpost/event/hazard/eva/terminus/gameover) + framer-motion transitions, reading only the store. Rewrite the e2e/browser tests for the new DOM. Green build + check + unit + browser smoke; Safari playtest each screen (frontmost+visible).
 
 ## Queue — Milestone 4: Asset & content pipelines (branch: feat/m4-pipelines)
-- [ ] m4-1 Port the REAL two-stage itch flow from a-good-old-fashioned-adventure (owned-keys cache, ALLOW_LIST of Martian Trail's purchased packs, Bearer auth, hardened curl, raw-assets→extract, idempotent).
+- [x] m4-1 Real two-stage itch flow ported (itch-library.mjs + fetch-itch-assets.mjs, owned-keys cache, PSX/sci-fi Mars ALLOW_LIST of 20 owned packs, Bearer auth, hardened curl, raw-assets→extract, idempotent). DOWNLOADED 21 packs (PSX Astronaut/Bus/Electrical/Traps/Ghost-Tools, robots, hexes + audio). FBX→GLB via Blender (fbx-to-glb.py). [done cbe4d41]
 - [ ] m4-2 Local `/Volumes/home/assets` curate path, correct casing (`2DLowPoly`/`2DPhotorealistic`/`Audio`); plus 3DPSX GLBs via assets-library MCP if the art direction uses them. Curate chosen scene assets → `public/assets/` + `MANIFEST.json` + integrity test (refuse unmanifested).
-- [ ] m4-3 Port the GenAI pipeline from maga-money-moves: `@google/genai`, `gemini-3.5-flash` (events), `imagen-4.0-fast-generate-001` (crew portraits), prompt/facet builders, zod validate gate, fs cache. Events→`src/content/events/*.json`; portraits→`public/assets/generated/portraits/`.
+- [x] m4-3 GenAI pipeline ported (src/genai/{client,events,portraits}.ts, @google/genai, gemini-3.5-flash events + imagen-4.0-fast portraits, zod validate, fs cache). RAN BOTH: 12 validated Mars events → src/content/events/generated.json; John+Frank portraits → public/assets/generated/portraits/ (Maya/Nadia declined by Imagen policy, script skips gracefully). 7 tests. [done 3132aa5, f0ad03c] FOLLOWUP: asset-manifest test must exclude public/assets/generated/.
 
 ## Queue — Milestone 5: The complete Oregon-Trail-equivalent loop (branch: feat/m5-loop)
 Build the full loop ON the M3 structure, mechanic-by-mechanic per docs/GAME-DESIGN.md. Each = content (JSON) + sim system + render scene + UI + tests + Safari playtest.
