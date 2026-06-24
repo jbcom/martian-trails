@@ -4,6 +4,7 @@ import { useGameStore } from "@/state/store";
 import { AlarmOverlay } from "@/ui/AlarmOverlay";
 import { BootScreen } from "@/ui/screens/BootScreen";
 import { DepotScreen } from "@/ui/screens/DepotScreen";
+import { EncounterScreen } from "@/ui/screens/EncounterScreen";
 import { EvaScreen } from "@/ui/screens/EvaScreen";
 import { EventModal } from "@/ui/screens/EventModal";
 import { GameOverScreen } from "@/ui/screens/GameOverScreen";
@@ -40,6 +41,8 @@ function ScreenForScreen({ screen }: { screen: Screen }) {
           <EventModal />
         </>
       );
+    case "encounter":
+      return <EncounterScreen />;
     case "hazard":
       return <HazardScreen />;
     case "eva":
