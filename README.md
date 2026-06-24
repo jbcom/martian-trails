@@ -13,8 +13,8 @@ regolith — from the **Underhill Depot** to **Korolev Crater** — rationing ox
 power, and spare parts against dust storms, solar flares, hull failures, and the slow
 grind of crew morale. It's the Ares Trail: a battle of attrition under a rust-colored sky.
 
-Built with **Svelte + PixiJS** on **Vite**, packaged for **Android** via **Capacitor**,
-with a diegetic glassmorphic Mars-ops interface.
+Built with **React + React-Three-Fiber** (Three.js, orthographic side-view 3D) on **Vite**,
+packaged for **Android** via **Capacitor**, with a diegetic glassmorphic Mars-ops interface.
 
 ## Play
 
@@ -26,7 +26,7 @@ The web build deploys continuously to GitHub Pages:
 ```sh
 pnpm install
 pnpm dev            # vite dev server
-pnpm check          # svelte-check typecheck
+pnpm check          # tsc --noEmit typecheck
 pnpm lint           # biome
 pnpm test           # unit (node/jsdom)
 pnpm test:browser   # real Chromium (vitest browser)

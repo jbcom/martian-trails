@@ -19,7 +19,7 @@ Spec wrong? Revise the spec → test → resume. Never let code drift from spec 
   (use `createRng(seed)`), no `performance.now()` (use the engine clock). Enforced by
   `.claude/gates.json`.
 - **Bridge by cadence:** sim→render via the frame-cadence `state/diagnostics.ts` plain object;
-  UI reads the Svelte store (human cadence) and **never touches Pixi objects**.
+  UI reads the zustand store (human cadence) and **never touches Three objects**.
 - **Screens are a `const`-union router**, not one enum-gated `update()`. Each screen owns its
   render scene. (This is *the* fix for the depot-black regression.)
 - **Content over code:** events, depot stock, outpost services, hazards, dialogue, crew live

@@ -8,8 +8,21 @@ Versions are managed by release-please; do not hand-edit version numbers.
 
 ## [Unreleased]
 
+### Changed
+- **Stack pivot to the house dialect: React 19 + React-Three-Fiber (drei,
+  @react-three/postprocessing, framer-motion) + Three.js (orthographic side-view 3D) +
+  Tailwind v4**, replacing the original Svelte + PixiJS scaffold. Render is now declarative
+  3D (curated GLB models) with a real post-processing pipeline.
+- Bumped the entire toolchain to latest: Vite 8, Vitest 4, Capacitor 8, TypeScript 6,
+  Biome 2 (config migrated to the 2.x schema).
+
 ### Added
-- Martian Trail branding (name, depot title screen) and a project README.
+- Martian Trail branding (name, boot title) and a project README.
+- React + R3F boot shell rendering the curated rover GLB in an ortho side view.
+- Design system: `src/styles/tokens.{css,ts}` (Mars palette, sync-tested) + self-hosted
+  Rajdhani/Inter/JetBrains Mono fonts. `docs/DESIGN-SYSTEM.md`, `docs/ART-DIRECTION.md`.
+- Curated game assets under `public/assets/` (organized by domain: models/{rover,crew,
+  terrain,rocks,outpost,props}, audio/{sfx,music}) with a manifest + integrity test.
 - Vite `base` handling for GitHub Pages (`/martian-trails/`) and Capacitor (`./`) targets,
   with `build:pages` / `build:native` scripts.
 - Capacitor 8 Android platform (`capacitor.config.ts`, committed `android/` project,
@@ -20,7 +33,3 @@ Versions are managed by release-please; do not hand-edit version numbers.
   Oregon-Trail→Mars mechanical-equivalency map.
 - `AGENTS.md` operating doctrine.
 
-### Changed
-- Bumped the entire toolchain to latest: Svelte 5, Vite 8, Vitest 4, PixiJS 8, Capacitor 8,
-  TypeScript 6, Biome 2 (config migrated to the 2.x schema).
-- Fixed the PixiJS canvas collapsing to 0 height when its container reported 0 height at mount.

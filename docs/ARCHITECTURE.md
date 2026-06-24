@@ -15,7 +15,7 @@ not a procedural-graphics POC.
 
 ## Stack (latest, no old packages)
 
-Svelte 5 (runes) · Vite 8 · **Three.js (orthographic side-view 3D)** · Capacitor 8 ·
+React 19 + R3F (drei, postprocessing, framer-motion) · Vite 8 · **Three.js (orthographic side-view 3D)** · Tailwind v4 · Capacitor 8 ·
 TypeScript 6 · Biome 2 · Vitest 4 (`@vitest/browser-playwright`, `vitest-browser-svelte`) ·
 Playwright.
 
@@ -56,13 +56,13 @@ src/
     scenes/    per-screen render (garage/depot, travel, outpost, hazard, eva, terminus)
     vfx/       particles, dust, weather, camera-shake (ice-sheet / dust-storm done here)
     assets/    GLB loaders, ortho camera rig, material/lighting setup
-  state/       Svelte store (UI/phase/settings cadence) + plain-object diagnostics bridge (frame cadence)
+  state/       zustand store (UI/phase/settings cadence) + plain-object diagnostics bridge (frame cadence)
   content/     PURE DATA (JSON) — events, depot stock, outposts, hazards, dialogue, crew
   config/      per-domain JSON tunables + typed loader (+ co-located .test.ts)
   audio/       howler wrapper + symbolic audio library manifest
   platform/    capacitor bridges — haptics, device, safe-area/scale, persistence, orientation
   styles/      tokens.css + tokens.ts (mirror) + tokens.test.ts (sync) + fonts.css
-  ui/          Svelte screens + design-system components
+  ui/          React screens + design-system components
   schemas/     zod schemas for content + config + saves
 ```
 
@@ -70,17 +70,17 @@ src/
 
 ### 1. Fixed-timestep loop (engine/loop.ts)
 `FIXED_DT = 1/60`, accumulator drains in fixed steps with a spiral-of-death guard and a
-render-interpolation `alpha`. A host (Svelte `onMount` rAF / Pixi ticker) feeds wall-clock
-deltas; `advance(state, frameDelta, step)` owns the fixed loop. `step` runs `sim/tick.ts`.
-The game's time→Sol accumulation rides on this, not on raw `ticker.deltaMS`.
+render-interpolation `alpha`. A host (R3F `useFrame` / rAF) feeds wall-clock deltas;
+`advance(state, frameDelta, step)` owns the fixed loop. `step` runs `sim/tick.ts`.
+The game's time→Sol accumulation rides on this, not on raw frame deltas.
 
 ### 2. Sim ↔ render/UI bridge (by cadence)
 - **Frame cadence (sim→render):** a plain mutable `state/diagnostics.ts` object the sim
-  writes each step; Pixi reads it in its render. NOT the Svelte store (60×/s store writes
-  tank reactivity).
-- **Human cadence (UI):** Svelte store holds screen/phase, settings, run-summary. UI reads
-  the store; **UI never touches Pixi objects** — only the documented bridge.
-- Sim purity enforced by import discipline: `src/sim/**` imports no pixi/svelte/DOM.
+  writes each step; the R3F scene reads it inside `useFrame`. NOT the zustand store (60×/s
+  store writes tank reactivity).
+- **Human cadence (UI):** the zustand store holds screen/phase, settings, run-summary. UI
+  reads the store; **UI never touches Three objects** — only the documented bridge.
+- Sim purity enforced by import discipline: `src/sim/**` imports no three/react/DOM.
 
 ### 3. Screens as a const-union, not an enum-gated `update()`
 ```ts
@@ -88,7 +88,7 @@ export const SCREENS = ["boot","sponsor","depot","travel","hazard","eva",
   "outpost","event","terminus","gameover"] as const;
 export type Screen = (typeof SCREENS)[number];
 ```
-Each screen is its own Svelte component + its own render scene, selected by conditional
+Each screen is its own React component + its own R3F render scene, selected by conditional
 render (lazy where heavy). This directly fixes the POC-regression where one
 `update()` early-returns unless `mode==='travel'` and leaves the depot black: every screen
 draws its own scene. ("Code interprets content, never embeds it" applies to screen content
@@ -108,7 +108,7 @@ Layout adapts across three classes, not just "mobile-first":
 - **Tablet (landscape, medium):** side HUD + scene; two-column store.
 - **Unfolded foldable (wide):** scene gets the wide canvas; HUD reflows to side rails; no letterboxing.
 Driven by container/viewport breakpoints + safe-area insets (`env(safe-area-inset-*)`),
-touch-primary input, Pixi resize to the live canvas. Verified on each form factor via
+touch-primary input, R3F canvas resize to the live viewport. Verified on each form factor via
 Safari playtest (window frontmost + `visibilityState === "visible"` before screenshot).
 
 ## Determinism & gates
