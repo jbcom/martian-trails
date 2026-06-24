@@ -124,7 +124,7 @@ The game ships and plays; this raises it from "complete" to "polished to a shine
 - [ ] [WAIT-AGENT] m7-2 Save/continue: wire src/platform/persistence.ts to the UI — persist an in-progress run (resume on reload) + a high-score board (terminus writes, boot/menu reads). High-throughput rAF makes losing a run on refresh painful.
 - [x] m7-3 Event pool 12->24 (broader themes incl crew-conflict/scavenging) [done 9f965a9]. Orig: regenerate to ~24 events (more variety = replayability); keep the content-integrity gate.
 - [x] m7-4 More music — tension/ambient/victory context beds [done]. Orig: m7-4 More music/ambience: curate 1-2 more trail/tension tracks from the owned itch/local audio; wire context (outpost calm vs hazard tension).
-- [ ] m7-final Full green + Safari run-through + PR.
+- [ ] [WAIT-AGENT] m7-final Full green + Safari run-through + PR.
 
 ## Queue — Milestone 8: Diegetic encounters + NPCs + yuka (branch: feat/m8-encounters) — NEW (user, this session)
 User mandate: explore **yuka** (`~/src/reference-codebases/yuka`) to take the game to the next level; switch from giant dialogue boxes to **real diegetic encounters** — "the equivalent of actually encountering fellow Martians at a supply depot prior to heading out." EMBRACE GenAI for interim portrait slides, NPC portraits, etc. Explore the **meshy MCP** + GenAI adaptations from `~/src/jbcom/a-good-old-fashioned-adventure` (its dialogue.ts + npcAI.ts + content/story/dialogue + pixelart/portrait pipeline) for a fully immersive Martian interpretation. Research the MECC trail lineage — **Oregon Trail, Yukon Trail, Amazon Trail** — and diegetic-NPC presentation in other games (use the internet, find screenshots). 
