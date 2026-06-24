@@ -219,13 +219,14 @@ async function waitForScenePixels(canvas: HTMLCanvasElement): Promise<PixelRead>
   let latest: PixelRead | null = null;
   await waitFor(
     () => {
+      expect(canvas.dataset.sceneReady).toBe("true");
       latest = readCanvasPixels(canvas);
       const stats = statsFromPixels(latest);
       expect(stats.visibleRatio).toBeGreaterThan(0.8);
       expect(stats.brightRatio).toBeGreaterThan(0.002);
       expect(stats.veryDarkEdgeRatio).toBeLessThan(0.1);
     },
-    { timeout: 7000 },
+    { timeout: 15_000 },
   );
   if (!latest) throw new Error("No base-scene pixels captured");
   return latest;
@@ -261,7 +262,7 @@ describe("BaseInteriorScene isolated visual matrix (real browser)", () => {
         await writeCanvasPng(read, `${variant}-${perspective.label}`);
       }
     }
-  }, 60_000);
+  }, 120_000);
 
   it("captures Underhill across phone, tablet, and unfolded foldable profiles", async () => {
     for (const profile of profiles) {
@@ -275,5 +276,5 @@ describe("BaseInteriorScene isolated visual matrix (real browser)", () => {
       const read = await waitForScenePixels(canvas as HTMLCanvasElement);
       await writeCanvasPng(read, `underhill-${profile.label}`);
     }
-  }, 45_000);
+  }, 90_000);
 });

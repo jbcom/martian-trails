@@ -659,7 +659,7 @@ export function DepotScreen() {
             profile.profile === "tablet"
               ? "min(42rem, calc(100vw - 2rem))"
               : profile.profile === "foldable"
-                ? "auto"
+                ? "calc(100vw - 2rem)"
                 : undefined,
         }}
       >
