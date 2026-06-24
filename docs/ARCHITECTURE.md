@@ -15,12 +15,21 @@ not a procedural-graphics POC.
 
 ## Stack (latest, no old packages)
 
-Svelte 5 (runes) · Vite 8 · PixiJS 8 · Capacitor 8 · TypeScript 6 · Biome 2 ·
-Vitest 4 (`@vitest/browser-playwright`, `vitest-browser-svelte`) · Playwright.
+Svelte 5 (runes) · Vite 8 · **Three.js (orthographic side-view 3D)** · Capacitor 8 ·
+TypeScript 6 · Biome 2 · Vitest 4 (`@vitest/browser-playwright`, `vitest-browser-svelte`) ·
+Playwright.
+
+**Render engine decision (2026-06-23):** Three.js with an orthographic camera, not PixiJS.
+The art direction is 3DLowPoly Kenney "Space" GLBs in a side view (`docs/ART-DIRECTION.md`);
+Three gives real lighting, parallax, and the animated *rover-noses-down-the-ramp* Hazard
+Traverse that flat 2D/Pixi cannot. Matches the house dialect (blobolines/agofa use Three).
+The Pixi-7 POC renderer is replaced wholesale in the render decomposition (M3); sim, content,
+state, audio, and the screen-router are renderer-agnostic and unaffected.
 
 ### Production libraries to add (the "elevation" set)
 | Role | Library | Why |
 |------|---------|-----|
+| Render | `three` (+ GLTFLoader, ortho camera) | 3DLowPoly GLB side-view; lighting/parallax/animated hazard |
 | ECS | `koota` | House standard; renderer-agnostic game state via `trait()` + `world.query()` |
 | RNG/determinism | `seedrandom` | One `createRng(seed): Rng` facade; **no raw `Math.random()`** in sim |
 | Audio | `howler` | House standard; channels, ducking, gesture-unlock, preload |
@@ -43,10 +52,10 @@ src/
     factories.ts  entity spawn (attach traits)
     tick.ts    step(world, dt) — hand-ordered system calls (dependency order)
     rng.ts     seeded facade
-  render/      PixiJS only — reads sim, never written-to by sim
+  render/      Three.js only — reads sim, never written-to by sim
     scenes/    per-screen render (garage/depot, travel, outpost, hazard, eva, terminus)
-    vfx/       particles, dust, weather, camera-shake
-    sprites/   sprite/atlas loaders
+    vfx/       particles, dust, weather, camera-shake (ice-sheet / dust-storm done here)
+    assets/    GLB loaders, ortho camera rig, material/lighting setup
   state/       Svelte store (UI/phase/settings cadence) + plain-object diagnostics bridge (frame cadence)
   content/     PURE DATA (JSON) — events, depot stock, outposts, hazards, dialogue, crew
   config/      per-domain JSON tunables + typed loader (+ co-located .test.ts)

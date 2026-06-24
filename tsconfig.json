@@ -1,29 +1,24 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "target": "ESNext",
-    "useDefineForClassFields": true,
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "useDefineForClassFields": true,
     "resolveJsonModule": true,
-    "allowJs": true,
-    "checkJs": true,
     "isolatedModules": true,
     "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
     "noEmit": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
+    "skipLibCheck": true,
     "types": ["node", "vite/client"],
     "paths": {
-      "$lib/*": ["./src/lib/*"],
-      "$assets/*": ["./src/assets/*"]
+      "@/*": ["./src/*"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.d.ts",
-    "src/**/*.svelte",
-    "vite.config.ts",
-    "scripts/**/*.ts"
-  ],
-  "exclude": ["node_modules", "dist"]
+  "include": ["src", "vite.config.ts", "scripts/**/*.ts"],
+  "exclude": ["node_modules", "dist", "android"]
 }

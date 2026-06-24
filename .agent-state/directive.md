@@ -69,7 +69,7 @@ This is NOT a patch-the-POC job. Plan + decompose properly: (1) the ADDED produc
 - [x] m1-ci-4 `cd.yml` = push:main: release-checks + real Pages deploy (configure-pages/upload-pages-artifact/deploy-pages) + debug APK. [done c64a3cd]
 
 ### m1-docs Doc set
-- [ ] m1-docs-1 Add `AGENTS.md` (operational doctrine: docs>tests>code, content-first, browser validation mandatory). Add `CHANGELOG.md`, `STANDARDS.md`. (`README.md` ✓, `docs/ARCHITECTURE.md` ✓, `docs/GAME-DESIGN.md` ✓ done.) Add `docs/{STATE,DESIGN-SYSTEM,TESTING,DEPLOYMENT,ART-DIRECTION}.md`. Frontmatter per standard-repo profile.
+- [x] m1-docs-1 AGENTS.md, STANDARDS.md, CHANGELOG.md, docs/{STATE,TESTING,DEPLOYMENT,ART-DIRECTION}.md, .github/copilot-instructions.md. (README, ARCHITECTURE, GAME-DESIGN ✓ earlier.) DESIGN-SYSTEM.md deferred to m2-1. [done — doc set complete]
 
 ---
 
@@ -81,13 +81,13 @@ NOTE: Milestones below are the UNIFIED production build (user mandate: it's all 
 - [ ] m2-3 `src/styles/tokens.css` (color/space/type/radius/glass-blur custom props) + typed `src/styles/tokens.ts` mirror + `tokens.test.ts` sync test. Migrate global.css/App styles onto tokens.
 
 ## Queue — Milestone 3: Architecture decomposition — the foundation (branch: feat/m3-arch)
-Adopt the blobolines skeleton + agofa content/config + koota, on Svelte 5 / Pixi 8. This rewrites App.svelte/Renderer/GameState/AudioEngine (resolves the Pixi 7→8 + Svelte 4→5 + sim-purity red).
-- [ ] m3-1 Add production libs: `koota`, `seedrandom`, `howler`, `zod`, `@capacitor/preferences|haptics|screen-orientation|device`, `motion`. Scaffold `src/{core,engine,sim,render,state,content,config,audio,platform,styles,ui,schemas}`.
+Stack swap DONE (one effort, cheapest moment): **React 19 + R3F + drei + @react-three/postprocessing + framer-motion + Tailwind v4**, Three.js ortho side-view 3D GLB (per docs/ART-DIRECTION.md). Svelte + Pixi removed; dead POC source deleted; minimal R3F boot shell renders (verified in Safari). Now adopt the blobolines skeleton + agofa content/config + koota on top.
+- [ ] m3-1 Add production libs: `koota`, `seedrandom`, `howler`, `zod`, `@capacitor/preferences|haptics|screen-orientation|device`. (R3F/drei/postprocessing/framer-motion/three ✓; React/Tailwind ✓.) Scaffold `src/{core,engine,sim,render,state,content,config,audio,platform,styles,ui,schemas}`.
 - [ ] m3-2 `src/core` (createRng facade over seedrandom; SCREENS const→union type) + `src/engine/loop.ts` (fixed-timestep `advance()` accumulator + alpha). Unit-tested, deterministic.
-- [ ] m3-3 `src/sim/**` PURE: port resource/sol/crew-trait/terrain/thermal/scoring math into koota traits + `systems/*` + hand-ordered `tick.ts`. No pixi/svelte/DOM, no Math.random/performance.now (gates enforce). Unit tests per system.
-- [ ] m3-4 `src/render/**` on Pixi 8 (async `Application.init()`, new graphics API): per-screen render scenes (garage/depot, travel, …) reading the sim via the `state/diagnostics.ts` frame-cadence bridge. Fixes depot-black (each screen draws its own scene).
-- [ ] m3-5 `src/audio/**` howler wrapper + symbolic audio manifest (keep procedural synth as fallback until real audio lands). `src/state` Svelte store (screen/phase/settings/run-summary) + diagnostics bridge.
-- [ ] m3-6 `src/ui/**` Svelte 5 (runes) screens as the const-union router (depot/travel/outpost/event/hazard/eva/terminus/gameover), reading only the store. Delete the monolithic App.svelte `update()`-gated structure. Green build + unit + browser smoke; Safari playtest each screen (frontmost+visible).
+- [ ] m3-3 `src/sim/**` PURE: port resource/sol/crew-trait/terrain/thermal/scoring math (from the frozen POC HTML + git history) into koota traits + `systems/*` + hand-ordered `tick.ts`. No three/react/DOM, no Math.random/performance.now (gates enforce). Unit tests per system.
+- [ ] m3-4 `src/render/**` R3F scenes: drei `<OrthographicCamera>` rig + GLTF loaders + `@react-three/postprocessing` pipeline (bloom/AO/grade); per-screen scenes (garage/depot, travel, …) reading the sim via the `state/diagnostics.ts` frame-cadence bridge (read in `useFrame`, NOT React state). Fixes depot-black (each screen draws its own scene).
+- [ ] m3-5 `src/audio/**` howler wrapper + symbolic audio manifest (port the procedural synth as a fallback until real audio lands). `src/state` zustand store (screen/phase/settings/run-summary) + plain-object diagnostics bridge.
+- [ ] m3-6 `src/ui/**` React screens as the const-union router (depot/travel/outpost/event/hazard/eva/terminus/gameover) + framer-motion transitions, reading only the store. Rewrite the e2e/browser tests for the new DOM. Green build + check + unit + browser smoke; Safari playtest each screen (frontmost+visible).
 
 ## Queue — Milestone 4: Asset & content pipelines (branch: feat/m4-pipelines)
 - [ ] m4-1 Port the REAL two-stage itch flow from a-good-old-fashioned-adventure (owned-keys cache, ALLOW_LIST of Martian Trail's purchased packs, Bearer auth, hardened curl, raw-assets→extract, idempotent).
