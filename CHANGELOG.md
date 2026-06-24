@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 Versions are managed by release-please; do not hand-edit version numbers.
 
+## [1.1.0](https://github.com/jbcom/martian-trails/compare/martian-trail-v1.0.0...martian-trail-v1.1.0) (2026-06-24)
+
+
+### Features
+
+* design system + fontography + curated assets (rover renders) ([#3](https://github.com/jbcom/martian-trails/issues/3)) ([8d89ced](https://github.com/jbcom/martian-trails/commit/8d89ced8a8ceedb312983004a2683ad9f5dbb5d2))
+* foundation — React/R3F/Three stack, CI/CD, Capacitor, docs ([#1](https://github.com/jbcom/martian-trails/issues/1)) ([df6745f](https://github.com/jbcom/martian-trails/commit/df6745f2498c34925d1848ff589d512264f92ae2))
+* M3 — architecture decomposition + PSX render + asset/genai pipelines ([#4](https://github.com/jbcom/martian-trails/issues/4)) ([db97c3d](https://github.com/jbcom/martian-trails/commit/db97c3d61a895bc2364c09416a4311584756942a))
+* M5 — the complete Oregon-Trail-equivalent gameplay loop ([#5](https://github.com/jbcom/martian-trails/issues/5)) ([75cdd99](https://github.com/jbcom/martian-trails/commit/75cdd99dbd9539f2d8962956dd97be428e68c6f5))
+* M6 — production polish (responsive, juice, audio, dust-storm) ([#6](https://github.com/jbcom/martian-trails/issues/6)) ([ef12b07](https://github.com/jbcom/martian-trails/commit/ef12b071f3b6b013b925979a566e5b15a299f377))
+
 ## [Unreleased]
 
 ### Changed
@@ -32,4 +43,3 @@ Versions are managed by release-please; do not hand-edit version numbers.
 - `docs/ARCHITECTURE.md` and `docs/GAME-DESIGN.md` — the structural contract and the
   Oregon-Trail→Mars mechanical-equivalency map.
 - `AGENTS.md` operating doctrine.
-
