@@ -157,7 +157,11 @@ export function DepotScreen() {
     setUpgrades((prev) => (prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]));
   }
 
+  // Budget + vitals are hard launch gates — never depart in an invalid state.
+  const canDepart = credits >= 0 && missing.length === 0;
+
   function depart() {
+    if (!canDepart) return;
     audio.unlock();
     run.start(
       seed ?? `ares-${Date.now().toString(36)}`,
@@ -251,13 +255,14 @@ export function DepotScreen() {
         <button
           type="button"
           onClick={depart}
-          className="mt-4 min-h-[44px] rounded border px-6 py-3 font-display text-sm uppercase tracking-[0.2em] text-mars-sand transition-colors hover:text-mars-dust"
+          disabled={!canDepart}
+          className="mt-4 min-h-[44px] rounded border px-6 py-3 font-display text-sm uppercase tracking-[0.2em] text-mars-sand transition-colors hover:text-mars-dust disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:text-mars-sand"
           style={{
-            borderColor: missing.length > 0 ? "var(--color-alert)" : "var(--color-ui-border)",
-            background: missing.length > 0 ? "rgba(255,90,60,0.12)" : "rgba(204,112,82,0.12)",
+            borderColor: !canDepart ? "var(--color-alert)" : "var(--color-ui-border)",
+            background: !canDepart ? "rgba(255,90,60,0.12)" : "rgba(204,112,82,0.12)",
           }}
         >
-          Clear Airlock &amp; Depart
+          {credits < 0 ? "Over Budget" : "Clear Airlock & Depart"}
         </button>
       </GlassPanel>
     </div>
