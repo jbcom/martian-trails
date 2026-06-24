@@ -133,7 +133,11 @@
             "text": "Tell me about the cutoff",
             "goto": "cutoff-detail"
           },
-          { "id": "pass", "text": "We'll keep to the marked route", "setsFlag": "flag:reyes-tipped" }
+          {
+            "id": "pass",
+            "text": "We'll keep to the marked route",
+            "setsFlag": "flag:reyes-tipped"
+          }
         ],
         "emits": "enc:reyes.rumor"
       },
