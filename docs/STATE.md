@@ -12,22 +12,29 @@ Round-by-round reality of what's shipped. (The plan/queue is `.agent-state/direc
 ## Shipped
 - **Foundation (M1):** Martian Trail branding; Vite `base` handling (Pages/Capacitor);
   Capacitor 8 Android platform (committed `android/`, `cap:sync` green); three-workflow CI
-  (`ci`→`release`→`cd`, SHA-pinned, Node 22, real Pages deploy); entire toolchain bumped to
-  latest (Svelte 5, Vite 8, Vitest 4, Pixi 8, Cap 8, TS 6, Biome 2).
-- **Docs:** `README`, `AGENTS`, `STANDARDS`, `CHANGELOG`, `docs/ARCHITECTURE`, `docs/GAME-DESIGN`.
+  (`ci`→`release`→`cd`, SHA-pinned, Node 22, real Pages deploy); full doc set.
+- **Stack pivot:** dropped Svelte + PixiJS for the house dialect — **React 19 +
+  @react-three/fiber + drei + @react-three/postprocessing + framer-motion + Three.js
+  (ortho side-view 3D) + Tailwind v4**, all on latest (Vite 8, Vitest 4, Cap 8, TS 6, Biome 2).
+  Dead POC source removed; a minimal R3F boot shell renders (verified in Safari). All gates
+  green: check (tsc), lint, test, build.
+- **Docs:** `README`, `AGENTS`, `STANDARDS`, `CHANGELOG`, `docs/{ARCHITECTURE,GAME-DESIGN,
+  ART-DIRECTION,STATE,TESTING,DEPLOYMENT}`.
+
+## Decisions locked
+- Render: Three.js ortho side-view 3D GLB (not Pixi/2D). Art: 3DLowPoly Kenney "Space" family.
+- UI: React + full R3F ecosystem (not Svelte). State: zustand (UI) + plain-object frame bridge.
 
 ## In flight
-- Architecture decomposition (M3): the POC scaffold (`src/lib/{GameState,Renderer,AudioEngine}.ts`
-  + monolithic `App.svelte`) is being rewritten into the `src/{core,engine,sim,render,state,
-  content,config,...}` structure on Svelte 5 / Pixi 8 with koota + production libs.
+- M2 (design system/tokens) then M3 (architecture decomposition): build out
+  `src/{core,engine,sim,render,state,content,config,…}` with koota + the production libs, on
+  the R3F shell. The POC mechanics are ported from the frozen `red_mars_the_ares_trail.html`
+  + git history into the new pure `src/sim`.
 
-## Known gaps / red (intentional — the punch-list)
-- `Renderer.ts` uses Pixi 7 API (breaks on Pixi 8: async `Application.init`, `BLEND_MODES`,
-  `beginFill`) → fixed in the render decomposition (M3).
-- Depot screen renders only the left panel; no garage backdrop (the `update()` early-returns
-  unless `mode==='travel'`) → fixed by per-screen render scenes (M3), not patched.
-- Budget regression (10k, outside the store), dust-storm system dark, 2 events vs POC's 3,
-  no sponsor select / save / typed illness / Hazard Traverse / EVA minigame → built in M5.
+## Known gaps (the build backlog, per directive)
+- No gameplay yet beyond the boot shell — depot/travel/hazard/eva/outpost/terminus, sponsor
+  select, save, typed illness, Hazard Traverse, EVA Prospecting all built in M5 on the M3
+  structure. Real art replaces the placeholder scene in M6.
 
 ## Next
-M2 design system/tokens, then M3 decomposition (the foundation for everything else).
+M2 design system/tokens → M3 decomposition (the foundation for the loop).
