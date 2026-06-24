@@ -32,7 +32,7 @@ export function HallOfRecords({
         <ol className="mt-3 space-y-1.5">
           {scores.map((s, i) => (
             <li
-              key={`${s.seed}-${s.date}-${i}`}
+              key={`${s.seed}-${s.date}-${s.score}-${s.sol}-${s.survivors}`}
               className="flex items-baseline justify-between gap-3 border-b border-[var(--color-ui-border)]/30 pb-1.5"
             >
               <span className="flex min-w-0 items-baseline gap-2">
