@@ -77,6 +77,7 @@ function StoreRow({
       <button
         type="button"
         aria-label={`Sell ${item.name}`}
+        data-testid={`sell-${item.id}`}
         disabled={!canSell(cart, item.id)}
         onClick={() => onAdjust(-1)}
         className="grid h-11 w-11 place-items-center rounded border border-[var(--color-ui-border)] font-display text-lg text-mars-sand transition-colors enabled:hover:text-mars-dust disabled:opacity-30"
@@ -87,6 +88,7 @@ function StoreRow({
       <button
         type="button"
         aria-label={`Buy ${item.name}`}
+        data-testid={`buy-${item.id}`}
         disabled={!canBuy(cart, item.id, budget)}
         onClick={() => onAdjust(1)}
         className="grid h-11 w-11 place-items-center rounded border border-[var(--color-ui-border)] font-display text-lg text-mars-sand transition-colors enabled:hover:text-mars-dust disabled:opacity-30"
@@ -149,12 +151,14 @@ function StationButton({
   detail,
   active,
   disabled = false,
+  testId,
   onClick,
 }: {
   label: string;
   detail: string;
   active: boolean;
   disabled?: boolean;
+  testId?: string;
   onClick: () => void;
 }) {
   return (
@@ -162,6 +166,7 @@ function StationButton({
       type="button"
       aria-label={label}
       aria-pressed={active}
+      data-testid={testId}
       disabled={disabled}
       onClick={onClick}
       className="min-h-[56px] min-w-0 overflow-hidden rounded border bg-black/35 px-3 py-2 text-left transition-colors enabled:hover:border-[var(--color-mars-dust)] disabled:cursor-not-allowed disabled:opacity-45"
@@ -279,6 +284,7 @@ function ManifestTerminal({
       <div className="flex items-center gap-2">
         <button
           type="button"
+          data-testid="manifest-tab-supplies"
           onClick={() => onTab("supplies")}
           className="min-h-[40px] flex-1 rounded border px-3 font-display text-[0.72rem] uppercase tracking-[0.14em]"
           style={{
@@ -291,6 +297,7 @@ function ManifestTerminal({
         </button>
         <button
           type="button"
+          data-testid="manifest-tab-upgrades"
           onClick={() => onTab("upgrades")}
           className="min-h-[40px] flex-1 rounded border px-3 font-display text-[0.72rem] uppercase tracking-[0.14em]"
           style={{
@@ -304,6 +311,7 @@ function ManifestTerminal({
         <button
           type="button"
           aria-label="Close manifest terminal"
+          data-testid="manifest-close"
           onClick={onClose}
           className="grid h-10 w-10 place-items-center rounded border border-[var(--color-ui-border)] font-display text-mars-sand"
         >
@@ -359,6 +367,7 @@ function CoDriverStation({
       <button
         type="button"
         aria-label="Close co-driver berth"
+        data-testid="codriver-close"
         onClick={onClose}
         className="absolute top-3 right-3 grid h-10 w-10 place-items-center rounded border border-[var(--color-ui-border)] font-display text-mars-sand"
       >
@@ -375,6 +384,7 @@ function CoDriverStation({
               key={coDriver.id}
               type="button"
               aria-label={`Recruit ${coDriver.name}`}
+              data-testid={`recruit-${coDriver.id}`}
               onClick={() => {
                 void tapLight();
                 onSelect(coDriver.id);
@@ -667,6 +677,7 @@ export function DepotScreen() {
           label="Recruit Co-driver"
           detail={coDriver ? coDriver.role : "Required"}
           active={activeStation === "codriver"}
+          testId="depot-action-codriver"
           onClick={() => setStation("codriver")}
         />
         <StationButton
@@ -674,22 +685,26 @@ export function DepotScreen() {
           detail={canProvision ? (manifestTab === "supplies" ? "Supplies" : "Upgrades") : "Locked"}
           active={activeStation === "manifest"}
           disabled={!canProvision}
+          testId="depot-action-manifest"
           onClick={() => setStation("manifest")}
         />
         <StationButton
           label="Talk to Okonkwo"
           detail={socialFlags.has("flag:okonkwo-briefed") ? "Briefed" : "Quartermaster"}
           active={activeStation === "okonkwo"}
+          testId="depot-action-okonkwo"
           onClick={() => setStation("okonkwo")}
         />
         <StationButton
           label="Talk to Reyes"
           detail={socialFlags.has("flag:reyes-tipped") ? "Route tip logged" : "Navigator"}
           active={activeStation === "reyes"}
+          testId="depot-action-reyes"
           onClick={() => setStation("reyes")}
         />
         <button
           type="button"
+          data-testid="depot-depart"
           onClick={depart}
           disabled={!canDepart}
           className="col-span-2 min-h-[56px] min-w-0 rounded border px-3 py-2 font-display text-[0.72rem] uppercase tracking-[0.1em] text-mars-sand transition-colors hover:text-mars-dust disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:text-mars-sand tablet:col-span-1"

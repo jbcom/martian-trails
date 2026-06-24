@@ -1,4 +1,4 @@
-import { expect, type Locator, test } from "@playwright/test";
+import { expect, type Page, test } from "@playwright/test";
 
 /**
  * Visual sweep — walks the full journey at several phone/tablet widths, screenshots every
@@ -45,7 +45,7 @@ const CLIP_PROBE = `(() => {
   return clips;
 })()`;
 
-async function assertNoClips(page: import("@playwright/test").Page, screen: string, label: string) {
+async function assertNoClips(page: Page, screen: string, label: string) {
   const clips = (await page.evaluate(CLIP_PROBE)) as Array<{ src: string; worstCutPx: number }>;
   expect(
     clips,
@@ -53,12 +53,18 @@ async function assertNoClips(page: import("@playwright/test").Page, screen: stri
   ).toEqual([]);
 }
 
-async function shot(page: import("@playwright/test").Page, screen: string, label: string) {
+async function shot(page: Page, screen: string, label: string) {
   await page.screenshot({ path: `artifacts/sweep/${screen}-${label}.png`, fullPage: false });
 }
 
-async function domClick(locator: Locator) {
-  await locator.evaluate((el) => (el as HTMLElement).click());
+async function dataClick(page: Page, testId: string) {
+  const clicked = await page.evaluate((id) => {
+    const el = document.querySelector<HTMLElement>(`[data-testid="${id}"]`);
+    if (!el) return false;
+    el.click();
+    return true;
+  }, testId);
+  expect(clicked, `missing ${testId}`).toBe(true);
 }
 
 for (const { label, w, h } of WIDTHS) {
@@ -106,27 +112,27 @@ for (const { label, w, h } of WIDTHS) {
     await shot(page, "depot", label);
     await assertNoClips(page, "depot", label);
 
-    await domClick(page.getByRole("button", { name: /recruit co-driver/i }));
+    await dataClick(page, "depot-action-codriver");
     await expect(page.getByText(/rover berth/i)).toBeVisible();
     await shot(page, "depot-codriver", label);
     await assertNoClips(page, "depot-codriver", label);
-    await domClick(page.getByRole("button", { name: /recruit okonkwo/i }));
+    await dataClick(page, "recruit-codriver:okonkwo");
     await expect(page.getByText(/rover berth/i)).toBeHidden();
 
-    await domClick(page.getByRole("button", { name: /manifest terminal/i }));
+    await dataClick(page, "depot-action-manifest");
     await expect(page.getByTestId("depot-station-panel").getByText(/cargo gantry/i)).toBeVisible();
     await shot(page, "depot-manifest", label);
     await assertNoClips(page, "depot-manifest", label);
-    await domClick(page.getByRole("button", { name: /^upgrades$/i }));
+    await dataClick(page, "manifest-tab-upgrades");
     await shot(page, "depot-upgrades", label);
     await assertNoClips(page, "depot-upgrades", label);
-    await domClick(page.getByRole("button", { name: /^supplies$/i }));
-    await domClick(page.getByRole("button", { name: /buy liquid o2/i }));
-    await domClick(page.getByRole("button", { name: /buy potable h2o/i }));
-    await domClick(page.getByRole("button", { name: /buy rations/i }));
-    await domClick(page.getByRole("button", { name: /close manifest terminal/i }));
+    await dataClick(page, "manifest-tab-supplies");
+    await dataClick(page, "buy-oxygen");
+    await dataClick(page, "buy-water");
+    await dataClick(page, "buy-rations");
+    await dataClick(page, "manifest-close");
 
-    await domClick(page.getByRole("button", { name: /clear airlock/i }));
+    await dataClick(page, "depot-depart");
     await expect(page.getByText(/expedition telemetry/i)).toBeVisible();
     await expect(page.getByText(/co-driver/i)).toBeVisible();
     await shot(page, "travel-codriver", label);
