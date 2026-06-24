@@ -99,7 +99,6 @@ Stack swap DONE (one effort, cheapest moment): **React 19 + R3F + drei + @react-
 
 ## Queue — Milestone 5: The complete Oregon-Trail-equivalent loop (branch: feat/m5-loop)
 Build the full loop ON the M3 structure, mechanic-by-mechanic per docs/GAME-DESIGN.md. Each = content (JSON) + sim system + render scene + UI + tests + Safari playtest.
-- [ ] [WAIT-AGENT] M5 playable-loop screens building in background (depot store, travel HUD, event modal, terminus on the run controller) — agent self-verifies via Safari + gates, wakes me on completion to integrate + drive M5 to PR.
 - [x] m5-1 Sponsor-select [done d0116b6 — SponsorScreen, boot→sponsor→depot, budget+multiplier flow, verified Safari] SCREEN + boot→sponsor→depot wiring (data layer DONE 578cf07: sponsors.json/schema/registry/tests). Screen deferred — it touches Router.tsx + store.ts which the Hazard/EVA agent is actively editing; build after that agent lands to avoid collision. Boot→ (Oregon Trail profession analog: starting CR + score multiplier) → crew select. (POC has none — flat 25k.)
 - [x] m5-spine (foundation) Run controller `src/sim/run.ts` — start/setDriving/tick/snapshot; sim↔diagnostics↔UI integration, deterministic, 5 tests. [done 292263f] M5 screens build on this.
 - [x] m5-2 Provisioning [done 00c4532 — real store, 25k budget enforced, verified in Safari] depot** done right: 25,000 CR enforced in the store (single source of truth, kill dual-qty-mutation), payload cap, missing-vitals launch warning, content-driven stock. Fixes the budget regression.
