@@ -6,16 +6,22 @@
 
 import type { Entity } from "koota";
 import { config } from "@/config";
-import { Crew, Outcome, Position, Resources } from "../traits";
+import { Crew, Outcome, Position, Resources, Sponsor } from "../traits";
 import { aliveCount } from "./helpers";
 
-/** Compute the UNOMA rating from raw run state (POC scoring formula). */
+/**
+ * Compute the UNOMA rating from raw run state (POC scoring formula) scaled by the sponsor
+ * multiplier (the Oregon Trail profession multiplier — a leaner-budget sponsor multiplies a
+ * higher score). The base raw score is floored first, then multiplied, so the multiplier
+ * always rewards the prestige run. `scoreMultiplier` defaults to ×1 (full-funding UNOMA).
+ */
 export function computeScore(input: {
   survivors: number;
   oxygen: number;
   water: number;
   rations: number;
   sol: number;
+  scoreMultiplier?: number;
 }): number {
   const s = config.scoring;
   const raw =
@@ -23,7 +29,7 @@ export function computeScore(input: {
     input.survivors * s.perSurvivor +
     Math.floor((input.oxygen + input.water + input.rations) / s.resourceDivisor) -
     input.sol * s.perSol;
-  return Math.max(s.floor, raw);
+  return Math.round(Math.max(s.floor, raw) * (input.scoreMultiplier ?? 1));
 }
 
 export function scoringSystem(expedition: Entity): void {
@@ -40,6 +46,7 @@ export function scoringSystem(expedition: Entity): void {
     water: res.water,
     rations: res.rations,
     sol: pos.sol,
+    scoreMultiplier: expedition.get(Sponsor)?.scoreMultiplier ?? 1,
   });
   expedition.set(Outcome, { score });
 }

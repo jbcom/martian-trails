@@ -116,12 +116,15 @@ export const terrainSchema = z.object({
 export type TerrainZoneConfig = z.infer<typeof terrainZoneSchema>;
 export type TerrainConfig = z.infer<typeof terrainSchema>;
 
-/** upgrades.json — rover sub-system upgrades bought with parts. */
+/** upgrades.json — rover sub-system upgrades. */
 export const upgradeSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
   desc: z.string().min(1),
+  /** Cost in machined Parts to install at an outpost (the field-install price). */
   cost: positive,
+  /** Cost in Credits to factory-fit at the depot before launch. */
+  creditCost: positive,
 });
 export const upgradesSchema = z.object({
   catalog: z.array(upgradeSchema).min(1),

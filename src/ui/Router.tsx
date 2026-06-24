@@ -3,6 +3,14 @@ import type { Screen } from "@/core/screens";
 import { useGameStore } from "@/state/store";
 import { BootScreen } from "@/ui/screens/BootScreen";
 import { DepotScreen } from "@/ui/screens/DepotScreen";
+import { EvaScreen } from "@/ui/screens/EvaScreen";
+import { EventModal } from "@/ui/screens/EventModal";
+import { GameOverScreen } from "@/ui/screens/GameOverScreen";
+import { HazardScreen } from "@/ui/screens/HazardScreen";
+import { OutpostScreen } from "@/ui/screens/OutpostScreen";
+import { SponsorScreen } from "@/ui/screens/SponsorScreen";
+import { TerminusScreen } from "@/ui/screens/TerminusScreen";
+import { TravelScreen } from "@/ui/screens/TravelScreen";
 
 /**
  * The DOM/UI screen router. Reads the active screen from the store (human cadence)
@@ -15,8 +23,29 @@ function ScreenForScreen({ screen }: { screen: Screen }) {
   switch (screen) {
     case "boot":
       return <BootScreen />;
+    case "sponsor":
+      return <SponsorScreen />;
     case "depot":
       return <DepotScreen />;
+    case "travel":
+      return <TravelScreen />;
+    case "outpost":
+      return <OutpostScreen />;
+    case "event":
+      return (
+        <>
+          <TravelScreen />
+          <EventModal />
+        </>
+      );
+    case "hazard":
+      return <HazardScreen />;
+    case "eva":
+      return <EvaScreen />;
+    case "terminus":
+      return <TerminusScreen />;
+    case "gameover":
+      return <GameOverScreen />;
     default:
       return (
         <div className="pointer-events-none grid h-full place-items-center">

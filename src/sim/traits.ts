@@ -93,6 +93,20 @@ export const Crew = trait<() => CrewState[]>(() => []);
 export const Upgrades = trait<() => Record<string, boolean>>(() => ({}));
 
 /**
+ * Mission sponsor parameters carried into the run (the Oregon Trail profession analog).
+ * The score multiplier scales the terminus UNOMA rating — a leaner-budget sponsor earns a
+ * higher multiplier, so risk trades against prestige. Set once at spawn from the loadout.
+ */
+export const Sponsor = trait({ scoreMultiplier: 1 });
+
+/**
+ * Per-ability cooldown bookkeeping: the Sol on which each crew active ability was last used,
+ * keyed by crew id (`{}` = never used). AoS factory → own object per entity so cooldowns
+ * don't leak across runs/tests.
+ */
+export const AbilityCooldowns = trait<() => Record<string, number>>(() => ({}));
+
+/**
  * The expedition's seeded rng. AoS factory holds the live stream; never serialized.
  * The factory default is a placeholder stream — `spawnExpedition` always supplies the real
  * seeded rng, which replaces it. (koota invokes the factory to build the store default even

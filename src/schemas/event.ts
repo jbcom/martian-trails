@@ -35,3 +35,5 @@ export const eventSchema = z.object({
 export const eventsFileSchema = z.array(eventSchema);
 
 export type TrailEvent = z.infer<typeof eventSchema>;
+export type EventOption = z.infer<typeof optionSchema>;
+export type Effect = z.infer<typeof effectSchema>;

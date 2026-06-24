@@ -14,6 +14,8 @@ export const MODELS = {
   rover: `${base}assets/models/rover/rover.glb`,
   /** PSX Astronaut — hero EVA actor + crew. */
   astronaut: `${base}assets/models/crew/astronaut.glb`,
+  /** PSX rocky cliff face — the hazard-traverse terrain feature + EVA deposit rocks. */
+  rocks: `${base}assets/models/terrain/rocks.glb`,
   /** PSX-Electrical machinery — outpost generator / habitat prop. */
   machinery1: `${base}assets/models/outpost/machinery_1.glb`,
   machinery3: `${base}assets/models/outpost/machinery_3.glb`,

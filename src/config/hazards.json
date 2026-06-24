@@ -1,0 +1,513 @@
+{
+  "triggerWindow": 40,
+  "hazards": [
+    {
+      "id": "noctis-chasma",
+      "name": "Noctis Chasma",
+      "kind": "crevasse",
+      "description": "A branch of Noctis Labyrinthus splits the route — a rubble-choked chasm too wide to roll across blind. The read is its span at the narrowest gap your survey found.",
+      "readLabel": "Width",
+      "distance": 360,
+      "options": [
+        {
+          "id": "ford",
+          "label": "Ford the ramp",
+          "blurb": "Gun a regolith ramp at the narrowest point. Fast and free — but a steep read can pitch the rover.",
+          "upfront": [],
+          "upfrontSols": 0,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 6,
+              "readScaling": -0.6,
+              "log": "The rover noses down the ramp and powers clean across the gap.",
+              "effects": [{ "target": "morale", "delta": 4 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 3,
+              "readScaling": 0.2,
+              "log": "A wheel drops into a fissure; you claw out, but the chassis takes a beating.",
+              "effects": [{ "target": "hull", "delta": -18 }],
+              "solsCost": 1,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "fail",
+              "weight": 2,
+              "readScaling": 0.9,
+              "log": "The ramp gives way. The rover slews into the chasm wall — crew thrown, cargo scattered.",
+              "effects": [
+                { "target": "hull", "delta": -35 },
+                { "target": "morale", "delta": -12 },
+                { "target": "parts", "delta": -2 }
+              ],
+              "solsCost": 2,
+              "distanceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "bridge",
+          "label": "Bridge it",
+          "blurb": "Deploy spanning plates across the gap. Costs Parts; a wide read risks a plate buckling mid-span.",
+          "upfront": [{ "target": "parts", "delta": -3 }],
+          "upfrontSols": 1,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 8,
+              "readScaling": -0.4,
+              "log": "The plates hold. The rover crawls across the span and onto solid regolith.",
+              "effects": [{ "target": "morale", "delta": 3 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 2,
+              "readScaling": 0.3,
+              "log": "A plate sags under load — you make it, but a crate tumbles into the dark.",
+              "effects": [
+                { "target": "rations", "delta": -40 },
+                { "target": "parts", "delta": -1 }
+              ],
+              "solsCost": 1,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "fail",
+              "weight": 1,
+              "readScaling": 0.8,
+              "log": "The span buckles. Plates and a cargo pallet plunge into the chasm.",
+              "effects": [
+                { "target": "parts", "delta": -2 },
+                { "target": "water", "delta": -60 },
+                { "target": "morale", "delta": -10 }
+              ],
+              "solsCost": 2,
+              "distanceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "detour",
+          "label": "Detour the rim",
+          "blurb": "Follow the chasm rim to a natural land bridge. Safe, but it costs Sols and power on the long way around.",
+          "upfront": [{ "target": "power", "delta": -20 }],
+          "upfrontSols": 3,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 10,
+              "readScaling": 0,
+              "log": "The rim track is slow but sound. You rejoin the route well past the chasm.",
+              "effects": [],
+              "solsCost": 0,
+              "distanceDelta": -8
+            }
+          ]
+        },
+        {
+          "id": "winch",
+          "label": "Winch descent",
+          "blurb": "Pay a rim prospector in rations to talk you down a known route. Near-safe, but you trade away supplies.",
+          "upfront": [{ "target": "rations", "delta": -50 }],
+          "upfrontSols": 1,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 12,
+              "readScaling": -0.2,
+              "log": "The prospector's beta is perfect. You descend, cross the floor, and winch out the far side.",
+              "effects": [{ "target": "morale", "delta": 6 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 2,
+              "readScaling": 0.4,
+              "log": "A winch anchor slips on the descent — recoverable, but it rattles the crew.",
+              "effects": [{ "target": "morale", "delta": -5 }],
+              "solsCost": 1,
+              "distanceDelta": 0
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "tharsis-storm-wall",
+      "name": "Tharsis Storm Wall",
+      "kind": "dustStorm",
+      "description": "A regional dust front stands across the route, a brown wall climbing past the horizon. The read is its density — how blind you'll be and how hard it abrades.",
+      "readLabel": "Density",
+      "distance": 820,
+      "options": [
+        {
+          "id": "punch-through",
+          "label": "Punch through",
+          "blurb": "Drive the storm on instruments. Fast — but a dense read crashes power and abrades the hull.",
+          "upfront": [],
+          "upfrontSols": 0,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 5,
+              "readScaling": -0.7,
+              "log": "You thread the front on dead reckoning and break into clear air beyond.",
+              "effects": [{ "target": "morale", "delta": 5 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 3,
+              "readScaling": 0.3,
+              "log": "Grit chews the seals and the panels brown out — you crawl through on reserve power.",
+              "effects": [{ "target": "power", "delta": -30 }, { "target": "hull", "delta": -12 }],
+              "solsCost": 1,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "fail",
+              "weight": 2,
+              "readScaling": 0.9,
+              "log": "Navigation whites out. You wander off-route for a Sol before the storm clears.",
+              "effects": [
+                { "target": "power", "delta": -40 },
+                { "target": "hull", "delta": -20 },
+                { "target": "morale", "delta": -10 }
+              ],
+              "solsCost": 2,
+              "distanceDelta": -25
+            }
+          ]
+        },
+        {
+          "id": "hunker-down",
+          "label": "Hunker down",
+          "blurb": "Park, seal up, and wait the front out. Safe — but it costs Sols and risks a dig-out.",
+          "upfront": [],
+          "upfrontSols": 2,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 8,
+              "readScaling": -0.3,
+              "log": "The front passes overnight. You shake off the dust and roll on.",
+              "effects": [],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 3,
+              "readScaling": 0.5,
+              "log": "The rover half-buries in drift. The crew spends a Sol digging it free.",
+              "effects": [{ "target": "morale", "delta": -6 }],
+              "solsCost": 1,
+              "distanceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "reroute",
+          "label": "Reroute wide",
+          "blurb": "Skirt the storm's edge on a long arc. Reliable, but the detour eats distance and power.",
+          "upfront": [{ "target": "power", "delta": -25 }],
+          "upfrontSols": 2,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 10,
+              "readScaling": 0,
+              "log": "The wide arc keeps you in clear air the whole way around the front.",
+              "effects": [],
+              "solsCost": 0,
+              "distanceDelta": -15
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "marineris-bog",
+      "name": "Marineris Dust Pit",
+      "kind": "regolithBog",
+      "description": "Fine fluffy regolith pools in a basin like quicksand — the rover sinks if it stops. The read is the pit's depth: how far you'd bog.",
+      "readLabel": "Depth",
+      "distance": 1080,
+      "options": [
+        {
+          "id": "power-through",
+          "label": "Power through",
+          "blurb": "Keep momentum and drive straight across. Free and fast — but a deep read bogs you completely.",
+          "upfront": [],
+          "upfrontSols": 0,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 5,
+              "readScaling": -0.8,
+              "log": "Wheels spinning, you skim across the pit before it can swallow them.",
+              "effects": [{ "target": "morale", "delta": 4 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "fail",
+              "weight": 4,
+              "readScaling": 0.9,
+              "log": "The rover bogs to the axles. Hours of winching and digging to break free.",
+              "effects": [
+                { "target": "power", "delta": -35 },
+                { "target": "morale", "delta": -10 }
+              ],
+              "solsCost": 2,
+              "distanceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "traction-mats",
+          "label": "Lay traction mats",
+          "blurb": "Roll out mats ahead of the wheels. Costs Parts, but it's reliable across any depth.",
+          "upfront": [{ "target": "parts", "delta": -2 }],
+          "upfrontSols": 1,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 12,
+              "readScaling": -0.2,
+              "log": "The mats bite. You crawl across the pit on a firm track and recover them the far side.",
+              "effects": [{ "target": "morale", "delta": 2 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 2,
+              "readScaling": 0.4,
+              "log": "A mat sinks before you recover it — left behind in the dust.",
+              "effects": [{ "target": "parts", "delta": -1 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "skirt",
+          "label": "Skirt the edge",
+          "blurb": "Trace the firm rim around the basin. Safe, but the long way costs Sols.",
+          "upfront": [],
+          "upfrontSols": 3,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 10,
+              "readScaling": 0,
+              "log": "The rim holds firm the whole way. Slow, but you never come close to bogging.",
+              "effects": [],
+              "solsCost": 0,
+              "distanceDelta": -6
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dichotomy-ice",
+      "name": "Dichotomy Ice Sheet",
+      "kind": "iceSheet",
+      "description": "A buried glacier spans the dichotomy boundary, its surface a dirty white shelf. The read is the ice thickness — thin spots break through like a river ford gone wrong.",
+      "readLabel": "Ice Thickness",
+      "distance": 1640,
+      "options": [
+        {
+          "id": "drive-across",
+          "label": "Drive across",
+          "blurb": "Roll straight over the shelf. Fast — but a thin read means a wheel punches through.",
+          "upfront": [],
+          "upfrontSols": 0,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 6,
+              "readScaling": 0.6,
+              "log": "The shelf holds firm under the rover's weight. A clean, fast crossing.",
+              "effects": [{ "target": "morale", "delta": 5 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 3,
+              "readScaling": -0.2,
+              "log": "Ice cracks underfoot — a wheel drops through into slush before you gun clear.",
+              "effects": [{ "target": "hull", "delta": -15 }, { "target": "water", "delta": 30 }],
+              "solsCost": 1,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "fail",
+              "weight": 2,
+              "readScaling": -0.7,
+              "log": "The shelf gives way. The rover drops a half-metre into a melt void — a hard, cold recovery.",
+              "effects": [
+                { "target": "hull", "delta": -30 },
+                { "target": "power", "delta": -25 },
+                { "target": "morale", "delta": -12 }
+              ],
+              "solsCost": 2,
+              "distanceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "probe-route",
+          "label": "Probe a route",
+          "blurb": "Send the crew ahead to sound the ice and flag a thick path. Costs Sols, far safer.",
+          "upfront": [],
+          "upfrontSols": 2,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 12,
+              "readScaling": 0.3,
+              "log": "Probing finds a thick lobe. You follow the flags across without a creak.",
+              "effects": [{ "target": "water", "delta": 20 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 2,
+              "readScaling": -0.3,
+              "log": "Even the flagged path thins midway — a tense, slow crawl, but you make it.",
+              "effects": [{ "target": "morale", "delta": -4 }],
+              "solsCost": 1,
+              "distanceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "go-around",
+          "label": "Go around",
+          "blurb": "Detour to where the glacier pinches out. Long, but it never tests the ice.",
+          "upfront": [{ "target": "power", "delta": -20 }],
+          "upfrontSols": 3,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 10,
+              "readScaling": 0,
+              "log": "You round the glacier's snout on bare rock and rejoin the route.",
+              "effects": [],
+              "solsCost": 0,
+              "distanceDelta": -10
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "korolev-scarp",
+      "name": "Korolev Scarp",
+      "kind": "scarp",
+      "description": "The basin rim drops away in a cliff scarp on the final approach to Korolev. The read is the descent grade — how steep the way down.",
+      "readLabel": "Grade",
+      "distance": 2300,
+      "options": [
+        {
+          "id": "direct-descent",
+          "label": "Direct descent",
+          "blurb": "Take the cliff head-on. Fast — but a steep read risks the rover and the crew.",
+          "upfront": [],
+          "upfrontSols": 0,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 4,
+              "readScaling": -0.8,
+              "log": "Brakes smoking, you ride the grade straight down to the basin floor.",
+              "effects": [{ "target": "morale", "delta": 6 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 3,
+              "readScaling": 0.3,
+              "log": "The rover slides the last stretch and slams the apron — jarring, but intact enough.",
+              "effects": [{ "target": "hull", "delta": -20 }, { "target": "morale", "delta": -6 }],
+              "solsCost": 1,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "fail",
+              "weight": 2,
+              "readScaling": 0.9,
+              "log": "A wheel station shears on the descent. You reach the floor battered and a crew bruised.",
+              "effects": [
+                { "target": "hull", "delta": -32 },
+                { "target": "parts", "delta": -2 },
+                { "target": "morale", "delta": -14 }
+              ],
+              "solsCost": 2,
+              "distanceDelta": 0
+            }
+          ]
+        },
+        {
+          "id": "switchback",
+          "label": "Switchback",
+          "blurb": "Pick a zig-zag track down the scarp. Slow and Sol-costly, but sound.",
+          "upfront": [],
+          "upfrontSols": 2,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 11,
+              "readScaling": -0.2,
+              "log": "The switchbacks are tedious but stable. You roll onto the basin floor unscathed.",
+              "effects": [{ "target": "morale", "delta": 2 }],
+              "solsCost": 0,
+              "distanceDelta": -5
+            }
+          ]
+        },
+        {
+          "id": "lower-winch",
+          "label": "Lower with winch",
+          "blurb": "Anchor and winch the rover down in stages. Costs Parts, but it tames any grade.",
+          "upfront": [{ "target": "parts", "delta": -3 }],
+          "upfrontSols": 1,
+          "outcomes": [
+            {
+              "tier": "success",
+              "weight": 12,
+              "readScaling": -0.1,
+              "log": "Stage by stage, the winch lowers the rover to the floor. Slow, controlled, clean.",
+              "effects": [{ "target": "morale", "delta": 4 }],
+              "solsCost": 0,
+              "distanceDelta": 0
+            },
+            {
+              "tier": "partial",
+              "weight": 2,
+              "readScaling": 0.4,
+              "log": "An anchor pulls on the second stage — a heart-stopping drop, then it catches.",
+              "effects": [{ "target": "morale", "delta": -5 }],
+              "solsCost": 1,
+              "distanceDelta": 0
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "$comment": "Crew active abilities (M10). One per role, triggered from the travel crew panel; config-driven costs/effects/cooldowns. Pure resolution in src/sim/abilities.ts.",
+  "evaYieldBonusMult": 1.5,
+  "abilities": [
+    {
+      "id": "rally-crew",
+      "crewId": "john",
+      "name": "Rally Crew",
+      "desc": "The Commander steadies the crew. +35 Morale. (3-Sol cooldown)",
+      "sols": 0,
+      "cooldownSols": 3,
+      "effects": [{ "target": "morale", "delta": 35 }]
+    },
+    {
+      "id": "jury-rig",
+      "crewId": "maya",
+      "name": "Jury-Rig",
+      "desc": "The Engineer patches the hull from scrap — no part needed. +25 Hull, −10 Power. (4-Sol cooldown)",
+      "sols": 1,
+      "cooldownSols": 4,
+      "effects": [{ "target": "hull", "delta": 25 }, { "target": "power", "delta": -10 }]
+    },
+    {
+      "id": "deep-prospect",
+      "crewId": "frank",
+      "name": "Deep Prospect",
+      "desc": "The Geologist surveys ahead, priming the next EVA for a richer haul. −8 Power. (5-Sol cooldown)",
+      "sols": 0,
+      "cooldownSols": 5,
+      "effects": [{ "target": "power", "delta": -8 }],
+      "sets": "evaYieldBonus"
+    },
+    {
+      "id": "emergency-harvest",
+      "crewId": "nadia",
+      "name": "Emergency Harvest",
+      "desc": "The Botanist forces an early hydroponic yield. +120 Rations, −60 Water. (4-Sol cooldown)",
+      "sols": 0,
+      "cooldownSols": 4,
+      "effects": [{ "target": "rations", "delta": 120 }, { "target": "water", "delta": -60 }]
+    }
+  ]
+}
