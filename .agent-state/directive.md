@@ -56,8 +56,8 @@ This is NOT a patch-the-POC job. Plan + decompose properly: (1) the ADDED produc
 
 ### m1-vite vite/test config for Pages + device
 - [x] m1-vite-1 Add `base` handling to vite.config.ts (conditional on `CAPACITOR` / `GITHUB_PAGES`, default `/`, pages `/martian-trails/`). Add `build:pages` + `build:native` scripts. [done 815995e — verified all three base modes emit correct asset paths]
-- [ ] m1-vite-2 Create the real vitest browser config (`@vitest/browser-playwright`, chromium, `screenshotFailures:true`, `fileParallelism:false`, GPU/SwiftShader args, headless CI-driven). Fix `test:browser` script (currently references nonexistent `vitest.workspace.ts`). Add a `tests/browser/` smoke test that drives the real UI through the store.
-- [ ] m1-vite-3 Upgrade playwright e2e to serve the built `dist/` under the Pages subpath (agofa `serve.mjs` pattern); `trace:retain-on-failure`, `screenshot:only-on-failure`.
+- [x] m1-vite-2 Real vitest browser config created (`vitest.browser.config.ts`: @vitest/browser-playwright, chromium, screenshotFailures, fileParallelism:false, SwiftShader args, CI-driven headless). `test:browser` fixed (was nonexistent workspace). [done in React-swap commit ffa7a31] `tests/browser/` smoke test lands in M3 with the first real UI screen.
+- [x] m1-vite-3 Playwright e2e rewritten as a boot smoke test (boot.spec.ts) for the current shell; full-journey deployed e2e (agofa serve.mjs pattern) lands in M5 as screens arrive. [done ffa7a31]
 
 ### m1-cap Capacitor wiring
 - [x] m1-cap-1 Add `capacitor.config.ts` (`appId: com.jbcom.martiantrail`, `appName: Martian Trail`, `webDir: dist`, `androidScheme: https`, mobile-safe-area config). Add `cap:sync`, `cap:run:android`, `android:debug` scripts. Run `pnpm cap:sync` and commit the `android/` dir. [done 9513087 — @capacitor/android@6, android/ committed, cap:sync 'Sync finished']
@@ -91,7 +91,7 @@ Stack swap DONE (one effort, cheapest moment): **React 19 + R3F + drei + @react-
 
 ## Queue — Milestone 4: Asset & content pipelines (branch: feat/m4-pipelines)
 - [ ] m4-1 Port the REAL two-stage itch flow from a-good-old-fashioned-adventure (owned-keys cache, ALLOW_LIST of Martian Trail's purchased packs, Bearer auth, hardened curl, raw-assets→extract, idempotent).
-- [ ] m4-2 Local `/Volumes/home/assets` curate path, correct casing (`2DLowPoly`/`2DPhotorealistic`/`Audio`); plus 3DPSX GLBs via assets-library MCP if the art direction uses them. Curate chosen scene assets → `public/assets/` + `MANIFEST.json` + integrity test (refuse unmanifested).
+- [x] m4-2 Local asset curation DONE EARLY (user: "we should HAVE a rover"): `scripts/assets.manifest.json` + `curate-assets.mjs` (`pnpm assets:curate`) copy 36 CC0 Kenney 3DLowPoly Space GLBs + Sci-Fi audio into `public/assets/` organized by domain (models/{rover,crew,terrain,rocks,outpost,props}, audio/{sfx,music}); `MANIFEST.json` + integrity test (`asset-manifest.test.ts`, refuses unmanifested). Rover renders in the boot shell. [done on feat/assets: 8e10041, b25a2e8]
 - [ ] m4-3 Port the GenAI pipeline from maga-money-moves: `@google/genai`, `gemini-3.5-flash` (events), `imagen-4.0-fast-generate-001` (crew portraits), prompt/facet builders, zod validate gate, fs cache. Events→`src/content/events/*.json`; portraits→`public/assets/generated/portraits/`.
 
 ## Queue — Milestone 5: The complete Oregon-Trail-equivalent loop (branch: feat/m5-loop)
