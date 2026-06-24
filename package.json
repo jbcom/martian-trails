@@ -20,6 +20,7 @@
     "cap:run:android": "cap run android",
     "android:debug": "pnpm cap:sync && cd android && ./gradlew assembleDebug",
     "assets:curate": "node scripts/curate-assets.mjs",
+    "itch:library": "node scripts/itch-library.mjs",
     "assets:fetch": "node scripts/fetch-itch-assets.mjs",
     "genai:events": "tsx scripts/genai-events.ts",
     "genai:portraits": "tsx scripts/genai-portraits.ts"

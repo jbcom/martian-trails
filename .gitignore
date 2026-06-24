@@ -31,8 +31,9 @@ playwright-report/
 blob-report/
 playwright/.local-browsers/
 
-# Itch assets cache
+# Itch assets cache + raw downloads (only curated keepers under public/assets/ ship)
 .itch-cache/
+raw-assets/
 src/assets/fetched/
 
 # Agent-state derivable cache (directive.md + decisions.ndjson are tracked)
