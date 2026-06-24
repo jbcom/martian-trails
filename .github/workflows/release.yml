@@ -4,12 +4,9 @@ on:
   push:
     branches:
       - main
+  # Manual re-run of the release flow against main (release-please manages
+  # releases on the default branch; the APK/web jobs build from the created tag).
   workflow_dispatch:
-    inputs:
-      ref:
-        description: "Git ref to build (branch or tag)"
-        default: "main"
-        required: false
 
 permissions:
   contents: write
@@ -83,6 +80,11 @@ jobs:
             echo "No signing keystore secret — building debug APK"
             ./gradlew assembleDebug
           fi
+
+      - name: Shred decoded keystore
+        if: always()
+        working-directory: android
+        run: rm -f release.keystore
 
       - name: Attach APK to release
         env:

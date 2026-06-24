@@ -40,7 +40,7 @@ jobs:
         run: pnpm run lint
 
       - name: Install Playwright browser
-        run: pnpm exec playwright install chromium
+        run: pnpm exec playwright install --with-deps chromium
 
       - name: Smoke E2E
         run: pnpm run e2e

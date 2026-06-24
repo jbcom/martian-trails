@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:pages": "GITHUB_PAGES=true vite build",
-    "build:native": "CAPACITOR=true vite build",
+    "build:pages": "cross-env GITHUB_PAGES=true vite build",
+    "build:native": "cross-env CAPACITOR=true vite build",
     "preview": "vite preview",
     "check": "tsc --noEmit",
     "lint": "biome check .",
@@ -37,6 +37,7 @@
     "@vitejs/plugin-react": "^6.0.3",
     "@vitest/browser": "^4.1.9",
     "@vitest/browser-playwright": "^4.1.9",
+    "cross-env": "^10.1.0",
     "jsdom": "^29.1.1",
     "tailwindcss": "^4.3.1",
     "tsx": "^4.22.4",
