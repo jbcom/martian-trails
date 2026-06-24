@@ -10,7 +10,7 @@ import type { TradeOffer } from "@/schemas/outpost";
 import type { RunSave } from "@/schemas/save";
 import { abilityBlock, abilityForCrew, cooldownRemaining, resolveAbility } from "@/sim/abilities";
 import type { ResolvedEncounter } from "@/sim/encounters";
-import { resolveEncounter } from "@/sim/encounters";
+import { gotoNode, resolveEncounter } from "@/sim/encounters";
 import {
   applyInjury,
   type EvaSession,
@@ -813,7 +813,7 @@ class Run {
 
     for (let s = this.lastEncounterSol + 1; s <= sol; s++) {
       const solRng = rng.fork(`encounter:${s}`);
-      if (solRng.chance(0.15)) {
+      if (solRng.chance(config.travel.encounterChance ?? 0.15)) {
         const traders = npcsByArchetype("trader");
         if (traders.length === 0) break;
         const npc = solRng.pick(traders);
@@ -849,6 +849,18 @@ class Run {
         }
       }
       if (choice.setsFlag) this.runFlags.add(choice.setsFlag);
+
+      // A `goto` branches to another node in the same bank — the encounter stays open and the
+      // panel re-renders with the new lines/choices. Effects/flags above still apply first; only a
+      // choice WITHOUT a goto ends the encounter. (Used by the conflicting-advice pair in m8-4.)
+      if (choice.goto) {
+        const bank = getEncounterBank(pending.resolved.bankId);
+        if (bank) {
+          this.pendingEncounter = { npcId: pending.npcId, resolved: gotoNode(bank, choice.goto) };
+          this.publish();
+          return;
+        }
+      }
     }
 
     if (this.world) triggerDepart(this.world, e);

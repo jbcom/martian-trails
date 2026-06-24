@@ -41,7 +41,9 @@ let skipped = 0;
 let declined = 0;
 for (const npc of npcs) {
   const portraitKey = npc.portrait ?? npc.id.replace(/^npc:/, "");
-  const dest = join(OUT_DIR, `${portraitKey}.png`);
+  // The `npc-` prefix keeps NPC faces from colliding with crew portraits (e.g. frank.png) and
+  // matches EncounterPanel's npcPortraitUrl (`assets/generated/portraits/npc-<key>.png`).
+  const dest = join(OUT_DIR, `npc-${portraitKey}.png`);
   if (existsSync(dest) && !force) {
     skipped++;
     continue;

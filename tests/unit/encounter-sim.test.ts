@@ -140,6 +140,30 @@ describe("encounter sim — respondEncounter effects", () => {
     expect(snap?.pendingEncounter?.npcId).toBe(npcId);
     expect(snap?.pendingEncounter?.resolved.node.lines.length).toBeGreaterThan(0);
   });
+
+  it("a goto choice branches to another node without ending the encounter", () => {
+    const enc = driveToEncounter();
+    expect(enc).not.toBeNull();
+
+    // The trader's first-meeting has an "ask-route" choice that gotos the route-tip node.
+    const gotoChoice = enc!.resolved.node.choices.find((c) => c.goto);
+    if (!gotoChoice) return; // not on this seed's resolved node
+    const fromNode = enc!.resolved.nodeKey;
+
+    run.respondEncounter(gotoChoice.id);
+
+    // Encounter stays open, now showing the goto target node (a different node).
+    expect(run.currentEncounter).not.toBeNull();
+    expect(run.currentEncounter?.resolved.nodeKey).toBe(gotoChoice.goto);
+    expect(run.currentEncounter?.resolved.nodeKey).not.toBe(fromNode);
+
+    // A plain (no-goto) choice on the branched node then ends the encounter.
+    const endChoice = run.currentEncounter?.resolved.node.choices.find((c) => !c.goto);
+    if (endChoice) {
+      run.respondEncounter(endChoice.id);
+      expect(run.currentEncounter).toBeNull();
+    }
+  });
 });
 
 describe("encounter sim — serialize / restore", () => {

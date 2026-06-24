@@ -32,6 +32,7 @@ function driveSol() {
   }
   if (run.currentOutpost) run.leaveOutpost();
   if (run.currentEvent) run.applyEventChoice([]);
+  if (run.currentEncounter) run.respondEncounter("decline");
   run.setDriving(true);
 }
 

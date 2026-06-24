@@ -21,11 +21,17 @@
             "setsFlag": "flag:vasquez-traded"
           },
           {
-            "id": "open-trade",
-            "text": "See the full manifest",
-            "opensTrade": "trade:vasquez-crawler"
+            "id": "trade-bulk",
+            "text": "Trade 50 parts for water + medkit",
+            "effects": [
+              { "target": "parts", "delta": -50 },
+              { "target": "water", "delta": 160 },
+              { "target": "medkits", "delta": 1 }
+            ],
+            "setsFlag": "flag:vasquez-traded"
           },
-          { "id": "decline", "text": "Not today", "goto": "parting" }
+          { "id": "ask-route", "text": "What's the road ahead like?", "goto": "route-tip" },
+          { "id": "decline", "text": "Not today" }
         ],
         "emits": "enc:vasquez.first-meeting"
       },
@@ -41,7 +47,7 @@
             "effects": [{ "target": "parts", "delta": -18 }, { "target": "water", "delta": 140 }],
             "setsFlag": "flag:vasquez-traded"
           },
-          { "id": "decline", "text": "We'll manage", "goto": "parting" }
+          { "id": "decline", "text": "We'll manage" }
         ],
         "emits": "enc:vasquez.hard-up"
       },
@@ -56,14 +62,25 @@
             "text": "Trade 30 parts for water",
             "effects": [{ "target": "parts", "delta": -30 }, { "target": "water", "delta": 120 }]
           },
-          { "id": "decline", "text": "Just passing", "goto": "parting" }
+          { "id": "decline", "text": "Just passing" }
         ],
         "emits": "enc:vasquez.return-greeting"
       },
-      "parting": {
-        "lines": ["Keep your visor clean and your reactor warm. Korolev's a long way yet."],
-        "choices": [],
-        "emits": "enc:vasquez.parting"
+      "route-tip": {
+        "lines": [
+          "Tharsis shelf bites hard past the next depot — dust fronts come fast, batteries bleed faster.",
+          "Top off your water while you can. That's the long crawl talking."
+        ],
+        "choices": [
+          {
+            "id": "trade-water",
+            "text": "Good advice — trade 30 parts for water",
+            "effects": [{ "target": "parts", "delta": -30 }, { "target": "water", "delta": 120 }],
+            "setsFlag": "flag:vasquez-traded"
+          },
+          { "id": "decline", "text": "Thanks. We'll press on" }
+        ],
+        "emits": "enc:vasquez.route-tip"
       }
     }
   }
