@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { onDriving, onScreen } from "@/audio/reactor";
 import type { Screen } from "@/core/screens";
 import { buildLoadout, type DepotState } from "@/sim/loadout";
 import { type RunSnapshot, run } from "@/sim/run";
@@ -40,6 +41,17 @@ export function useRun(
   const lastFrame = useRef(0);
   const screenRef = useRef(screen);
   screenRef.current = screen;
+
+  // Audio reacts to the active screen (music bed, ducking, context stings).
+  useEffect(() => {
+    onScreen(screen);
+  }, [screen]);
+
+  // The engine hum follows the rover's live drive state.
+  const driving = snap?.driving ?? false;
+  useEffect(() => {
+    onDriving(driving);
+  }, [driving]);
 
   // Fallback start: if we land on an in-run screen with a seed but no live sim,
   // spin one up so the screen is never a dead end (the depot start is preferred).
