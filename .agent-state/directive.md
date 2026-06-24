@@ -1,6 +1,6 @@
 # Continuous Work Directive — martian-trails
 
-**Status:** RELEASED
+**Status:** ACTIVE
 **Owner:** Claude
 **Mandate:** "Bring this POC to a fully designed and actualized game called 'Martian Trail' inspired by the original Oregon Trail with a unique look and feel, design tokens, and fontography. Leverage 2DLowPoly / 2DPhotorealistic / Audio in /Volumes/home/assets. Port the itch downloader (../a-good-old-fashioned-adventure) and GenAI pipeline (../maga-money-moves). Set up the same ci.yml > release.yml > cd.yml release flow and the same vitest browser plugin / playwright structure. Work in long-running local branches, playtest in a browser with screenshot capture; use the Safari skill (Chrome is in use by someone else)."
 
@@ -117,3 +117,11 @@ Build the full loop ON the M3 structure, mechanic-by-mechanic per docs/GAME-DESI
 - [x] m6-3 Responsive phone/tablet/foldable [done 007c67b — verified all 3 form factors in Safari]. Orig: m6-3 **Responsive across phone / tablet / unfolded foldable**: container/viewport breakpoints, safe-area insets, touch-primary, Pixi resize to live canvas, HUD reflow (stacked→side→wide-rails). Verify each form factor via Safari at the three viewport classes + on-device cap:run:android.
 - [x] m6-4 Juice [done 007c67b — transitions, camera shake, alarm overlay, dust-storm VFX, haptics, preload]. Orig: m6-4 Juice & polish: motion transitions between screens, camera-shake, particle/weather VFX, haptics, critical-alarm overlay, loading/preload.
 - [x] m6-final Definition of done: full green (lint, check, unit, browser, e2e-deployed, build, APK); Pages live at jonbogaty.com/martian-trails/; docs/STATE.md current; full playable run boot→sponsor→depot→trail→hazard→eva→outpost→terminus verified in Safari with screenshots read; on-device APK runs.
+
+## Queue — Milestone 7: Production hardening (branch: feat/m7-hardening)
+The game ships and plays; this raises it from "complete" to "polished to a shine."
+- [ ] m7-1 Crew portraits: only John+Frank generated (Imagen declined Maya+Nadia). Get all 4 — try a filter-safe framing (helmet-on / 3-quarter / "video-game character art" wording) or meshy text-to-image. The game shows silhouettes for half the crew now.
+- [ ] m7-2 Save/continue: wire src/platform/persistence.ts to the UI — persist an in-progress run (resume on reload) + a high-score board (terminus writes, boot/menu reads). High-throughput rAF makes losing a run on refresh painful.
+- [ ] m7-3 Richer event pool: regenerate to ~24 events (more variety = replayability); keep the content-integrity gate.
+- [ ] m7-4 More music/ambience: curate 1-2 more trail/tension tracks from the owned itch/local audio; wire context (outpost calm vs hazard tension).
+- [ ] m7-final Full green + Safari run-through + PR.
