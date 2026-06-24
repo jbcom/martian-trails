@@ -1,0 +1,26 @@
+{
+  "$comment": "Sponsor / difficulty select — the Oregon Trail profession analog. Each sponsor sets the provisioning budget (starting Credits) and a terminal score multiplier (less funding = harder = higher score). Interpreted by the sponsor-select screen + scoring.",
+  "roster": [
+    {
+      "id": "unoma",
+      "name": "UNOMA Mandate",
+      "blurb": "A fully-funded UN Mars Authority expedition. Generous provisioning, modest acclaim.",
+      "budget": 25000,
+      "scoreMultiplier": 1.0
+    },
+    {
+      "id": "consortium",
+      "name": "Corporate Consortium",
+      "blurb": "A resource-extraction syndicate. Lean budget, sharper stakes — a respected run.",
+      "budget": 18000,
+      "scoreMultiplier": 1.5
+    },
+    {
+      "id": "independent",
+      "name": "Independent Settlers",
+      "blurb": "A shoestring colonist co-op. Scarce funds, everything to prove — the legend run.",
+      "budget": 12000,
+      "scoreMultiplier": 2.0
+    }
+  ]
+}
