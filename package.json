@@ -26,6 +26,7 @@
     "assets:fetch": "node scripts/fetch-itch-assets.mjs",
     "genai:events": "tsx scripts/genai-events.ts",
     "genai:portraits": "tsx scripts/genai-portraits.ts",
+    "genai:npc-portraits": "tsx scripts/genai-npc-portraits.ts",
     "genai:lore": "tsx scripts/genai-lore.ts"
   },
   "devDependencies": {
