@@ -16,7 +16,7 @@
     "test:watch": "vitest",
     "test:browser": "vitest run --config vitest.browser.config.ts --passWithNoTests",
     "e2e": "playwright test boot.spec.ts",
-    "e2e:visual": "playwright test visual-sweep.spec.ts --timeout=120000",
+    "e2e:visual": "playwright test visual-sweep.spec.ts --timeout=180000 --workers=1 --retries=0",
     "e2e:all": "playwright test",
     "cap:sync": "pnpm build:native && cap sync android",
     "cap:run:android": "cap run android",
@@ -26,6 +26,7 @@
     "assets:fetch": "node scripts/fetch-itch-assets.mjs",
     "genai:events": "tsx scripts/genai-events.ts",
     "genai:portraits": "tsx scripts/genai-portraits.ts",
+    "genai:npc-portraits": "tsx scripts/genai-npc-portraits.ts",
     "genai:lore": "tsx scripts/genai-lore.ts"
   },
   "devDependencies": {
@@ -75,6 +76,7 @@
     "react-dom": "^19.2.7",
     "seedrandom": "^3.0.5",
     "three": "^0.184.0",
+    "yuka": "^0.7.8",
     "zod": "^4.4.3",
     "zustand": "^5.0.14"
   }

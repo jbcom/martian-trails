@@ -18,6 +18,8 @@ function musicFor(screen: Screen): "menu" | "trail" | "tension" | "ambient" | "v
     case "travel":
     case "event":
       return "trail";
+    case "encounter":
+      return "tension"; // diegetic hail — same tense bed as hazard
     case "hazard":
       return "tension"; // the signature risk decision gets its own tense bed
     case "eva":
@@ -41,7 +43,7 @@ export function onScreen(screen: Screen): void {
   if (bed) audio.playMusic(bed, bed === "menu" ? 0.4 : 0.32);
 
   // Modal-like screens duck the bed so the moment reads; open screens restore it.
-  if (screen === "event" || screen === "hazard") audio.duckMusic(0.18);
+  if (screen === "event" || screen === "hazard" || screen === "encounter") audio.duckMusic(0.18);
   else audio.duckMusic(0.32);
 
   // One-shot stings per context.

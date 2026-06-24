@@ -1,6 +1,6 @@
 ---
 title: Art Direction
-updated: 2026-06-23
+updated: 2026-06-24
 status: current
 domain: creative
 ---
@@ -38,13 +38,15 @@ FBX→GLB headless via Blender (`/opt/homebrew/bin/blender`), then promotes keep
 directly. Source packs live in gitignored `raw-assets/`; only curated GLBs ship.
 
 ## Scene → asset map (local roots, all verified)
-Root: `/Volumes/home/assets/3DLowPoly/Environment/Space/`
+Primary roots: `/Volumes/home/assets/3DPSX/PSX Mega Pack II v1.8/`,
+`/Volumes/home/assets/3DLowPoly/Environment/Space/`, and curated owned itch PSX packs in
+`raw-assets/`.
 
 | Scene (Oregon Trail ancestor) | Primary assets |
 |---|---|
 | **EVA Prospecting** (hunting) | `Space Kit/astronautA.glb`; rocks/ice `Space Kit/rock*.glb`, `rock_crystalsLarge*.glb`, `crater*.glb`, `meteor.glb`; scanner-feel `machine_generator/wireless.glb`, `satelliteDish.glb`; sample yields `Ultimate Space Kit/Items/Pickup_*` |
 | **Hazard Traverse** (river crossing) | `Space Kit/terrain_sideCliff.glb` (crevasse/scarp), `terrain_ramp*.glb` (the ford), `terrain_side*.glb`; rover `Ultimate Space Kit/Vehicles/Rover_2.glb`; span/winch `platform_*`, `supports_*`, `monorail_track*` |
-| **Outpost / Depot** (forts + store) | exterior `hangar_round*Glass.glb` (airlock dome), `GeodesicDome.glb`, `Base_Large.glb`, `House_*`, `SolarPanel_*`; interior **`Space Station Kit`** (177 GLBs: walls/floors/doors/computers/tables/containers); colonists `astronautA/B` |
+| **Outpost / Depot / Terminus interiors** (forts + store + finale) | 3DPSX modular base kit from `PSX Mega Pack II v1.8`: `floor_ceiling_hr_*`, `wall_hr_*`, `garage_door_frame_hr_1`, `roof_hr_3_*`, `doorway_hr_1_wide`, `lamp_mx_1_a_on`, `electrical_equipment_*`, `test_machine_mx_1`, tanks, shelves, barrels, crates. Implemented as `BaseInteriorScene` variants (`underhill`, `outpost`, `korolev`) with slotted rover/NPC/terminal/cargo components, enclosed floors/walls/roofs, and no visible void leaks. Colonists use the curated PSX astronaut GLB. |
 | **Rover** (wagon) | hero `Ultimate Space Kit/Vehicles/Rover_2.glb` (multi-wheel); haulers `craft_cargo*`, `craft_miner.glb` |
 | **Trail backdrop** | `terrain*` tiles, `crater*`, `Planet_1..11.glb` (Phobos + horizon worlds) |
 

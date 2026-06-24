@@ -1,7 +1,15 @@
 import { describe, expect, it } from "vitest";
 import { config } from "@/config";
+import { adviceForOutpost, allOutpostAdvicePairs } from "@/content/outpostAdvice";
 import type { OutpostStop } from "@/sim/outpost";
-import { canAfford, resolveRest, resolveTrade, serviceForOutpost, tradeChips } from "@/sim/outpost";
+import {
+  canAfford,
+  resolveOutpostAdviceChoice,
+  resolveRest,
+  resolveTrade,
+  serviceForOutpost,
+  tradeChips,
+} from "@/sim/outpost";
 
 /** A full resource snapshot for the pure resolvers. */
 const RES = {
@@ -66,5 +74,28 @@ describe("outpost services (pure resolution)", () => {
     const { give, get } = tradeChips(offer);
     expect(give.every((e) => e.delta < 0)).toBe(true);
     expect(get.every((e) => e.delta > 0)).toBe(true);
+  });
+
+  it("binds a conflicting advice pair to every terrain outpost", () => {
+    expect(allOutpostAdvicePairs()).toHaveLength(config.terrain.outposts.length);
+    for (const wp of config.terrain.outposts) {
+      const pair = adviceForOutpost(wp.name);
+      expect(pair?.veteran.role).toBe("veteran");
+      expect(pair?.liaison.role).toBe("liaison");
+      expect(pair?.choices.map((choice) => choice.advisorId).sort()).toEqual(
+        [pair?.liaison.id, pair?.veteran.id].sort(),
+      );
+    }
+  });
+
+  it("resolveOutpostAdviceChoice applies the chosen route-prep effect and emits a flag", () => {
+    const pair = adviceForOutpost("Tharsis Outpost")!;
+    const result = resolveOutpostAdviceChoice(pair, "veteran", RES, config.resources.max.power);
+    expect(result).not.toBeNull();
+    expect(result?.flag).toBe("flag:advice:tharsis:veteran");
+    expect(result?.resources).not.toEqual(RES);
+    expect(() =>
+      resolveOutpostAdviceChoice(pair, "missing", RES, config.resources.max.power),
+    ).toThrow(/unknown outpost advice choice/);
   });
 });

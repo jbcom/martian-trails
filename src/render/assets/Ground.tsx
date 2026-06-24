@@ -9,6 +9,8 @@ interface GroundProps {
   width?: number;
   /** World depth of the regolith slab. */
   depth?: number;
+  /** World-space slab position; base interiors shift it forward to avoid roofline leaks. */
+  position?: [number, number, number];
   /** When true, scrolls the texture by diagnostics.distance to fake trail travel. */
   scroll?: boolean;
 }
@@ -19,7 +21,12 @@ interface GroundProps {
  * UVs by the live `diagnostics.distance` inside useFrame so the rover appears to
  * cover ground without moving the camera (the side-scroll trail).
  */
-export function Ground({ width = 60, depth = 26, scroll = false }: GroundProps) {
+export function Ground({
+  width = 60,
+  depth = 26,
+  position = [0, 0, 0],
+  scroll = false,
+}: GroundProps) {
   const tex = useMemo(() => {
     const t = makeRegolithTexture();
     t.repeat.set(width / 4, depth / 4);
@@ -35,7 +42,7 @@ export function Ground({ width = 60, depth = 26, scroll = false }: GroundProps) 
   });
 
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
+    <mesh rotation={[-Math.PI / 2, 0, 0]} position={position} receiveShadow>
       <planeGeometry args={[width, depth]} />
       <meshStandardMaterial ref={matRef} map={tex} roughness={1} metalness={0} />
     </mesh>

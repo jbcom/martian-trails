@@ -12,6 +12,7 @@
 
 import { config } from "@/config";
 import type { OutpostEffect, OutpostService, TradeOffer } from "@/schemas/outpost";
+import type { OutpostAdvicePair } from "@/schemas/outpostAdvice";
 import { applyEffects, type EventResources } from "@/sim/event";
 
 /** The outpost the rover is docked at — the waypoint name + its bound services. */
@@ -75,5 +76,19 @@ export function tradeChips(offer: TradeOffer): { give: OutpostEffect[]; get: Out
   return {
     give: offer.effects.filter((e) => e.delta < 0),
     get: offer.effects.filter((e) => e.delta > 0),
+  };
+}
+
+export function resolveOutpostAdviceChoice(
+  pair: OutpostAdvicePair,
+  choiceId: string,
+  current: EventResources,
+  maxPower: number,
+): { resources: Partial<EventResources>; flag: string } | null {
+  const choice = pair.choices.find((item) => item.id === choiceId);
+  if (!choice) throw new Error(`unknown outpost advice choice "${choiceId}" for ${pair.outpost}`);
+  return {
+    resources: applyEffects(current, choice.effects, maxPower),
+    flag: choice.setsFlag,
   };
 }

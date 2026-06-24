@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import type { ReactNode } from "react";
+import type { ComponentProps, ReactNode } from "react";
 
 /**
  * The core UNOMA Field Ops surface — a holographic glass panel (docs/DESIGN-SYSTEM.md).
@@ -20,13 +20,14 @@ export function GlassPanel({
   children,
   className = "",
   motionProps,
+  ...props
 }: {
   children: ReactNode;
   className?: string;
-  motionProps?: React.ComponentProps<typeof motion.div>;
-}) {
+  motionProps?: ComponentProps<typeof motion.div>;
+} & Omit<ComponentProps<typeof motion.div>, "children" | "className" | "style">) {
   return (
-    <motion.div style={glassStyle} className={className} {...motionProps}>
+    <motion.div style={glassStyle} className={className} {...props} {...motionProps}>
       {children}
     </motion.div>
   );

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "npc:depot-trader-vasquez",
+    "name": "Vasquez",
+    "archetype": "trader",
+    "look": "a sun-weathered crawler-trader in a patched amber pressure suit, a cracked visor pushed up over a wry grin, dust ground into every seam",
+    "portrait": "vasquez",
+    "bank": "encbank:vasquez",
+    "locations": ["trail"],
+    "approachSpeed": 5,
+    "hailRange": 48,
+    "goalWeights": { "trade": 1 }
+  },
+  {
+    "id": "npc:stranded-hauler-rourke",
+    "name": "Rourke",
+    "archetype": "stranded",
+    "look": "a stranded pressure-hauler in a torn ochre suit, visor spidered with dust scratches, one glove wrapped in silver repair tape",
+    "portrait": "reyes",
+    "bank": "encbank:rourke",
+    "locations": ["trail"],
+    "approachSpeed": 3,
+    "hailRange": 56,
+    "goalWeights": { "beg": 1, "warn": 0.6 }
+  },
+  {
+    "id": "npc:scavenger-marrow",
+    "name": "Marrow",
+    "archetype": "scavenger",
+    "look": "a lean salvage runner in a soot-black suit with a cracked salvage beacon, tool hooks clacking against the oxygen pack",
+    "portrait": "vasquez",
+    "bank": "encbank:marrow",
+    "locations": ["trail"],
+    "approachSpeed": 5,
+    "hailRange": 44,
+    "goalWeights": { "trade": 0.6, "raid": 0.4 }
+  },
+  {
+    "id": "npc:rival-expedition-kline",
+    "name": "Kline Expedition",
+    "archetype": "rival",
+    "look": "a polished corporate survey crew in matched teal suits, sponsor decals still clean, posture too confident for the dust",
+    "portrait": "okonkwo",
+    "bank": "encbank:kline",
+    "locations": ["trail"],
+    "approachSpeed": 6,
+    "hailRange": 52,
+    "goalWeights": { "warn": 0.5, "trade": 0.5 }
+  },
+  {
+    "id": "npc:depot-quartermaster-okonkwo",
+    "name": "Okonkwo",
+    "archetype": "liaison",
+    "look": "a crisp teal UNOMA pressure suit with a quartermaster's shoulder insignia, a clipboard-slate clipped at the hip, a comms headset over the helmet seal",
+    "portrait": "okonkwo",
+    "bank": "encbank:okonkwo",
+    "locations": ["depot"],
+    "approachSpeed": 3,
+    "hailRange": 40,
+    "goalWeights": { "warn": 1 }
+  },
+  {
+    "id": "npc:depot-prospector-reyes",
+    "name": "Reyes",
+    "archetype": "veteran",
+    "look": "a grizzled ice-prospector in a rime-frosted rust-orange suit, regolith ground into the gauntlets, a chipped sample-corer slung across the chest",
+    "portrait": "reyes",
+    "bank": "encbank:reyes",
+    "locations": ["depot"],
+    "approachSpeed": 4,
+    "hailRange": 44,
+    "goalWeights": { "warn": 1 }
+  }
+]

@@ -132,6 +132,59 @@ Two-layer staging, reused for every encounter — the modern-games bar from the 
 3. **Companion advice (the Yukon mechanic)** surfaces as a small persistent co-driver portrait that
    pipes in *occasionally and sometimes wrongly* — a fallible partner, never a tutorial oracle.
 
+### m8-3 co-driver contract
+
+The co-driver is selected at Underhill before cargo provisioning. This keeps the choice diegetic
+and mechanically meaningful instead of a late UI toggle:
+
+- **Content** — co-drivers live in validated JSON (`src/content/coDrivers.json`) with id/name/role,
+  local portrait key, a short recruitment line, a start-loadout patch, and authored advice lines.
+- **Depot lock** — the manifest terminal and launch command stay disabled until one co-driver is
+  recruited. Okonkwo/Reyes briefings remain available, but buying cargo waits until the player has
+  a named person in the rover berth.
+- **Supply-spread tradeoff** — each co-driver changes the starting spread (for example more water
+  but fewer parts, more parts but less food). This is stored on the spawn loadout and applied before
+  the run begins, so browser reload/save/restore are not responsible for re-deriving the choice.
+- **Persistent portrait** — travel shows the recruited co-driver as a small comms portrait in the
+  HUD, with a line that updates from the live run state (low resource, hull risk, pace/ration mix,
+  or steady-state route read).
+- **Fallibility** — advice is deterministic for the same co-driver + run state, but not always
+  correct. Authored advice includes reliable and misleading variants; the sim chooses the variant
+  via a seeded hash of the co-driver id + Sol + situation. The UI labels it as advice, not truth.
+
+### m8-4 outpost conflicting-advice contract
+
+Each route outpost turns the old "fort news" beat into a small reasoning puzzle:
+
+- **Content** — every configured terrain outpost has one veteran advisor and one corporate liaison
+  in validated JSON (`src/content/outpostAdvice.json`). Each advisor carries a local portrait key,
+  role, recommendation, and route/weather line.
+- **Conflict** — the two advisors must disagree on the same near-future decision: safer detour vs
+  faster direct route, rest vs push, conserve reserves vs spend them now. They are not flavor-only.
+- **Choice consequence** — picking one advisor applies a small `OutpostEffect[]` route-prep patch
+  immediately and records a run flag (`flag:advice:<outpost>:<advisor>`). Save/restore persists that
+  flag through the existing encounter flag channel.
+- **One adjudication per dock** — once advice is logged at an outpost, the two choices disable and
+  the screen shows the selected advisor. Rest and local exchange remain available afterward.
+- **Presentation** — the outpost base scene shows multiple in-scene NPC slots, while the UI presents
+  compact portrait rows anchored inside the dock panel. No full-screen advice wall.
+
+### m8-5 roadside encounter contract
+
+Mid-trail encounters use the same M8-1 in-scene approach + portrait-card system, but the trail pool
+is no longer only the trader:
+
+- **Content** — trail NPC content includes trader, stranded hauler, scavenger, and rival expedition
+  archetypes. Every roadside NPC has `locations:["trail"]` and a validated dialogue bank.
+- **Selection** — `rollEncounter` picks from all trail-located NPCs through the seeded encounter
+  stream. Same seed yields the same roadside NPC; different seeds can surface different archetypes.
+- **Survival decision** — every new roadside bank has at least one effect-bearing choice and one
+  refusal/decline path. Rescue, barter, cooperate, or rebuff all trade against oxygen/water/rations,
+  parts, morale, hull, or medkits.
+- **Resume** — choosing a non-branching response clears the pending encounter, sends the NPC into
+  the depart state, and lets `run.setDriving(true)` resume the rover. This reuses the existing
+  Encounter trait/save path instead of adding a parallel roadside system.
+
 This is the user's "interim portrait slides" + "NPC portraits" + "real diegetic encounters" — and
 it maps exactly onto our three owned pipelines (Meshy body + Imagen face + R3F scene).
 
@@ -174,19 +227,32 @@ slice reuses. Order:
 2. **m8-2 Depot social hub** — populate the launch outpost with 2–4 in-scene Martians (quartermaster +
    prospector + recruitable partner); replace the static "Colonist News" block with a resolved encounter;
    choices open the existing resupply trade or set flags. *(MECC spine item #1.)*
-3. **m8-3 Fallible co-driver** — recruit-a-partner at the depot (locks provisioning until chosen; supply-spread
-   tradeoff); persistent small portrait that advises occasionally and sometimes wrongly. *(Yukon signature mechanic.)*
+   Implementation note: launch-depot NPC presence is content metadata (`locations:["depot"]`).
+   Underhill uses the shared `BaseInteriorScene` shell (`underhill` variant) with slotted rover,
+   terminal, NPC, and cargo placements; outpost forts and the Korolev finale reuse the same shell
+   through `outpost` and `korolev` variants. The depot screen starts as a small mission strip plus
+   station action dock; selecting the manifest terminal opens resupply/upgrades, and selecting
+   Okonkwo/Reyes resolves their encounter banks with the current manifest. Selected flags carry
+   into the run controller on departure.
+3. **m8-3 Fallible co-driver** — recruit-a-partner at the depot (locks provisioning until chosen;
+   supply-spread tradeoff); persistent small portrait that advises occasionally and sometimes wrongly.
+   Implemented as validated co-driver content + loadout patch + `RunSave.progress.coDriverId` +
+   deterministic advice selection. *(Yukon signature mechanic.)*
 4. **m8-4 Conflicting-advice pair** — veteran + corporate liaison at each outpost give conflicting route/weather
-   advice the player adjudicates. *(Amazon — encounter as reasoning puzzle.)*
+   advice the player adjudicates. Implemented as validated outpost-advice content + pure choice
+   resolver + run flag/effect persistence. *(Amazon — encounter as reasoning puzzle.)*
 5. **m8-5 Mid-trail roadside encounters** — stranded crew / scavenger / rival spawn during travel, halt the rover,
    `EncounterPanel` over `TravelScene`, choices apply effects, then `run.setDriving(true)` resumes.
+   Implemented as additional trail-located NPC content plus a location-based encounter pool.
 6. **m8-6 GOAP event director** *(optional, gated behind playtests)* — replace the uniform random event roll with
    `Think`+`GoalEvaluator` desirability scoring for dramatically-shaped pacing; pure logic, seeded tie-break.
 7. **m8-7 Fuzzy NPC mood** *(polish)* — trader greed / beggar desperation / raider aggression as fuzzy variables
    feeding the goal scores. Only after m8-1 lands.
 
-Each slice: Docs→Tests→Code, determinism test, Safari playtest with screenshot read, forward commit,
-pipelined review. Ships on `feat/m8-encounters` **after M7 hardening ships**.
+Each slice: Docs→Tests→Code, determinism test, browser-visible screenshot review, forward commit,
+pipelined review. Prefer Vitest browser / Playwright / integrated browser artifacts; use an external
+browser only when the compatibility target or the user explicitly calls for it. Ships on `feat/m8-encounters`
+**after M7 hardening ships**.
 
 ---
 

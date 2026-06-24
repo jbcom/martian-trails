@@ -1,0 +1,306 @@
+[
+  {
+    "id": "encbank:vasquez",
+    "npc": "npc:depot-trader-vasquez",
+    "slots": [
+      { "when": { "resourceLow": "water" }, "node": "hard-up" },
+      { "when": { "flagSet": "flag:vasquez-traded" }, "node": "return-greeting" },
+      { "default": true, "node": "first-meeting" }
+    ],
+    "nodes": {
+      "first-meeting": {
+        "lines": [
+          "Vasquez. I run the long crawl between depots — and I've got what the long crawl takes.",
+          "Water for parts. Fair rate, for a face that hasn't crossed the Tharsis shelf yet."
+        ],
+        "choices": [
+          {
+            "id": "trade-water",
+            "text": "Trade 30 parts for water",
+            "effects": [{ "target": "parts", "delta": -30 }, { "target": "water", "delta": 120 }],
+            "setsFlag": "flag:vasquez-traded"
+          },
+          {
+            "id": "trade-bulk",
+            "text": "Trade 50 parts for water + medkit",
+            "effects": [
+              { "target": "parts", "delta": -50 },
+              { "target": "water", "delta": 160 },
+              { "target": "medkits", "delta": 1 }
+            ],
+            "setsFlag": "flag:vasquez-traded"
+          },
+          { "id": "ask-route", "text": "What's the road ahead like?", "goto": "route-tip" },
+          { "id": "decline", "text": "Not today" }
+        ],
+        "emits": "enc:vasquez.first-meeting"
+      },
+      "hard-up": {
+        "lines": [
+          "You're running your tanks dry — I can smell it on your rig.",
+          "I'll cut you a hauler's rate on water. Pride's heavy out here; leave some behind."
+        ],
+        "choices": [
+          {
+            "id": "trade-water-cheap",
+            "text": "Trade 18 parts for water (hauler's rate)",
+            "effects": [{ "target": "parts", "delta": -18 }, { "target": "water", "delta": 140 }],
+            "setsFlag": "flag:vasquez-traded"
+          },
+          { "id": "decline", "text": "We'll manage" }
+        ],
+        "emits": "enc:vasquez.hard-up"
+      },
+      "return-greeting": {
+        "lines": [
+          "Back again. Good — means you're still breathing.",
+          "Same deal stands while my tanks hold."
+        ],
+        "choices": [
+          {
+            "id": "trade-water",
+            "text": "Trade 30 parts for water",
+            "effects": [{ "target": "parts", "delta": -30 }, { "target": "water", "delta": 120 }]
+          },
+          { "id": "decline", "text": "Just passing" }
+        ],
+        "emits": "enc:vasquez.return-greeting"
+      },
+      "route-tip": {
+        "lines": [
+          "Tharsis shelf bites hard past the next depot — dust fronts come fast, batteries bleed faster.",
+          "Top off your water while you can. That's the long crawl talking."
+        ],
+        "choices": [
+          {
+            "id": "trade-water",
+            "text": "Good advice — trade 30 parts for water",
+            "effects": [{ "target": "parts", "delta": -30 }, { "target": "water", "delta": 120 }],
+            "setsFlag": "flag:vasquez-traded"
+          },
+          { "id": "decline", "text": "Thanks. We'll press on" }
+        ],
+        "emits": "enc:vasquez.route-tip"
+      }
+    }
+  },
+  {
+    "id": "encbank:rourke",
+    "npc": "npc:stranded-hauler-rourke",
+    "slots": [
+      { "when": { "resourceLow": "oxygen" }, "node": "airless" },
+      { "default": true, "node": "distress" }
+    ],
+    "nodes": {
+      "distress": {
+        "lines": [
+          "Rourke, hauler out of Pavonis. My scrubber cartwheeled off the ridge and took the spare tank with it.",
+          "Give me enough oxygen to limp home and the salvage locker is yours."
+        ],
+        "choices": [
+          {
+            "id": "rescue",
+            "text": "Share oxygen for parts",
+            "effects": [
+              { "target": "oxygen", "delta": -90 },
+              { "target": "parts", "delta": 4 },
+              { "target": "morale", "delta": 8 }
+            ],
+            "setsFlag": "flag:rourke-rescued"
+          },
+          {
+            "id": "minimal-aid",
+            "text": "Spare a small tank",
+            "effects": [{ "target": "oxygen", "delta": -45 }, { "target": "morale", "delta": 4 }],
+            "setsFlag": "flag:rourke-aided"
+          },
+          { "id": "decline", "text": "We cannot spare it" }
+        ],
+        "emits": "enc:rourke.distress"
+      },
+      "airless": {
+        "lines": [
+          "Your own tanks are wheezing. I can see it from here.",
+          "No shame in passing by. Just do not pretend this road is civilized."
+        ],
+        "choices": [
+          {
+            "id": "risk-rescue",
+            "text": "Risk the rescue anyway",
+            "effects": [
+              { "target": "oxygen", "delta": -70 },
+              { "target": "parts", "delta": 3 },
+              { "target": "morale", "delta": 10 }
+            ],
+            "setsFlag": "flag:rourke-rescued"
+          },
+          { "id": "decline", "text": "Mark the beacon and move" }
+        ],
+        "emits": "enc:rourke.airless"
+      }
+    }
+  },
+  {
+    "id": "encbank:marrow",
+    "npc": "npc:scavenger-marrow",
+    "slots": [
+      { "when": { "resourceLow": "hull" }, "node": "smells-blood" },
+      { "default": true, "node": "salvage-offer" }
+    ],
+    "nodes": {
+      "salvage-offer": {
+        "lines": [
+          "Name's Marrow. I pull useful metal out of useless wrecks.",
+          "You've got medkits. I've got rover plating that still remembers being straight."
+        ],
+        "choices": [
+          {
+            "id": "trade-plating",
+            "text": "Trade medkit for hull plating",
+            "effects": [{ "target": "medkits", "delta": -1 }, { "target": "hull", "delta": 14 }],
+            "setsFlag": "flag:marrow-traded"
+          },
+          {
+            "id": "buy-parts",
+            "text": "Trade water for parts",
+            "effects": [{ "target": "water", "delta": -80 }, { "target": "parts", "delta": 3 }],
+            "setsFlag": "flag:marrow-traded"
+          },
+          { "id": "decline", "text": "Keep distance" }
+        ],
+        "emits": "enc:marrow.salvage"
+      },
+      "smells-blood": {
+        "lines": [
+          "That hull is singing through the dust. Bad song.",
+          "Pay me now and it becomes a repair. Refuse, and every scavenger past Noctis hears you rattle."
+        ],
+        "choices": [
+          {
+            "id": "urgent-plating",
+            "text": "Pay 2 parts for emergency plating",
+            "effects": [{ "target": "parts", "delta": -2 }, { "target": "hull", "delta": 16 }],
+            "setsFlag": "flag:marrow-traded"
+          },
+          {
+            "id": "rebuff",
+            "text": "Run them off",
+            "effects": [{ "target": "morale", "delta": -4 }],
+            "setsFlag": "flag:marrow-rebuffed"
+          }
+        ],
+        "emits": "enc:marrow.blood"
+      }
+    }
+  },
+  {
+    "id": "encbank:kline",
+    "npc": "npc:rival-expedition-kline",
+    "slots": [{ "default": true, "node": "challenge" }],
+    "nodes": {
+      "challenge": {
+        "lines": [
+          "Kline Expedition to unidentified rover. We are running a sponsored timing trial to Korolev.",
+          "Share telemetry and we both dodge the next dust shelf. Race us and one of us gets the clean lane."
+        ],
+        "choices": [
+          {
+            "id": "cooperate",
+            "text": "Share telemetry",
+            "effects": [
+              { "target": "power", "delta": -8 },
+              { "target": "morale", "delta": 8 },
+              { "target": "hull", "delta": 4 }
+            ],
+            "setsFlag": "flag:kline-cooperated"
+          },
+          {
+            "id": "race",
+            "text": "Race for the clean lane",
+            "effects": [
+              { "target": "power", "delta": -18 },
+              { "target": "morale", "delta": 14 },
+              { "target": "hull", "delta": -8 }
+            ],
+            "setsFlag": "flag:kline-raced"
+          },
+          { "id": "decline", "text": "Ignore their hail" }
+        ],
+        "emits": "enc:kline.challenge"
+      }
+    }
+  },
+  {
+    "id": "encbank:okonkwo",
+    "npc": "npc:depot-quartermaster-okonkwo",
+    "slots": [
+      { "when": { "flagSet": "flag:okonkwo-briefed" }, "node": "after-briefing" },
+      { "default": true, "node": "briefing" }
+    ],
+    "nodes": {
+      "briefing": {
+        "lines": [
+          "Quartermaster Okonkwo. Your manifest's logged — Underhill to Korolev, twenty-five hundred klicks.",
+          "Word from up the line: dust season's early this cycle. Carry more water than the tables say."
+        ],
+        "choices": [
+          {
+            "id": "heed",
+            "text": "Note it — inspect the manifest",
+            "opensTrade": "depot-store",
+            "setsFlag": "flag:okonkwo-briefed"
+          },
+          { "id": "shrug", "text": "We'll take our chances", "setsFlag": "flag:okonkwo-briefed" }
+        ],
+        "emits": "enc:okonkwo.briefing"
+      },
+      "after-briefing": {
+        "lines": ["Safe crawl, driver. Korolev's been waiting a long time."],
+        "choices": [{ "id": "ack", "text": "Clear" }],
+        "emits": "enc:okonkwo.after-briefing"
+      }
+    }
+  },
+  {
+    "id": "encbank:reyes",
+    "npc": "npc:depot-prospector-reyes",
+    "slots": [
+      { "when": { "flagSet": "flag:reyes-tipped" }, "node": "after-tip" },
+      { "default": true, "node": "rumor" }
+    ],
+    "nodes": {
+      "rumor": {
+        "lines": [
+          "Reyes. Thirty cycles on the ice and still breathing — that's the whole résumé.",
+          "There's a regolith cutoff past the second depot. Saves a Sol if the crust holds. Costs you everything if it doesn't."
+        ],
+        "choices": [
+          {
+            "id": "ask-more",
+            "text": "Tell me about the cutoff",
+            "goto": "cutoff-detail"
+          },
+          {
+            "id": "pass",
+            "text": "We'll keep to the marked route",
+            "setsFlag": "flag:reyes-tipped"
+          }
+        ],
+        "emits": "enc:reyes.rumor"
+      },
+      "cutoff-detail": {
+        "lines": [
+          "Run it cold, run it early, run it light. Heavy rigs crack the crust and that's all she wrote.",
+          "I'd not chance it myself anymore. But you've got younger nerves."
+        ],
+        "choices": [{ "id": "thanks", "text": "Appreciated", "setsFlag": "flag:reyes-tipped" }],
+        "emits": "enc:reyes.cutoff-detail"
+      },
+      "after-tip": {
+        "lines": ["Still here. Means the ice hasn't won yet. Keep it that way."],
+        "choices": [{ "id": "ack", "text": "Aim to" }],
+        "emits": "enc:reyes.after-tip"
+      }
+    }
+  }
+]

@@ -7,8 +7,8 @@ interface ModelProps {
   url: string;
   position?: [number, number, number];
   rotation?: [number, number, number];
-  /** Uniform scale, or a single number applied to all axes. */
-  scale?: number;
+  /** Uniform scale or per-axis scale for modular kit pieces. */
+  scale?: number | [number, number, number];
 }
 
 /**

@@ -68,4 +68,12 @@ describe("depot loadout (pure cart model)", () => {
     expect(loadout.parts).toBe(3);
     expect(loadout.rtg).toBeGreaterThanOrEqual(1);
   });
+
+  it("applies the selected co-driver's supply-spread patch to the spawn loadout", () => {
+    const cart = { ...initialDepot(), oxygen: 300, water: 200, rations: 150, parts: 6 };
+    const loadout = buildLoadout(cart, [], 1, "codriver:okonkwo");
+    expect(loadout.coDriverId).toBe("codriver:okonkwo");
+    expect(loadout.water).toBeGreaterThan(cart.water);
+    expect(loadout.parts).toBeLessThan(cart.parts);
+  });
 });

@@ -26,6 +26,8 @@ export interface Diagnostics {
    * it back to 0. Render-only — never feeds back into the pure sim.
    */
   shake: number;
+  /** Active encounter NPC position for the render layer (null when none). */
+  encounter: { active: boolean; npcId: string; x: number; y: number; z: number } | null;
 }
 
 const diagnostics: Diagnostics = {
@@ -38,6 +40,7 @@ const diagnostics: Diagnostics = {
   power: 1,
   critical: false,
   shake: 0,
+  encounter: null,
 };
 
 /** The shared diagnostics object. Mutate in place; never replace the reference. */
@@ -64,4 +67,5 @@ export function resetDiagnostics(): void {
   diagnostics.power = 1;
   diagnostics.critical = false;
   diagnostics.shake = 0;
+  diagnostics.encounter = null;
 }

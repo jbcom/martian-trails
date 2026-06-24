@@ -12,6 +12,7 @@ const IN_RUN_SCREENS: ReadonlySet<Screen> = new Set([
   "eva",
   "outpost",
   "event",
+  "encounter",
 ]);
 
 /** Snapshot publish cadence — ~10Hz. Per-frame data is on the diagnostics bridge. */
@@ -115,5 +116,9 @@ function routeFromSnapshot(s: RunSnapshot, current: Screen, goTo: (screen: Scree
   }
   if (s.pendingEvent && current === "travel") {
     goTo("event");
+    return;
+  }
+  if (s.pendingEncounter && current === "travel") {
+    goTo("encounter");
   }
 }

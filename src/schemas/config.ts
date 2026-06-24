@@ -72,6 +72,8 @@ export const travelSchema = z.object({
   cold: z.object({ onsetTemp: z.number(), coefficient: positive, baseTemp: z.number() }),
   /** Morale spikes when a vital hits zero (POC water≤0 → +15, rations≤0 → +10). */
   starvation: z.object({ waterZero: nonNegative, rationsZero: nonNegative }),
+  /** Per-Sol chance (while driving) of a diegetic NPC encounter on the trail (M8). */
+  encounterChance: z.number().min(0).max(1).default(0.15),
 });
 export type TravelConfig = z.infer<typeof travelSchema>;
 

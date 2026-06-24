@@ -7,16 +7,48 @@
     "storm": 2
   },
   "pace": {
-    "steady": { "speedMult": 1.0, "eventChance": 0.12, "moraleDrainBonus": 0 },
-    "strenuous": { "speedMult": 1.5, "eventChance": 0.18, "moraleDrainBonus": 4 },
-    "grueling": { "speedMult": 2.0, "eventChance": 0.25, "moraleDrainBonus": 8 }
+    "steady": {
+      "speedMult": 1.0,
+      "eventChance": 0.12,
+      "moraleDrainBonus": 0
+    },
+    "strenuous": {
+      "speedMult": 1.5,
+      "eventChance": 0.18,
+      "moraleDrainBonus": 4
+    },
+    "grueling": {
+      "speedMult": 2.0,
+      "eventChance": 0.25,
+      "moraleDrainBonus": 8
+    }
   },
   "rations": {
-    "filling": { "consumptionMult": 1.0, "moralePenalty": 0 },
-    "meager": { "consumptionMult": 0.5, "moralePenalty": 7.5 },
-    "bareBones": { "consumptionMult": 0.25, "moralePenalty": 11.25 }
+    "filling": {
+      "consumptionMult": 1.0,
+      "moralePenalty": 0
+    },
+    "meager": {
+      "consumptionMult": 0.5,
+      "moralePenalty": 7.5
+    },
+    "bareBones": {
+      "consumptionMult": 0.25,
+      "moralePenalty": 11.25
+    }
   },
-  "lowHull": { "threshold": 30, "powerMult": 1.5 },
-  "cold": { "onsetTemp": -60, "coefficient": 0.02, "baseTemp": -60 },
-  "starvation": { "waterZero": 15, "rationsZero": 10 }
+  "lowHull": {
+    "threshold": 30,
+    "powerMult": 1.5
+  },
+  "cold": {
+    "onsetTemp": -60,
+    "coefficient": 0.02,
+    "baseTemp": -60
+  },
+  "starvation": {
+    "waterZero": 15,
+    "rationsZero": 10
+  },
+  "encounterChance": 0.15
 }

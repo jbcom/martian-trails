@@ -6,9 +6,11 @@ import type { Screen } from "@/core/screens";
 import { preloadModels } from "@/render/assets/models";
 import { CameraShake, SideCamera } from "@/render/camera";
 import { DepotScene } from "@/render/scenes/DepotScene";
+import { EncounterScene } from "@/render/scenes/EncounterScene";
 import { EvaScene } from "@/render/scenes/EvaScene";
 import { HazardScene } from "@/render/scenes/HazardScene";
 import { OutpostScene } from "@/render/scenes/OutpostScene";
+import { TerminusScene } from "@/render/scenes/TerminusScene";
 import { TravelScene } from "@/render/scenes/TravelScene";
 import { useGameStore } from "@/state/store";
 import { colors } from "@/styles/tokens";
@@ -32,6 +34,10 @@ function SceneForScreen({ screen }: { screen: Screen }) {
       return <EvaScene />;
     case "outpost":
       return <OutpostScene />;
+    case "terminus":
+      return <TerminusScene />;
+    case "encounter":
+      return <EncounterScene />;
     default:
       return <DepotScene />;
   }

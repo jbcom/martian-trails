@@ -1,6 +1,6 @@
 ---
 title: Architecture
-updated: 2026-06-23
+updated: 2026-06-24
 status: current
 domain: technical
 ---
@@ -16,20 +16,21 @@ not a procedural-graphics POC.
 ## Stack (latest, no old packages)
 
 React 19 + R3F (drei, postprocessing, framer-motion) · Vite 8 · **Three.js (orthographic side-view 3D)** · Tailwind v4 · Capacitor 8 ·
-TypeScript 6 · Biome 2 · Vitest 4 (`@vitest/browser-playwright`, `vitest-browser-svelte`) ·
+TypeScript 6 · Biome 2 · Vitest 4 (`@vitest/browser-playwright`) ·
 Playwright.
 
 **Render engine decision (2026-06-23):** Three.js with an orthographic camera, not PixiJS.
-The art direction is 3DLowPoly Kenney "Space" GLBs in a side view (`docs/ART-DIRECTION.md`);
-Three gives real lighting, parallax, and the animated *rover-noses-down-the-ramp* Hazard
-Traverse that flat 2D/Pixi cannot. Matches the house dialect (blobolines/agofa use Three).
+The art direction is 3D-PSX GLBs in a side view (`docs/ART-DIRECTION.md`); Three gives real
+lighting, parallax, enclosed modular base interiors, and the animated
+*rover-noses-down-the-ramp* Hazard Traverse that flat 2D/Pixi cannot. Matches the house dialect
+(blobolines/agofa use Three).
 The Pixi-7 POC renderer is replaced wholesale in the render decomposition (M3); sim, content,
 state, audio, and the screen-router are renderer-agnostic and unaffected.
 
 ### Production libraries to add (the "elevation" set)
 | Role | Library | Why |
 |------|---------|-----|
-| Render | `three` (+ GLTFLoader, ortho camera) | 3DLowPoly GLB side-view; lighting/parallax/animated hazard |
+| Render | `three` (+ GLTFLoader, ortho camera) | 3D-PSX GLB side-view; lighting/parallax/base interiors/animated hazard |
 | ECS | `koota` | House standard; renderer-agnostic game state via `trait()` + `world.query()` |
 | RNG/determinism | `seedrandom` | One `createRng(seed): Rng` facade; **no raw `Math.random()`** in sim |
 | Audio | `howler` | House standard; channels, ducking, gesture-unlock, preload |
@@ -107,9 +108,11 @@ Layout adapts across three classes, not just "mobile-first":
 - **Phone (portrait, narrow):** HUD panels stack/drawer; single-column store; large touch targets.
 - **Tablet (landscape, medium):** side HUD + scene; two-column store.
 - **Unfolded foldable (wide):** scene gets the wide canvas; HUD reflows to side rails; no letterboxing.
-Driven by container/viewport breakpoints + safe-area insets (`env(safe-area-inset-*)`),
-touch-primary input, R3F canvas resize to the live viewport. Verified on each form factor via
-Safari playtest (window frontmost + `visibilityState === "visible"` before screenshot).
+Driven by container/viewport breakpoints, safe-area insets (`env(safe-area-inset-*)`), and the
+`src/platform/deviceProfile.ts` Capacitor/viewport classifier. Touch-primary input and the R3F
+canvas resize to the live viewport; device profiles are covered by Vitest browser permutations,
+Playwright sweeps, and integrated-browser screenshot review. External browsers are only for
+specific compatibility targets or explicit user requests.
 
 ## Determinism & gates
 `src/sim/**` is pure, seeded (`createRng`), no `Math.random()`/`performance.now()` (enforced

@@ -11,6 +11,7 @@ import {
   AbilityCooldowns,
   Crew,
   type CrewState,
+  Encounter,
   MaxResources,
   Outcome,
   Position,
@@ -37,6 +38,8 @@ export interface Loadout {
   upgrades: string[];
   /** The chosen sponsor's terminus score multiplier (UNOMA=×1, leaner sponsors more). */
   scoreMultiplier?: number;
+  /** The recruited co-driver id, chosen before provisioning at the depot. */
+  coDriverId?: string;
   pace?: string;
   rationLevel?: string;
 }
@@ -117,6 +120,7 @@ export function spawnExpedition(
     Upgrades(spawnUpgrades(loadout.upgrades)),
     Sponsor({ scoreMultiplier: loadout.scoreMultiplier ?? 1 }),
     AbilityCooldowns({}),
+    Encounter(),
     RngSource(rng),
   );
 }

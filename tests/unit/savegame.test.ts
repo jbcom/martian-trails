@@ -106,6 +106,20 @@ describe("run save — serialize / restore round-trip", () => {
     expect(run.serialize()?.progress.evaYieldPrimed).toBe(true);
   });
 
+  it("persists the selected co-driver across save/restore", () => {
+    run.start("co-save", { ...LOADOUT, coDriverId: "codriver:reyes" });
+    const before = run.snapshot();
+    const save = run.serialize();
+
+    expect(before?.coDriver?.id).toBe("codriver:reyes");
+    expect(save?.progress.coDriverId).toBe("codriver:reyes");
+
+    run.start("unrelated-seed", defaultLoadout());
+    run.restore(save!);
+    expect(run.snapshot()?.coDriver?.id).toBe("codriver:reyes");
+    expect(run.snapshot()?.coDriver?.advice.text).toBe(before?.coDriver?.advice.text);
+  });
+
   it("back-fills evaYieldPrimed=false for a pre-existing save missing the field", () => {
     const save = run.serialize()!;
     // Simulate an older save written before the field existed.

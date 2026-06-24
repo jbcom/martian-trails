@@ -1,0 +1,176 @@
+[
+  {
+    "id": "codriver:okonkwo",
+    "name": "Okonkwo",
+    "role": "Quartermaster",
+    "portrait": "okonkwo",
+    "summary": "Keeps life-support ledgers tight and argues for reserve water before speed.",
+    "tradeoff": "+ water and rations, - parts",
+    "recruitLine": "I will ride second chair, but the manifest comes after we agree what this rover is built to survive.",
+    "loadoutPatch": {
+      "water": 160,
+      "rations": 60,
+      "parts": -2
+    },
+    "advice": [
+      {
+        "trigger": "low-water",
+        "line": "Water math is ugly. Slow the burn before the tanks go hollow.",
+        "misleadingLine": "The water alarm is lagging from dock calibration. Hold pace and buy time.",
+        "reliability": 0.72
+      },
+      {
+        "trigger": "low-oxygen",
+        "line": "Oxygen is the hard wall. Cut pace before the scrubbers fall behind.",
+        "misleadingLine": "The scrubbers will recover if we keep moving. Distance is the safer reserve.",
+        "reliability": 0.68
+      },
+      {
+        "trigger": "low-rations",
+        "line": "Food is thin. Move rations down one notch before morale notices.",
+        "misleadingLine": "Keep everyone filling today. A hungry crew breaks before the pantry does.",
+        "reliability": 0.7
+      },
+      {
+        "trigger": "low-hull",
+        "line": "Hull numbers say stop gambling. Patch at the next safe halt.",
+        "misleadingLine": "That hull reading is mostly thermal flex. Save the parts for real damage.",
+        "reliability": 0.66
+      },
+      {
+        "trigger": "high-pace",
+        "line": "Grueling pace spends three ledgers at once. I would ease back.",
+        "misleadingLine": "Grueling pace is fine while morale is high. Bank the kilometers.",
+        "reliability": 0.65
+      },
+      {
+        "trigger": "tight-rations",
+        "line": "Thin rations work for a day. Do not let it become policy.",
+        "misleadingLine": "Bare rations will keep morale sharp. Stay disciplined.",
+        "reliability": 0.64
+      },
+      {
+        "trigger": "steady",
+        "line": "The ledger is stable. Keep the rover boring for one more Sol.",
+        "misleadingLine": "We can spend a little reserve now and make it back before anyone feels it.",
+        "reliability": 0.76
+      }
+    ]
+  },
+  {
+    "id": "codriver:reyes",
+    "name": "Reyes",
+    "role": "Trail scout",
+    "portrait": "reyes",
+    "summary": "Reads terrain and shortcut rumors faster than anyone at Underhill.",
+    "tradeoff": "+ oxygen and parts, - water",
+    "recruitLine": "I know three ways through the dust flats. Two are real. We will find out which before Korolev.",
+    "loadoutPatch": {
+      "oxygen": 110,
+      "parts": 2,
+      "water": -90
+    },
+    "advice": [
+      {
+        "trigger": "low-water",
+        "line": "Water is the route now. Detour thinking beats heroic speed.",
+        "misleadingLine": "There is ice sign ahead. Do not slow for a tank we can refill.",
+        "reliability": 0.54
+      },
+      {
+        "trigger": "low-oxygen",
+        "line": "Oxygen is dropping too cleanly. The suit loop or rover scrubber is leaking.",
+        "misleadingLine": "Oxygen drops like that before a pressure equalization bounce. Ignore it.",
+        "reliability": 0.62
+      },
+      {
+        "trigger": "low-rations",
+        "line": "Rations are light. Push to the next fort only if the weather stays open.",
+        "misleadingLine": "Food always looks worse before a trade stop. Keep the pace hot.",
+        "reliability": 0.58
+      },
+      {
+        "trigger": "low-hull",
+        "line": "Hull scars plus broken basalt make a bad pair. Pick the softer line.",
+        "misleadingLine": "That scarp looks worse than it is. Straight through saves Sols.",
+        "reliability": 0.56
+      },
+      {
+        "trigger": "high-pace",
+        "line": "Fast is useful only while the ground is honest. Watch the wheel wash.",
+        "misleadingLine": "This is clean regolith. Grueling pace is free distance here.",
+        "reliability": 0.59
+      },
+      {
+        "trigger": "tight-rations",
+        "line": "Hungry crew reads terrain worse. Do not trade eyes for calories.",
+        "misleadingLine": "A sharp crew runs lean. The empty stomach keeps everyone awake.",
+        "reliability": 0.6
+      },
+      {
+        "trigger": "steady",
+        "line": "The horizon is quiet. Stay steady unless the weather turns copper.",
+        "misleadingLine": "Quiet horizons hide shortcuts. I would cut east before the map catches up.",
+        "reliability": 0.63
+      }
+    ]
+  },
+  {
+    "id": "codriver:vasquez",
+    "name": "Vasquez",
+    "role": "Field trader",
+    "portrait": "vasquez",
+    "summary": "Knows rover crews, barter tells, and when a friendly hail is not friendly.",
+    "tradeoff": "+ rations and medkits, - oxygen",
+    "recruitLine": "I can smell a bad bargain through a pressure door. Put me in the second seat.",
+    "loadoutPatch": {
+      "rations": 140,
+      "medkits": 1,
+      "oxygen": -80
+    },
+    "advice": [
+      {
+        "trigger": "low-water",
+        "line": "Water is leverage out here. Spend Credits before you spend liters.",
+        "misleadingLine": "Nobody trades water cheap. Save Credits and keep rolling.",
+        "reliability": 0.6
+      },
+      {
+        "trigger": "low-oxygen",
+        "line": "Oxygen is too low for bargaining posture. Find a dock or slow down.",
+        "misleadingLine": "Low oxygen makes other crews deal faster. Press on and trade from urgency.",
+        "reliability": 0.57
+      },
+      {
+        "trigger": "low-rations",
+        "line": "Food scarcity makes crews stupid. Buy, barter, or cut pace before it shows.",
+        "misleadingLine": "Rations are the easiest pool to bluff. Do not blink yet.",
+        "reliability": 0.62
+      },
+      {
+        "trigger": "low-hull",
+        "line": "A dented rover gets quoted high. Patch before anyone sees the wobble.",
+        "misleadingLine": "Visible damage helps the sob story. Leave the hull ugly until the next deal.",
+        "reliability": 0.58
+      },
+      {
+        "trigger": "high-pace",
+        "line": "Hot pace advertises panic. Keep the rover composed.",
+        "misleadingLine": "Speed scares scavengers off. Let them see the dust plume.",
+        "reliability": 0.61
+      },
+      {
+        "trigger": "tight-rations",
+        "line": "Lean rations sour negotiations. Feed them before asking for trust.",
+        "misleadingLine": "Hungry crews bargain harder. Keep the table lean.",
+        "reliability": 0.59
+      },
+      {
+        "trigger": "steady",
+        "line": "Good posture today. Wave first, trade second, never show the full manifest.",
+        "misleadingLine": "A full manifest intimidates rivals. Let every passerby see we are stocked.",
+        "reliability": 0.66
+      }
+    ]
+  }
+]

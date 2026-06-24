@@ -13,6 +13,7 @@ export const SCREENS = [
   "eva",
   "outpost",
   "event",
+  "encounter",
   "terminus",
   "gameover",
 ] as const;
