@@ -120,8 +120,8 @@ Build the full loop ON the M3 structure, mechanic-by-mechanic per docs/GAME-DESI
 
 ## Queue — Milestone 7: Production hardening (branch: feat/m7-hardening)
 The game ships and plays; this raises it from "complete" to "polished to a shine."
-- [ ] m7-1 Crew portraits: only John+Frank generated (Imagen declined Maya+Nadia). Get all 4 — try a filter-safe framing (helmet-on / 3-quarter / "video-game character art" wording) or meshy text-to-image. The game shows silhouettes for half the crew now.
-- [ ] m7-2 Save/continue: wire src/platform/persistence.ts to the UI — persist an in-progress run (resume on reload) + a high-score board (terminus writes, boot/menu reads). High-throughput rAF makes losing a run on refresh painful.
-- [ ] m7-3 Richer event pool: regenerate to ~24 events (more variety = replayability); keep the content-integrity gate.
+- [x] m7-1 Crew portraits — all 4 generated via helmet-on filter-safe framing [done 53b5600]. Orig: only John+Frank generated (Imagen declined Maya+Nadia). Get all 4 — try a filter-safe framing (helmet-on / 3-quarter / "video-game character art" wording) or meshy text-to-image. The game shows silhouettes for half the crew now.
+- [ ] [WAIT-AGENT] m7-2 Save/continue: wire src/platform/persistence.ts to the UI — persist an in-progress run (resume on reload) + a high-score board (terminus writes, boot/menu reads). High-throughput rAF makes losing a run on refresh painful.
+- [x] m7-3 Event pool 12->24 (broader themes incl crew-conflict/scavenging) [done 9f965a9]. Orig: regenerate to ~24 events (more variety = replayability); keep the content-integrity gate.
 - [ ] m7-4 More music/ambience: curate 1-2 more trail/tension tracks from the owned itch/local audio; wire context (outpost calm vs hazard tension).
 - [ ] m7-final Full green + Safari run-through + PR.
