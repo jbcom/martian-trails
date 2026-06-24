@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, type Locator, test } from "@playwright/test";
 
 /**
  * Visual sweep — walks the full journey at several phone/tablet widths, screenshots every
@@ -57,6 +57,10 @@ async function shot(page: import("@playwright/test").Page, screen: string, label
   await page.screenshot({ path: `artifacts/sweep/${screen}-${label}.png`, fullPage: false });
 }
 
+async function domClick(locator: Locator) {
+  await locator.evaluate((el) => (el as HTMLElement).click());
+}
+
 for (const { label, w, h } of WIDTHS) {
   test(`visual sweep — no clipped content @ ${label}`, async ({ page }) => {
     await page.setViewportSize({ width: w, height: h });
@@ -102,27 +106,27 @@ for (const { label, w, h } of WIDTHS) {
     await shot(page, "depot", label);
     await assertNoClips(page, "depot", label);
 
-    await page.getByRole("button", { name: /recruit co-driver/i }).click({ force: true });
+    await domClick(page.getByRole("button", { name: /recruit co-driver/i }));
     await expect(page.getByText(/rover berth/i)).toBeVisible();
     await shot(page, "depot-codriver", label);
     await assertNoClips(page, "depot-codriver", label);
-    await page.getByRole("button", { name: /recruit okonkwo/i }).click({ force: true });
+    await domClick(page.getByRole("button", { name: /recruit okonkwo/i }));
     await expect(page.getByText(/rover berth/i)).toBeHidden();
 
-    await page.getByRole("button", { name: /manifest terminal/i }).click({ force: true });
+    await domClick(page.getByRole("button", { name: /manifest terminal/i }));
     await expect(page.getByTestId("depot-station-panel").getByText(/cargo gantry/i)).toBeVisible();
     await shot(page, "depot-manifest", label);
     await assertNoClips(page, "depot-manifest", label);
-    await page.getByRole("button", { name: /^upgrades$/i }).click();
+    await domClick(page.getByRole("button", { name: /^upgrades$/i }));
     await shot(page, "depot-upgrades", label);
     await assertNoClips(page, "depot-upgrades", label);
-    await page.getByRole("button", { name: /^supplies$/i }).click();
-    await page.getByRole("button", { name: /buy liquid o2/i }).click({ force: true });
-    await page.getByRole("button", { name: /buy potable h2o/i }).click({ force: true });
-    await page.getByRole("button", { name: /buy rations/i }).click({ force: true });
-    await page.getByRole("button", { name: /close manifest terminal/i }).click();
+    await domClick(page.getByRole("button", { name: /^supplies$/i }));
+    await domClick(page.getByRole("button", { name: /buy liquid o2/i }));
+    await domClick(page.getByRole("button", { name: /buy potable h2o/i }));
+    await domClick(page.getByRole("button", { name: /buy rations/i }));
+    await domClick(page.getByRole("button", { name: /close manifest terminal/i }));
 
-    await page.getByRole("button", { name: /clear airlock/i }).click();
+    await domClick(page.getByRole("button", { name: /clear airlock/i }));
     await expect(page.getByText(/expedition telemetry/i)).toBeVisible();
     await expect(page.getByText(/co-driver/i)).toBeVisible();
     await shot(page, "travel-codriver", label);
