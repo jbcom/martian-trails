@@ -7,25 +7,35 @@ domain: creative
 
 # Martian Trail — Art Direction
 
-Replaces the POC's procedural `PIXI.Graphics` with real, cohesive, production art.
+Replaces the POC's procedural `PIXI.Graphics` with real, production art. **ZERO procedural
+or placeholder geometry ships** — no flat-colored boxes/planes as stand-ins (user mandate,
+2026-06-23). Every scene uses a real curated asset.
 
-## Decision: 3DLowPoly Kenney "Space" family, orthographic side view
+## Decision: 3D-PSX, side-3D view (REVERSED from Kenney — 2026-06-23)
 
-A "side-scroller" does **not** mean 2D. The chosen direction is **3D GLB models rendered
-through an orthographic side camera** — one continuous Kenney CC0 aesthetic across every
-scene. Rationale:
+A "side-scroller" does **not** mean 2D, and it does not mean clean low-poly. The chosen
+direction is **PSX-era 3D models rendered through a side-3D (orthographic/near-ortho) camera**
+— a rich, nostalgic PS1-era look (low-res textures, vertex jitter feel, chunky geometry) that
+reads as retro while giving real 3D parallax, lighting, and the *rover-noses-down-the-ramp*
+animated hazard. The user's call: this is "MUCH better while still feeling nostalgic" than the
+clean Kenney low-poly. **Kenney/pixel-era is OUT.**
 
-1. **Cohesion** (the priority): `Space Kit` + `Space Station Kit` + `Ultimate Space Kit` +
-   `Sci-Fi Essentials Kit` are a single Kenney visual language (palette, poly density,
-   shading). Every signature scene is covered by *one* source — astronaut, rover, cliffs,
-   dome/airlock, full modular interior, props, planets. All CC0.
-2. **The 3D-in-side-view payoff:** ortho GLBs give parallax, reactive lighting, and the
-   *rover-noses-down-the-ramp* animated hazard consequence the Hazard Traverse demands
-   (`terrain_ramp` + `Rover_2`) — flat 2D sprite packs cannot.
-3. **3DPSX is not viable locally for Mars** (the local 3DPSX library is fantasy/farm/PSX-horror;
-   zero astronaut/rover/base/Mars terrain). A PSX look would require assembling 8+ separate
-   owned itch packs — mixed conventions, the opposite of cohesion. Kept as a documented
-   *alternate* only if a grittier tone is later wanted.
+This is now viable because the **owned itch PSX library** (pulled via `pnpm assets:fetch` —
+`scripts/fetch-itch-assets.mjs`) supplies the Mars-relevant PSX packs the local 3DPSX folder
+lacked:
+- **PSX Astronaut** (ships a ready GLB) — EVA actor + crew.
+- **PSX Bus** → kitbashed pressurized rover; **PSX-Electrical** (machinery + pipes) → habitat /
+  outpost interior + props; **PSX Ghost Hunting Tools** → EVA scanner/prospecting tools;
+  **PSX Traps** → hazard props; **Robot voxel** characters → utility droids;
+  **Space & Planetary Hexes** → planetary backdrops / map.
+- Audio: UI SFX, victory/level stingers, dark-ambient beds, impacts, lasers, whoosh, PSX
+  footsteps — all owned, into the howler layer.
+
+### Format pipeline
+Most PSX packs ship `.fbx` (some `.gltf`); the web needs `.glb`. The curation step converts
+FBX→GLB headless via Blender (`/opt/homebrew/bin/blender`), then promotes keepers to
+`public/assets/models/` with manifest + integrity gate. PSX Astronaut's bundled GLB is used
+directly. Source packs live in gitignored `raw-assets/`; only curated GLBs ship.
 
 ## Scene → asset map (local roots, all verified)
 Root: `/Volumes/home/assets/3DLowPoly/Environment/Space/`

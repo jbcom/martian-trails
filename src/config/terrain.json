@@ -1,0 +1,20 @@
+{
+  "zones": [
+    {
+      "name": "Smooth Regolith",
+      "speed": 1.0,
+      "power": 1.0,
+      "hullDamage": 0.5,
+      "color": "#cc7052"
+    },
+    { "name": "Boulder Field", "speed": 0.6, "power": 1.5, "hullDamage": 2.5, "color": "#8a3324" },
+    { "name": "Deep Sand", "speed": 0.4, "power": 1.8, "hullDamage": 0.8, "color": "#a85b32" },
+    { "name": "Hardpan Rock", "speed": 0.9, "power": 1.1, "hullDamage": 1.5, "color": "#9c6b4a" }
+  ],
+  "outposts": [
+    { "name": "Tharsis Outpost", "distance": 600 },
+    { "name": "Pavonis Mons Base", "distance": 1300 },
+    { "name": "Noctis Labyrinthus", "distance": 2000 }
+  ],
+  "zoneChangeMinDistance": 100
+}

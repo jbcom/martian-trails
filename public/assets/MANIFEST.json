@@ -1,7 +1,7 @@
 {
   "generatedFrom": "scripts/assets.manifest.json",
-  "license": "CC0-1.0 (Kenney)",
-  "count": 36,
+  "license": "PSX packs per source itch licenses (raw-assets/); audio CC0 (Kenney). See docs/ART-DIRECTION.md.",
+  "count": 16,
   "assets": [
     {
       "path": "audio/music/menu.ogg",
@@ -54,134 +54,34 @@
       "sha256": "e32cd53d5c868320e05d5f8c4c6153e7bc47eb91a7badcaef22b304d8f8bd367"
     },
     {
-      "path": "models/crew/astronautA.glb",
-      "bytes": 27912,
-      "sha256": "9db62dd9790beadc1b8e45cf9623e99ade21751bb23f16dfe1b8cfb05a54f3b5"
+      "path": "models/crew/astronaut.glb",
+      "bytes": 199332,
+      "sha256": "87e2edb832f7d6d27f7f91b09f5d1006c240de2845ab27d2deb0f3844f1de1d1"
     },
     {
-      "path": "models/crew/astronautB.glb",
-      "bytes": 27824,
-      "sha256": "6fa5b3e11cb3d117b28a0794b261ad9107f16ca6ce886b288493e22493d74d2d"
+      "path": "models/outpost/machinery_1.glb",
+      "bytes": 170904,
+      "sha256": "dc34e42f64809056959cb8cd0826cc7faa7f2221b8db0645f60b3fb4e6946a23"
     },
     {
-      "path": "models/outpost/hangar_largeA.glb",
-      "bytes": 25304,
-      "sha256": "cae233b3e53aa5004bc8d7d43bd00763a919064af6b5249f354a71cae5fbf29a"
+      "path": "models/outpost/machinery_3.glb",
+      "bytes": 144964,
+      "sha256": "b9a70263f519e4cb2c3f4b5204d3d8b731da71de4a735106b8b57f1e280a99dc"
     },
     {
-      "path": "models/outpost/hangar_roundA.glb",
-      "bytes": 12104,
-      "sha256": "cf64a33cc795f897971990433c46097d43529ae3ef0dce8ba719761c54dd6a3d"
+      "path": "models/props/pipe_straight.glb",
+      "bytes": 130372,
+      "sha256": "ba0510585bc14f8b44452402c832a96d09a46bf4d9045b177d5c66693858491c"
     },
     {
-      "path": "models/outpost/hangar_roundGlass.glb",
-      "bytes": 10076,
-      "sha256": "6b6346d95b90b8c012880832cef3969a108ae2b153bef8e2106b27997e33d601"
-    },
-    {
-      "path": "models/props/machine_generator.glb",
-      "bytes": 28044,
-      "sha256": "98e8ac6aceada3b2483ed1eceb59bff7190ee774edac799350ccc11ad140f7f3"
-    },
-    {
-      "path": "models/props/machine_wireless.glb",
-      "bytes": 13420,
-      "sha256": "9d49e70d51515bc38628fb0d6e43f4eda7f9cd5326882fd02e8815e61f2259d7"
-    },
-    {
-      "path": "models/props/platform_large.glb",
-      "bytes": 6272,
-      "sha256": "aa1fba20818bc1d623953794146d9f9ff0e0f025463b013e325b373deb9be6c4"
-    },
-    {
-      "path": "models/props/satelliteDish.glb",
-      "bytes": 19528,
-      "sha256": "db27a561b66fabda45a6ce2bcf41d650852e89e15bb9f63b68133ad1293aed8b"
-    },
-    {
-      "path": "models/props/supports_high.glb",
-      "bytes": 20544,
-      "sha256": "48a8aa7818e0f3731aa7bd825f2030089bc16340fcebdf2a4bf60ef4a933a4da"
-    },
-    {
-      "path": "models/rocks/meteor.glb",
-      "bytes": 6496,
-      "sha256": "83c75071d3a48955ff3f719992f7d69dc13e915da988878bff441fd3dbb472f8"
-    },
-    {
-      "path": "models/rocks/rock_crystalsLargeA.glb",
-      "bytes": 26160,
-      "sha256": "cfe8f339f6be4a321e5f3822237002b6a70f9c5d03596a7c347adabd5247fbd9"
-    },
-    {
-      "path": "models/rocks/rock_crystalsLargeB.glb",
-      "bytes": 25924,
-      "sha256": "3fe54711b8d0fbeaebcc055409f256bf414ad7493e7f97adba4b213e44f11117"
-    },
-    {
-      "path": "models/rocks/rock_largeA.glb",
-      "bytes": 13224,
-      "sha256": "13b2bf393fcd7ca8c73d8a2a731da0be6c2c2b4e67ef0ae826e816c0d8733f2f"
-    },
-    {
-      "path": "models/rocks/rock_largeB.glb",
-      "bytes": 12984,
-      "sha256": "9ad6aafcbdf3a813d3ab5ca59d6d6eb41d8cb38d07897b2c4d24c3206f33c759"
-    },
-    {
-      "path": "models/rocks/rock.glb",
-      "bytes": 13172,
-      "sha256": "dbc02af619e176d10676ceb0e788d0bf8838731bef0d50972f11c7bf5d1f4922"
-    },
-    {
-      "path": "models/rover/craft_cargoA.glb",
-      "bytes": 18964,
-      "sha256": "b9676e838c605699e164c4c1779262bf47db1562a1504ceb29764828cbaa80c2"
-    },
-    {
-      "path": "models/rover/craft_miner.glb",
-      "bytes": 26672,
-      "sha256": "de32320578886d2e73b1cd24b6161c9bd855e3a172bc2abcc8cb7bdd46352348"
+      "path": "models/props/valve.glb",
+      "bytes": 119256,
+      "sha256": "d88a48e29d8e706e5dc4bf4b8d84d0692b37042a3042eed80d35e380cbca6330"
     },
     {
       "path": "models/rover/rover.glb",
-      "bytes": 13384,
-      "sha256": "9784549775017e540ab84e6fc0eb8a1902dbeff9ba4285cecb97c086d2937fa5"
-    },
-    {
-      "path": "models/terrain/crater.glb",
-      "bytes": 5684,
-      "sha256": "8b872ebe7358e1d5f08c600ed43f61d4d0dbbd03274a718424c599778915b175"
-    },
-    {
-      "path": "models/terrain/craterLarge.glb",
-      "bytes": 5688,
-      "sha256": "703f86c085371d5e53e39029a0c74e51cefccd02697ea5e00eb2b4235ed9011b"
-    },
-    {
-      "path": "models/terrain/terrain_ramp.glb",
-      "bytes": 2224,
-      "sha256": "9171061212ee5aa9a74393c9f657a89a5b19d675766a43c88d5d91df6e507dea"
-    },
-    {
-      "path": "models/terrain/terrain_side.glb",
-      "bytes": 1572,
-      "sha256": "f51223639675ae5d95581b11061c92494a0cf1a1960b65b8cc890a671986a15a"
-    },
-    {
-      "path": "models/terrain/terrain_sideCliff.glb",
-      "bytes": 2644,
-      "sha256": "888d6845cfcd6d21a08cca29f15185d0ed478c003746f0f46e2526bb0f8b0298"
-    },
-    {
-      "path": "models/terrain/terrain_sideCorner.glb",
-      "bytes": 2624,
-      "sha256": "5161bbc51bb130f92d39a4f51abf874b18dcade8c84f34dbcff79c63c24f7738"
-    },
-    {
-      "path": "models/terrain/terrain.glb",
-      "bytes": 1556,
-      "sha256": "c0daef0a3c92cf52b6d5a3f64288e50e41d3008397ae25b46ab55dd3e1630288"
+      "bytes": 584592,
+      "sha256": "20297eba651e944ec9af7099531ca3a279fbb2bfc05dbe823c35cecf383842c0"
     }
   ]
 }

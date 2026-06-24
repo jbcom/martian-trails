@@ -20,6 +20,7 @@
     "cap:run:android": "cap run android",
     "android:debug": "pnpm cap:sync && cd android && ./gradlew assembleDebug",
     "assets:curate": "node scripts/curate-assets.mjs",
+    "itch:library": "node scripts/itch-library.mjs",
     "assets:fetch": "node scripts/fetch-itch-assets.mjs",
     "genai:events": "tsx scripts/genai-events.ts",
     "genai:portraits": "tsx scripts/genai-portraits.ts"
@@ -31,9 +32,11 @@
     "@tailwindcss/vite": "^4.3.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
+    "@types/howler": "^2.2.13",
     "@types/node": "^26.0.0",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@types/seedrandom": "^3.0.8",
     "@types/three": "^0.184.1",
     "@vitejs/plugin-react": "^6.0.3",
     "@vitest/browser": "^4.1.9",
@@ -49,17 +52,27 @@
   "dependencies": {
     "@capacitor/android": "^8.4.1",
     "@capacitor/core": "^8.4.1",
+    "@capacitor/device": "^8.0.2",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/screen-orientation": "^8.0.1",
     "@fontsource/inter": "^5.2.8",
     "@fontsource/jetbrains-mono": "^5.2.8",
     "@fontsource/rajdhani": "^5.2.7",
+    "@google/genai": "^2.9.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.6.1",
     "@react-three/postprocessing": "^3.0.4",
     "dotenv": "^17.4.2",
     "framer-motion": "^12.41.0",
+    "howler": "^2.2.4",
+    "koota": "^0.6.6",
     "postprocessing": "^6.39.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "three": "^0.184.0"
+    "seedrandom": "^3.0.5",
+    "three": "^0.184.0",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
   }
 }

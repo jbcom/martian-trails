@@ -1,0 +1,60 @@
+{
+  "budget": 25000,
+  "payloadCap": 1000,
+  "items": [
+    {
+      "id": "oxygen",
+      "name": "Liquid O2",
+      "price": 10,
+      "step": 50,
+      "max": 1000,
+      "isBulk": true,
+      "startQty": 0
+    },
+    {
+      "id": "water",
+      "name": "Potable H2O",
+      "price": 5,
+      "step": 50,
+      "max": 1000,
+      "isBulk": true,
+      "startQty": 0
+    },
+    {
+      "id": "rations",
+      "name": "Rations",
+      "price": 8,
+      "step": 50,
+      "max": 1000,
+      "isBulk": true,
+      "startQty": 0
+    },
+    {
+      "id": "parts",
+      "name": "Machined Parts",
+      "price": 250,
+      "step": 1,
+      "max": 15,
+      "isBulk": false,
+      "startQty": 0
+    },
+    {
+      "id": "medkits",
+      "name": "Medical Kits",
+      "price": 400,
+      "step": 1,
+      "max": 10,
+      "isBulk": false,
+      "startQty": 0
+    },
+    {
+      "id": "rtg",
+      "name": "RTG Cell",
+      "price": 3000,
+      "step": 1,
+      "max": 4,
+      "isBulk": false,
+      "startQty": 1
+    }
+  ]
+}

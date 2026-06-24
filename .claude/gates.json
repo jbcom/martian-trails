@@ -2,9 +2,9 @@
   "coverage_rules": [
     {
       "when_changed": ["src/render/**", "src/ui/**"],
-      "require_changed": ["tests/visual/**", "tests/harness/**"],
+      "require_changed": ["tests/visual/**", "tests/harness/**", "tests/browser/**"],
       "or_explicit_skip": "// no-visual-impact: <≥10 word reason>",
-      "block_message": "Render/UI change without visual test update."
+      "block_message": "Render/UI change without visual/browser test update."
     },
     {
       "when_changed": ["src/audio/**"],

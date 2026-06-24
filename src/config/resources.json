@@ -1,0 +1,17 @@
+{
+  "max": {
+    "oxygen": 1000,
+    "water": 1000,
+    "rations": 1000,
+    "power": 100,
+    "morale": 100,
+    "hull": 100
+  },
+  "drainPerCrew": {
+    "oxygen": 1.0,
+    "water": 1.2,
+    "rations": 1.2,
+    "morale": 1.2
+  },
+  "maxPowerPerRtg": 100
+}

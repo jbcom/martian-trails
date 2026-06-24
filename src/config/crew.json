@@ -1,0 +1,52 @@
+{
+  "roster": [
+    {
+      "id": "john",
+      "name": "John",
+      "role": "Commander",
+      "traits": {
+        "consumptionMult": 1.0,
+        "moraleDrainMult": 0.5,
+        "partSaveChance": 0,
+        "hullRepairBonus": 0,
+        "evaYieldMult": 1.0
+      }
+    },
+    {
+      "id": "maya",
+      "name": "Maya",
+      "role": "Engineer",
+      "traits": {
+        "consumptionMult": 1.0,
+        "moraleDrainMult": 1.0,
+        "partSaveChance": 0.3,
+        "hullRepairBonus": 15,
+        "evaYieldMult": 1.0
+      }
+    },
+    {
+      "id": "frank",
+      "name": "Frank",
+      "role": "Geologist",
+      "traits": {
+        "consumptionMult": 1.0,
+        "moraleDrainMult": 1.0,
+        "partSaveChance": 0,
+        "hullRepairBonus": 0,
+        "evaYieldMult": 2.0
+      }
+    },
+    {
+      "id": "nadia",
+      "name": "Nadia",
+      "role": "Botanist",
+      "traits": {
+        "consumptionMult": 0.8,
+        "moraleDrainMult": 1.0,
+        "partSaveChance": 0,
+        "hullRepairBonus": 0,
+        "evaYieldMult": 1.0
+      }
+    }
+  ]
+}

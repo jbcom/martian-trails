@@ -1,0 +1,62 @@
+{
+  "conditions": [
+    {
+      "id": "injury",
+      "name": "Injury",
+      "cause": "Trauma during EVA or a rough traverse",
+      "progressionPerSol": 0.15,
+      "mortalityPerSol": 0.15,
+      "moralePenaltyPerSol": 5,
+      "moralePenaltyOnDeath": 20
+    },
+    {
+      "id": "hypothermia",
+      "name": "Hypothermia",
+      "cause": "Exposure during a cold snap with power conserved",
+      "progressionPerSol": 0.2,
+      "mortalityPerSol": 0.15,
+      "moralePenaltyPerSol": 5,
+      "moralePenaltyOnDeath": 20
+    },
+    {
+      "id": "radiationSickness",
+      "name": "Radiation Sickness",
+      "cause": "Solar flare exposure without shielding",
+      "progressionPerSol": 0.25,
+      "mortalityPerSol": 0.18,
+      "moralePenaltyPerSol": 5,
+      "moralePenaltyOnDeath": 20
+    },
+    {
+      "id": "regolithLung",
+      "name": "Regolith Lung",
+      "cause": "Perchlorate and silica dust inhalation",
+      "progressionPerSol": 0.1,
+      "mortalityPerSol": 0.12,
+      "moralePenaltyPerSol": 5,
+      "moralePenaltyOnDeath": 20
+    },
+    {
+      "id": "hypoxia",
+      "name": "Hypoxia",
+      "cause": "Life-support oxygen dip",
+      "progressionPerSol": 0.3,
+      "mortalityPerSol": 0.2,
+      "moralePenaltyPerSol": 5,
+      "moralePenaltyOnDeath": 20
+    },
+    {
+      "id": "cabinFever",
+      "name": "Cabin Fever",
+      "cause": "Sustained low morale and confinement",
+      "progressionPerSol": 0.15,
+      "mortalityPerSol": 0.1,
+      "moralePenaltyPerSol": 5,
+      "moralePenaltyOnDeath": 20
+    }
+  ],
+  "criticalSeverity": 1.0,
+  "lowMoraleThreshold": 10,
+  "lowMoraleDeathChance": 0.1,
+  "healMoraleBonus": 10
+}

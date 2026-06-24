@@ -30,11 +30,23 @@ try {
 const sourceRoot = process.env.LOCAL_ASSET_DIR || manifest.sourceRoot;
 const outRoot = join(root, "public/assets");
 
-if (!existsSync(sourceRoot)) {
-  console.error(
-    `Asset library not mounted at ${sourceRoot}. Set LOCAL_ASSET_DIR or mount the NAS.`,
-  );
-  process.exit(1);
+// Per-section source roots. Curated PSX GLBs are produced by the local
+// FBX->GLB pipeline (Blender) into a gitignored repo dir, so models source from
+// there; audio still copies from the mounted asset library. A section root may
+// be relative to the repo (resolved here) or absolute.
+const sectionRoots = {
+  models: manifest.modelsRoot ? resolve(root, manifest.modelsRoot) : sourceRoot,
+  audio: manifest.audioRoot ? resolve(root, manifest.audioRoot) : sourceRoot,
+};
+
+const rootFor = (section) => sectionRoots[section] ?? sourceRoot;
+
+const usedRoots = [...new Set(Object.values(sectionRoots))];
+for (const r of usedRoots) {
+  if (!existsSync(r)) {
+    console.error(`Asset source not found at ${r}. Set LOCAL_ASSET_DIR or mount the NAS.`);
+    process.exit(1);
+  }
 }
 
 const entries = [];
@@ -48,7 +60,7 @@ for (const section of ["models", "audio"]) {
 
 // Pass 1: validate every source exists BEFORE copying anything, so a missing
 // asset never leaves a partial copy or a manifest that doesn't match disk.
-const missing = entries.filter((e) => !existsSync(join(sourceRoot, e.from)));
+const missing = entries.filter((e) => !existsSync(join(rootFor(e.section), e.from)));
 if (missing.length > 0) {
   for (const e of missing) console.error(`MISSING source: ${e.from}`);
   console.error(`\n${missing.length} source asset(s) missing — aborting (nothing copied).`);
@@ -59,7 +71,7 @@ if (missing.length > 0) {
 const records = [];
 let copied = 0;
 for (const e of entries) {
-  const src = join(sourceRoot, e.from);
+  const src = join(rootFor(e.section), e.from);
   const rel = `${e.section}/${e.to}`;
   const dest = join(outRoot, rel);
   const bytes = readFileSync(src);
