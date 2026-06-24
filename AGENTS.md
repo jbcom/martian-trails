@@ -35,10 +35,9 @@ broke hex-color parsing here). Fix the cause, or recognize the red as a queued s
 ## Visual verification is mandatory
 Every render/UI/asset change: run the game, screenshot, **READ your own screenshot**, compare
 against the named reference in `docs/DESIGN-SYSTEM.md`, fix before commit. "Tests pass" ≠
-"app runs". Playtest via the **Safari skill** (Chrome is in use by someone else). Critical:
-bring the Safari window genuinely frontmost (`System Events → set frontmost`) and assert
-`document.visibilityState === "visible"` BEFORE screenshotting — a hidden tab captures all
-black (WebKit blanks hidden-tab compositing); it is not a render bug.
+"app runs". Prefer the integrated browser, Vitest browser, and Playwright for local visual
+proof because they are scriptable, reproducible, and can capture the exact tested viewport.
+Use an external browser only when the compatibility target or the user explicitly calls for it.
 
 ## Workflow
 - pnpm only. Conventional Commits. One branch per milestone, layered forward commits, one PR

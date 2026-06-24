@@ -273,6 +273,23 @@ describe("run controller — outpost stops", () => {
     const getEffect = offer!.effects.find((ef) => ef.delta > 0)!;
     expect(after[getEffect.target]).toBeGreaterThanOrEqual(before[getEffect.target]);
   });
+
+  it("outpost advice applies once and persists the selected advisor flag", () => {
+    const stop = driveToOutpost();
+    expect(stop).not.toBeNull();
+    const ok = run.resolveOutpostAdvice("veteran");
+    expect(ok).toBe(true);
+    const after = run.snapshot();
+    expect(after?.encounterFlags).toContain("flag:advice:tharsis:veteran");
+
+    const duplicate = run.resolveOutpostAdvice("veteran");
+    expect(duplicate).toBe(false);
+
+    const saved = run.serialize();
+    expect(saved?.progress.encounterFlags).toContain("flag:advice:tharsis:veteran");
+    run.restore(saved!);
+    expect(run.snapshot()?.encounterFlags).toContain("flag:advice:tharsis:veteran");
+  });
 });
 
 describe("run controller — crew active abilities", () => {

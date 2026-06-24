@@ -7,7 +7,7 @@ import { expect, test } from "@playwright/test";
  * ancestor or pushed off a centered scroll origin. This sweep is the regression guard for both
  * the Hall-of-Records clipping and the "half a portrait on phones" report.
  *
- * Screenshots land in test-results/ for human review; the assertions fail CI on any clip.
+ * Screenshots land in artifacts/ for human review; the assertions fail CI on any clip.
  */
 
 const WIDTHS = [
@@ -54,7 +54,7 @@ async function assertNoClips(page: import("@playwright/test").Page, screen: stri
 }
 
 async function shot(page: import("@playwright/test").Page, screen: string, label: string) {
-  await page.screenshot({ path: `test-results/sweep/${screen}-${label}.png`, fullPage: false });
+  await page.screenshot({ path: `artifacts/sweep/${screen}-${label}.png`, fullPage: false });
 }
 
 for (const { label, w, h } of WIDTHS) {
@@ -101,13 +101,34 @@ for (const { label, w, h } of WIDTHS) {
     await expect(page.getByText(/underhill depot/i)).toBeVisible();
     await shot(page, "depot", label);
     await assertNoClips(page, "depot", label);
-    // Depot has scrollable supply/upgrade lists — scroll to the bottom and re-check, so a
-    // clip in the lower upgrade cards (off the initial fold) is still caught.
-    await page.mouse.wheel(0, 4000);
-    await assertNoClips(page, "depot-scrolled", label);
+
+    await page.getByRole("button", { name: /recruit co-driver/i }).click({ force: true });
+    await expect(page.getByText(/rover berth/i)).toBeVisible();
+    await shot(page, "depot-codriver", label);
+    await assertNoClips(page, "depot-codriver", label);
+    await page.getByRole("button", { name: /recruit okonkwo/i }).click({ force: true });
+    await expect(page.getByText(/rover berth/i)).toBeHidden();
+
+    await page.getByRole("button", { name: /manifest terminal/i }).click({ force: true });
+    await expect(page.getByTestId("depot-station-panel").getByText(/cargo gantry/i)).toBeVisible();
+    await shot(page, "depot-manifest", label);
+    await assertNoClips(page, "depot-manifest", label);
+    await page.getByRole("button", { name: /^upgrades$/i }).click();
+    await shot(page, "depot-upgrades", label);
+    await assertNoClips(page, "depot-upgrades", label);
+    await page.getByRole("button", { name: /^supplies$/i }).click();
+    await page.getByRole("button", { name: /buy liquid o2/i }).click({ force: true });
+    await page.getByRole("button", { name: /buy potable h2o/i }).click({ force: true });
+    await page.getByRole("button", { name: /buy rations/i }).click({ force: true });
+    await page.getByRole("button", { name: /close manifest terminal/i }).click();
+
+    await page.getByRole("button", { name: /clear airlock/i }).click();
+    await expect(page.getByText(/expedition telemetry/i)).toBeVisible();
+    await expect(page.getByText(/co-driver/i)).toBeVisible();
+    await shot(page, "travel-codriver", label);
+    await assertNoClips(page, "travel-codriver", label);
   });
 }
 
-// The Travel screen (crew portraits) and the larger event-modal portrait are exercised by the
-// real-browser test (tests/browser/savegame.browser.test.tsx) and the manual Safari sweep, which
-// reach those screens deterministically via the store rather than the flaky depot supply UI.
+// Event-modal portraits are exercised by the real-browser encounter tests, which reach those
+// screens deterministically via the run controller rather than relying on random trail rolls here.

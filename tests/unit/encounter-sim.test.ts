@@ -68,6 +68,17 @@ describe("encounter sim — determinism", () => {
     expect(enc1 !== undefined || enc2 !== undefined).toBe(true);
   });
 
+  it("the roadside pool can surface non-trader archetypes", () => {
+    const seen = new Set<string>();
+    for (let i = 0; i < 8 && ![...seen].some((kind) => kind !== "trader"); i++) {
+      run.start(`roadside-${i}`, LOADOUT);
+      const enc = driveToEncounter();
+      const archetype = enc ? getNpc(enc.npcId)?.archetype : undefined;
+      if (archetype) seen.add(archetype);
+    }
+    expect([...seen].some((kind) => kind !== "trader")).toBe(true);
+  });
+
   it("encounterHalted gates the rover — driving is false while NPC is active", () => {
     run.setDriving(true);
     // Tick until encounter fires (enc active but not yet HAIL).

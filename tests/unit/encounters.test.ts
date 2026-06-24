@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { allNpcs, getEncounterBank, getNpc } from "@/content/encounters";
+import { allNpcs, getEncounterBank, getNpc, npcsAtLocation } from "@/content/encounters";
 import type { EncounterBank } from "@/schemas/encounter";
 import {
   type EncounterRunState,
@@ -101,7 +101,26 @@ describe("encounter content registry", () => {
     expect(allNpcs().length).toBeGreaterThan(0);
     const vasquez = getNpc("npc:depot-trader-vasquez");
     expect(vasquez?.archetype).toBe("trader");
+    expect(vasquez?.locations).toContain("trail");
     expect(getEncounterBank(vasquez!.bank)).toBeDefined();
+  });
+
+  it("indexes depot NPCs by content location", () => {
+    expect(npcsAtLocation("depot").map((npc) => npc.id)).toEqual([
+      "npc:depot-quartermaster-okonkwo",
+      "npc:depot-prospector-reyes",
+    ]);
+  });
+
+  it("indexes all roadside encounter archetypes by trail location", () => {
+    const trail = npcsAtLocation("trail");
+    expect(trail.map((npc) => npc.archetype).sort()).toEqual([
+      "rival",
+      "scavenger",
+      "stranded",
+      "trader",
+    ]);
+    for (const npc of trail) expect(getEncounterBank(npc.bank)).toBeDefined();
   });
 
   it("resolves the trader's first-meeting by default and the hard-up node when water is low", () => {

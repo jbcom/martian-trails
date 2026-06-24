@@ -1,0 +1,121 @@
+[
+  {
+    "outpost": "Tharsis Outpost",
+    "veteran": {
+      "id": "rourke",
+      "name": "Asha Rourke",
+      "role": "veteran",
+      "title": "Dust veteran",
+      "portrait": "reyes",
+      "line": "The storm wall is thin on the shelf road. It costs power now, but it keeps the hull out of the basalt teeth.",
+      "recommendation": "Take the shelf road and spend power to protect the hull."
+    },
+    "liaison": {
+      "id": "hale",
+      "name": "Director Hale",
+      "role": "liaison",
+      "title": "UNOMA logistics",
+      "portrait": "okonkwo",
+      "line": "Corporate telemetry shows the direct regolith lane is open. Keep your power reserve and accept some cosmetic hull abrasion.",
+      "recommendation": "Stay direct and conserve power for the next sector."
+    },
+    "choices": [
+      {
+        "id": "veteran",
+        "advisorId": "rourke",
+        "label": "Follow veteran",
+        "effects": [{ "target": "power", "delta": -12 }, { "target": "hull", "delta": 10 }],
+        "setsFlag": "flag:advice:tharsis:veteran"
+      },
+      {
+        "id": "liaison",
+        "advisorId": "hale",
+        "label": "Follow liaison",
+        "effects": [{ "target": "power", "delta": 8 }, { "target": "hull", "delta": -8 }],
+        "setsFlag": "flag:advice:tharsis:liaison"
+      }
+    ]
+  },
+  {
+    "outpost": "Pavonis Mons Base",
+    "veteran": {
+      "id": "sato",
+      "name": "Mina Sato",
+      "role": "veteran",
+      "title": "Basalt guide",
+      "portrait": "vasquez",
+      "line": "Pavonis shade fools the temperature model. Rest the crew and run meager until the ridge light turns clean.",
+      "recommendation": "Spend food discipline now to protect morale and hull later."
+    },
+    "liaison": {
+      "id": "kline",
+      "name": "Orin Kline",
+      "role": "liaison",
+      "title": "Route auditor",
+      "portrait": "okonkwo",
+      "line": "The route window is profitable only if you leave before the afternoon dust. Push through with the depot exchange.",
+      "recommendation": "Trade into oxygen and keep the schedule."
+    },
+    "choices": [
+      {
+        "id": "veteran",
+        "advisorId": "sato",
+        "label": "Follow veteran",
+        "effects": [
+          { "target": "rations", "delta": -30 },
+          { "target": "morale", "delta": 10 },
+          { "target": "hull", "delta": 6 }
+        ],
+        "setsFlag": "flag:advice:pavonis:veteran"
+      },
+      {
+        "id": "liaison",
+        "advisorId": "kline",
+        "label": "Follow liaison",
+        "effects": [
+          { "target": "oxygen", "delta": 40 },
+          { "target": "morale", "delta": -6 },
+          { "target": "power", "delta": -10 }
+        ],
+        "setsFlag": "flag:advice:pavonis:liaison"
+      }
+    ]
+  },
+  {
+    "outpost": "Noctis Labyrinthus",
+    "veteran": {
+      "id": "beko",
+      "name": "Tavi Beko",
+      "role": "veteran",
+      "title": "Canyon scout",
+      "portrait": "reyes",
+      "line": "The canyon mouth is eating axles. Water hurts less than a cracked suspension. Cut wide around the ribs.",
+      "recommendation": "Spend water on the longer canyon skirt and spare the hull."
+    },
+    "liaison": {
+      "id": "marwick",
+      "name": "Sera Marwick",
+      "role": "liaison",
+      "title": "Claims liaison",
+      "portrait": "vasquez",
+      "line": "The corridor is rough, but it is short. Korolev bonuses disappear if you crawl the scenic route.",
+      "recommendation": "Punch the direct corridor and preserve expedition time."
+    },
+    "choices": [
+      {
+        "id": "veteran",
+        "advisorId": "beko",
+        "label": "Follow veteran",
+        "effects": [{ "target": "water", "delta": -35 }, { "target": "hull", "delta": 14 }],
+        "setsFlag": "flag:advice:noctis:veteran"
+      },
+      {
+        "id": "liaison",
+        "advisorId": "marwick",
+        "label": "Follow liaison",
+        "effects": [{ "target": "water", "delta": 20 }, { "target": "hull", "delta": -12 }],
+        "setsFlag": "flag:advice:noctis:liaison"
+      }
+    ]
+  }
+]

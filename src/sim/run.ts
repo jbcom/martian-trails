@@ -1,7 +1,8 @@
 import { createWorld, type Entity, type World } from "koota";
 import { config } from "@/config";
-import { getEncounterBank, getNpc, npcsByArchetype } from "@/content/encounters";
+import { getEncounterBank, getNpc, npcsAtLocation } from "@/content/encounters";
 import { allEvents } from "@/content/events";
+import { adviceForOutpost } from "@/content/outpostAdvice";
 import type { Rng } from "@/core/rng";
 import { createRng } from "@/core/rng";
 import type { Effect, TrailEvent } from "@/schemas/event";
@@ -9,6 +10,11 @@ import type { Hazard } from "@/schemas/hazard";
 import type { TradeOffer } from "@/schemas/outpost";
 import type { RunSave } from "@/schemas/save";
 import { abilityBlock, abilityForCrew, cooldownRemaining, resolveAbility } from "@/sim/abilities";
+import {
+  buildCoDriverSnapshot,
+  type CoDriverAdviceContext,
+  type CoDriverSnapshot,
+} from "@/sim/coDriver";
 import type { ResolvedEncounter } from "@/sim/encounters";
 import { gotoNode, resolveEncounter } from "@/sim/encounters";
 import {
@@ -24,7 +30,13 @@ import { applyEffects } from "@/sim/event";
 import type { Loadout } from "@/sim/factories";
 import { spawnExpedition } from "@/sim/factories";
 import { type HazardResult, resolveHazard } from "@/sim/hazard";
-import { type OutpostStop, resolveRest, resolveTrade, serviceForOutpost } from "@/sim/outpost";
+import {
+  type OutpostStop,
+  resolveOutpostAdviceChoice,
+  resolveRest,
+  resolveTrade,
+  serviceForOutpost,
+} from "@/sim/outpost";
 import { pruneEncounterBrains, tickEncounterBrain, triggerDepart } from "@/sim/systems/encounterAI";
 import { SECONDS_PER_SOL, step } from "@/sim/tick";
 import {
@@ -97,6 +109,10 @@ export interface RunSnapshot {
   pendingOutpost: OutpostStop | null;
   /** The encounter awaiting a player response (NPC in HAIL state), or null. */
   pendingEncounter: { npcId: string; resolved: ResolvedEncounter } | null;
+  /** Flags set by diegetic encounter choices, including depot-social briefings. */
+  encounterFlags: string[];
+  /** The recruited co-driver and current fallible advice, or null before M8-3 recruitment. */
+  coDriver: CoDriverSnapshot | null;
 }
 
 /** Clamp huge frame gaps (tab backgrounded) so one slow frame can't skip Sols. */
@@ -159,6 +175,8 @@ class Run {
   private lastEncounterSol = 1;
   /** Run flags set by encounter choices (drives slot resolution). */
   private runFlags = new Set<string>();
+  /** Recruited co-driver id, selected before provisioning. */
+  private coDriverId: string | null = null;
 
   /** Begin a fresh run. Resets the diagnostics bridge + spawns the expedition. */
   start(seed: string, loadout?: Loadout): void {
@@ -189,6 +207,7 @@ class Run {
     this.encounterRng = this.entity.get(RngSource)?.fork("encounters") ?? null;
     this.lastEncounterSol = this.entity.get(Position)?.sol ?? 1;
     this.runFlags = new Set();
+    this.coDriverId = loadout?.coDriverId ?? null;
     this.entity.set(Encounter, { active: false, npcId: "", npcX: 12, npcY: 0, npcZ: 0 });
     resetDiagnostics();
     this.publish();
@@ -270,6 +289,7 @@ class Run {
           return { active: true, npcId: enc.npcId, npcX: enc.npcX, npcY: enc.npcY, npcZ: enc.npcZ };
         })(),
         encounterFlags: [...this.runFlags],
+        coDriverId: this.coDriverId,
       },
     };
   }
@@ -322,6 +342,7 @@ class Run {
     this.evaYieldPrimed = save.progress.evaYieldPrimed;
     this.lastEncounterSol = save.progress.lastEncounterSol ?? 1;
     this.runFlags = new Set(save.progress.encounterFlags ?? []);
+    this.coDriverId = save.progress.coDriverId ?? null;
 
     // A run resumes parked on the trail — any pending decision/EVA at save time is dropped.
     this.pendingEvent = null;
@@ -370,6 +391,12 @@ class Run {
     // A pending event/hazard halts the rover; it can't drive until the choice is made.
     this.driving = on && !this.halted;
     getDiagnostics().driving = this.driving && this.active;
+  }
+
+  /** Seed encounter flags collected before run start, such as launch-depot social briefings. */
+  addEncounterFlags(flags: Iterable<string>): void {
+    for (const flag of flags) this.runFlags.add(flag);
+    this.publish();
   }
 
   /** Set the travel pace (key into config.travel.pace). Writes the Travel trait. */
@@ -572,6 +599,27 @@ class Run {
     const patch = resolveTrade(offer, res, maxPower);
     if (!patch) return false;
     e.set(Resources, patch);
+    this.publish();
+    return true;
+  }
+
+  /** Resolve one veteran/liaison advice pick at the current outpost. */
+  resolveOutpostAdvice(choiceId: string): boolean {
+    const e = this.entity;
+    const stop = this.pendingOutpost;
+    if (!e || !stop) return false;
+    const pair = adviceForOutpost(stop.name);
+    if (!pair) return false;
+    const choice = pair.choices.find((item) => item.id === choiceId);
+    if (!choice || this.runFlags.has(choice.setsFlag)) return false;
+    if (pair.choices.some((item) => this.runFlags.has(item.setsFlag))) return false;
+    const res = e.get(Resources);
+    if (!res) return false;
+    const maxPower = e.get(MaxResources)?.power ?? config.resources.max.power;
+    const result = resolveOutpostAdviceChoice(pair, choiceId, res, maxPower);
+    if (!result) return false;
+    e.set(Resources, result.resources);
+    this.runFlags.add(result.flag);
     this.publish();
     return true;
   }
@@ -795,7 +843,7 @@ class Run {
   }
 
   /**
-   * Per fresh Sol, roll a seeded encounter chance (15%). On a hit, pick a trader NPC, activate
+   * Per fresh Sol, roll a seeded encounter chance (15%). On a hit, pick a trail NPC, activate
    * the Encounter trait, and halt the rover. Mirrors rollEvent() — one draw per Sol, stream persists.
    */
   private rollEncounter(): void {
@@ -814,9 +862,9 @@ class Run {
     for (let s = this.lastEncounterSol + 1; s <= sol; s++) {
       const solRng = rng.fork(`encounter:${s}`);
       if (solRng.chance(config.travel.encounterChance ?? 0.15)) {
-        const traders = npcsByArchetype("trader");
-        if (traders.length === 0) break;
-        const npc = solRng.pick(traders);
+        const trailNpcs = npcsAtLocation("trail");
+        if (trailNpcs.length === 0) break;
+        const npc = solRng.pick(trailNpcs);
         e.set(Encounter, { active: true, npcId: npc.id, npcX: 12, npcY: 0, npcZ: 0 });
         this.encounterHalted = true;
         this.driving = false;
@@ -928,6 +976,7 @@ class Run {
     const travel = e.get(Travel);
     const outcome = e.get(Outcome);
     const res = e.get(Resources);
+    const maxResources = e.get(MaxResources);
     const sol = pos?.sol ?? 1;
     const cooldowns = e.get(AbilityCooldowns) ?? {};
     const roster = config.crew.roster;
@@ -953,6 +1002,35 @@ class Run {
             : null,
       };
     });
+    const coDriverContext: CoDriverAdviceContext | null =
+      res && maxResources
+        ? {
+            sol,
+            distance: pos?.distance ?? 0,
+            resources: {
+              oxygen: res.oxygen,
+              water: res.water,
+              rations: res.rations,
+              power: res.power,
+              parts: res.parts,
+              medkits: res.medkits,
+              morale: res.morale,
+              hull: res.hull,
+              rtg: res.rtg,
+            },
+            maxResources: {
+              oxygen: maxResources.oxygen,
+              water: maxResources.water,
+              rations: maxResources.rations,
+              power: maxResources.power,
+              morale: maxResources.morale,
+              hull: maxResources.hull,
+            },
+            pace: travel?.pace ?? "steady",
+            rationLevel: travel?.rationLevel ?? "filling",
+          }
+        : null;
+
     return {
       sol: pos?.sol ?? 1,
       distance: pos?.distance ?? 0,
@@ -973,6 +1051,8 @@ class Run {
       scoreMultiplier: e.get(Sponsor)?.scoreMultiplier ?? 1,
       pendingOutpost: this.pendingOutpost,
       pendingEncounter: this.pendingEncounter,
+      encounterFlags: [...this.runFlags],
+      coDriver: coDriverContext ? buildCoDriverSnapshot(this.coDriverId, coDriverContext) : null,
     };
   }
 }

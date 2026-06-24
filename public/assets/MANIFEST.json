@@ -1,7 +1,7 @@
 {
   "generatedFrom": "scripts/assets.manifest.json",
   "license": "PSX packs per source itch licenses (raw-assets/); audio CC0 (Kenney). See docs/ART-DIRECTION.md.",
-  "count": 20,
+  "count": 41,
   "assets": [
     {
       "path": "audio/music/ambient.mp3",
@@ -67,6 +67,111 @@
       "path": "audio/sfx/thruster.ogg",
       "bytes": 203314,
       "sha256": "e32cd53d5c868320e05d5f8c4c6153e7bc47eb91a7badcaef22b304d8f8bd367"
+    },
+    {
+      "path": "models/base/doorway_hr_1_wide.glb",
+      "bytes": 1706852,
+      "sha256": "37be2ac06a93db83f35df6afee9495693ac8360df5b9ef09f5ea0e3f7d5515e6"
+    },
+    {
+      "path": "models/base/electrical_equipment_1.glb",
+      "bytes": 250756,
+      "sha256": "82626fa7561de299c527c5a8ed0f8700b55add4920067aa5d5d3eccf371679cc"
+    },
+    {
+      "path": "models/base/electrical_equipment_2.glb",
+      "bytes": 272388,
+      "sha256": "820b3c813ea98690fd91466183deec68aa165b5a3fbe09570ca617272a3b0a10"
+    },
+    {
+      "path": "models/base/floor_ceiling_hr_1.glb",
+      "bytes": 555956,
+      "sha256": "285f35505ddb5d6b464073920949a305fac2a656588d2a174d840b2dc0aad70b"
+    },
+    {
+      "path": "models/base/floor_ceiling_hr_5.glb",
+      "bytes": 574848,
+      "sha256": "6600bfddbc8dfdf9e9f23f7c200e692f4257862674bd1f8e34b812e6f7c1124a"
+    },
+    {
+      "path": "models/base/garage_door_frame_hr_1.glb",
+      "bytes": 1596592,
+      "sha256": "170d2c0cd5bf9070844eedb16d7aac7d6a066f1d4d4c3e8aeeef3786d388a3f6"
+    },
+    {
+      "path": "models/base/lamp_mx_1_a_on.glb",
+      "bytes": 864792,
+      "sha256": "1003232aae6f4b2fb6c0a6521ebdb87d604cc3a671ca2eb0028cd59ffb27c336"
+    },
+    {
+      "path": "models/base/metal_barrel_hr_1.glb",
+      "bytes": 417912,
+      "sha256": "bbfde694c66eb3f5ea57dc837990ca4d57ab88de21a3e30636b79a008a0da9af"
+    },
+    {
+      "path": "models/base/platform_b_handrail_1.glb",
+      "bytes": 83632,
+      "sha256": "f78623ce7c7f6959bf712e2e57036dd8971212c57d90242503766be591d99793"
+    },
+    {
+      "path": "models/base/platform_large_mx_1.glb",
+      "bytes": 509492,
+      "sha256": "a9149e503a8f083d83ae6aff35af84de52bf8ce3c996ff27385a2b46a7127dee"
+    },
+    {
+      "path": "models/base/ramp_platform_wide_mx_1.glb",
+      "bytes": 509284,
+      "sha256": "49cf7d1d12568853f0209feb174fede813700590c2d9ed0bd8658bdccb20b043"
+    },
+    {
+      "path": "models/base/roof_hr_3_middle_angle.glb",
+      "bytes": 250428,
+      "sha256": "81ecf2bba123c08c810af81e587931c4e272fea569bfbb0dbc80d55c58bfb625"
+    },
+    {
+      "path": "models/base/roof_hr_3_side_1_angle.glb",
+      "bytes": 190188,
+      "sha256": "5e76b8612c63b0e12f88107e91e98de17cd60b14776e05ded94ba787d033fd83"
+    },
+    {
+      "path": "models/base/shelf_mx_1.glb",
+      "bytes": 617080,
+      "sha256": "5d66c290010f2aa1f6ba70bf9ed225b30f181bfd7704c34192d7a785a7120d2a"
+    },
+    {
+      "path": "models/base/storage_tank_mx_1.glb",
+      "bytes": 812852,
+      "sha256": "44c5790a1f3a4ae887e73e8fbde8afb672a5252e1a25a06ce88dc3551efa1cd4"
+    },
+    {
+      "path": "models/base/tank_system_mx_1.glb",
+      "bytes": 282728,
+      "sha256": "1f63766457d4b76d58743e76f1b4ea303f6bd38073351ef0242fd5b1a0b909f1"
+    },
+    {
+      "path": "models/base/test_machine_mx_1.glb",
+      "bytes": 154544,
+      "sha256": "bf30769ffdcd088268dd5d55ad91f8d0dc9ee181b7acaffd895e4cf709e1946c"
+    },
+    {
+      "path": "models/base/wall_hr_1_double.glb",
+      "bytes": 994344,
+      "sha256": "e03ae13442fec95a683a1531e4bf911ddc8b97f1dd26a66fd24a5353d7fcd958"
+    },
+    {
+      "path": "models/base/wall_hr_1_hole_2.glb",
+      "bytes": 1596548,
+      "sha256": "870af78288dc18dc97a8fd9372b884549f17bb0397de94f3c95d0f5510512bd3"
+    },
+    {
+      "path": "models/base/wall_top_part_hr_1.glb",
+      "bytes": 994248,
+      "sha256": "47710f189a7c806a537b2afad3869ae68a25953628db2f44199a8cbb8da583a9"
+    },
+    {
+      "path": "models/base/wooden_crate_2_a.glb",
+      "bytes": 184816,
+      "sha256": "ec4fb803a5229fd938436fef6a7c8488e70100396fd8992587c579c457d9ea4e"
     },
     {
       "path": "models/crew/astronaut.glb",

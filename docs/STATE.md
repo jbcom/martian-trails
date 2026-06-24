@@ -33,20 +33,47 @@ Traverse → EVA Prospecting → outpost stops → terminus / game-over.**
   Traverse** (river-crossing analog: 5 hazards, read gauge, seeded outcomes), **EVA Prospecting**
   (hunting analog: O₂-clock scan/drill minigame), outpost dock (GenAI colonist news, rest,
   resupply), terminus (UNOMA score) + typed game-over.
-- **M6 — Polish** (this branch, `feat/m6-polish`): state-reactive howler audio; **responsive
-  phone/tablet/unfolded-foldable** (verified all 3 in Safari); juice (screen transitions, camera
+- **M6 — Polish** (#6): state-reactive howler audio; **responsive
+  phone/tablet/unfolded-foldable** (verified all 3 with browser-visible artifacts); juice (screen transitions, camera
   shake, critical-alarm overlay, dust-storm VFX, haptics, preload); the POC's dust-storm weather
   gap finally wired.
+- **M7 — Production hardening** (#7): all four generated crew portraits, save/continue with
+  Hall of Records, expanded 24-event pool, richer music context, visual-sweep e2e, and
+  browser-visible save/resume proof.
+
+## In progress — Milestone 8 diegetic encounters
+Local branch: `feat/m8-encounters`.
+
+- **M8 research**: `docs/ENCOUNTERS.md` synthesizes yuka, sibling dialogue/NPC architecture,
+  and MECC Trail lineage into the build spec.
+- **M8-1 Encounter engine + Trader slice**: content-driven encounter banks, pure resolver,
+  yuka `Vehicle`/`Arrive` NPC brain, encounter trait/save data, EncounterScene/Panel, and
+  seeded trail trader encounters.
+- **M8-2 Depot social hub**: Underhill now renders as an enclosed 3DPSX modular base, not a
+  panel-first depot. The reusable `BaseInteriorScene` shell slots rover, terminal, NPC, and cargo
+  placements for Underhill, outpost forts, and the Korolev finale. Okonkwo/Reyes resolve encounter
+  banks from station interactions before departure; choices set encounter flags and can focus the
+  provisioning manifest. Flags carry into the run controller on departure.
 
 ### Art / content
 3D-PSX side-view (Kenney/pixel rejected). Real curated PSX assets (astronaut, machinery, rocks,
-hangar) + the meshy rover; **zero procedural/placeholder geometry**. GenAI: 12 trail events,
-crew portraits, outpost lore — all real, validated content.
+modular base kit) + the meshy rover; **zero procedural/placeholder geometry**. GenAI: 24 trail
+events, crew portraits, NPC portraits, outpost lore — all real, validated content.
 
 ## Verification
-Gates green: `check` (tsc), `lint`, `test` 238, `test:browser` 23, `build`, `cap:sync`. The full
-loop + every screen verified in Safari at phone/tablet/foldable.
+Current local M8 proof: `pnpm check`, `pnpm lint`, `pnpm test` (295), `pnpm test:browser` (36),
+`pnpm build`, `pnpm e2e`, `pnpm e2e:visual`. Vitest browser captures the isolated
+`BaseInteriorScene` matrix to `artifacts/base-interior/*.png`; Playwright visual sweep captures
+app-flow frames under `artifacts/sweep/*.png`, including `depot-codriver-*` and
+`travel-codriver-*` for phone/tablet/foldable profiles. Screenshot review read the final
+Underhill recruit berth, travel co-driver HUD, outpost base shell, and base-interior captures:
+no bottom void leak, no clipped co-driver portraits, and the phone berth shows all three recruits
+without scrolling. M8-4 adds validated veteran/liaison advice pairs for every outpost; selecting
+one advisor applies a route-prep resource patch and persists the selected `flag:advice:*`. M8-5
+expands the seeded trail encounter pool from trader-only to trader, stranded hauler, scavenger,
+and rival expedition roadside NPCs; each new bank has effect-bearing choices and decline paths,
+and the existing in-scene Encounter trait still handles halt/respond/resume.
 
 ## Next
-M6 PR → merge → live. Remaining: definition-of-done (APK build verification), then the game is
-fully shipped. Future polish rides on the same structure.
+M8 final review/PR. M8-6 GOAP event director and M8-7 fuzzy NPC mood remain gated polish unless
+playtesting shows the current seeded encounter/event pacing is too flat.

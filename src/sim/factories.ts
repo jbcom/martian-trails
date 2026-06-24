@@ -38,6 +38,8 @@ export interface Loadout {
   upgrades: string[];
   /** The chosen sponsor's terminus score multiplier (UNOMA=×1, leaner sponsors more). */
   scoreMultiplier?: number;
+  /** The recruited co-driver id, chosen before provisioning at the depot. */
+  coDriverId?: string;
   pace?: string;
   rationLevel?: string;
 }

@@ -10,6 +10,17 @@ const headless = process.env.VITEST_BROWSER_HEADLESS === "false" ? false : !!pro
 
 export default defineConfig({
   plugins: [react()],
+  define: {
+    __WORKSPACE_ROOT__: JSON.stringify(__dirname),
+  },
+  optimizeDeps: {
+    include: [
+      "@capacitor/core",
+      "@capacitor/device",
+      "@capacitor/haptics",
+      "@capacitor/preferences",
+    ],
+  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

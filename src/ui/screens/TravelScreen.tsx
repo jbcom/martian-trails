@@ -5,6 +5,7 @@ import { type RunSnapshot, run } from "@/sim/run";
 import { useGameStore } from "@/state/store";
 import { Gauge } from "@/ui/components/Gauge";
 import { GlassPanel } from "@/ui/components/GlassPanel";
+import { NpcPortrait } from "@/ui/components/NpcPortrait";
 import { useRun } from "@/ui/useRun";
 
 /** Portrait URL for a crew id (BASE_URL-aware so it resolves under Pages/Capacitor). */
@@ -65,7 +66,7 @@ function blockLabel(blocked: "dead" | "cooldown" | "afford" | null, cooldown: nu
 function CrewPanel({ crew }: { crew: RunSnapshot["crew"] }) {
   return (
     <GlassPanel
-      className="pointer-events-auto flex w-full flex-col gap-2 p-3 md:w-72"
+      className="pointer-events-auto flex w-full min-w-0 flex-col gap-2 p-3 md:w-72"
       motionProps={{ initial: { y: 16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}
     >
       <p className="font-display text-[0.6rem] uppercase tracking-[0.2em] text-mars-sand/60">
@@ -119,6 +120,29 @@ function CrewPanel({ crew }: { crew: RunSnapshot["crew"] }) {
   );
 }
 
+function CoDriverPanel({ coDriver }: { coDriver: NonNullable<RunSnapshot["coDriver"]> }) {
+  return (
+    <GlassPanel
+      className="pointer-events-auto flex w-full min-w-0 items-center gap-3 p-3 md:w-72"
+      motionProps={{ initial: { y: 16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}
+    >
+      <NpcPortrait portrait={coDriver.portrait} name={coDriver.name} />
+      <div className="min-w-0 flex-1">
+        <p className="font-display text-[0.6rem] uppercase tracking-[0.2em] text-mars-sand/60">
+          Co-driver
+        </p>
+        <p className="truncate font-display text-[0.78rem] tracking-wide text-mars-sand">
+          {coDriver.name}
+          <span className="text-mars-sand/45"> · {coDriver.role}</span>
+        </p>
+        <p className="mt-1 line-clamp-2 text-xs leading-snug text-mars-sand/75">
+          {coDriver.advice.text}
+        </p>
+      </div>
+    </GlassPanel>
+  );
+}
+
 /** Human-facing labels for the pace dial, with the design's Δ readout. */
 const PACE_OPTIONS = [
   { key: "steady", label: "Steady" },
@@ -155,7 +179,7 @@ function Segmented({
             type="button"
             title={hint?.(opt.key)}
             onClick={() => onPick(opt.key)}
-            className="min-h-[44px] flex-1 rounded border px-2 py-1.5 font-display text-[0.7rem] uppercase tracking-[0.12em] transition-colors"
+            className="min-h-[44px] min-w-0 flex-1 rounded border px-2 py-1.5 font-display text-[0.7rem] uppercase tracking-[0.12em] transition-colors"
             style={{
               borderColor: on ? "var(--color-mars-dust)" : "var(--color-ui-border)",
               color: on ? "var(--color-mars-dust)" : "var(--color-mars-sand)",
@@ -259,9 +283,12 @@ export function TravelScreen() {
 
       {/* Bottom cluster: vitals, crew, controls, log. */}
       <div className="flex flex-col gap-3 md:flex-row md:items-end">
-        <CrewPanel crew={snap.crew} />
+        <div className="flex w-full flex-col gap-3 md:w-72">
+          <CrewPanel crew={snap.crew} />
+          {snap.coDriver && <CoDriverPanel coDriver={snap.coDriver} />}
+        </div>
         <GlassPanel
-          className="pointer-events-auto grid flex-1 grid-cols-2 gap-x-4 gap-y-2 p-3 sm:grid-cols-3"
+          className="pointer-events-auto grid min-w-0 flex-1 grid-cols-2 gap-x-4 gap-y-2 p-3 sm:grid-cols-3"
           motionProps={{ initial: { y: 16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}
         >
           <Gauge label="O₂" value={res.oxygen} max={max.oxygen} />
@@ -273,7 +300,7 @@ export function TravelScreen() {
         </GlassPanel>
 
         <GlassPanel
-          className="pointer-events-auto flex w-full flex-col gap-2 p-3 md:w-72"
+          className="pointer-events-auto flex w-full min-w-0 flex-col gap-2 p-3 md:w-72"
           motionProps={{ initial: { y: 16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}
         >
           <div>

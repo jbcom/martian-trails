@@ -6,6 +6,7 @@
  */
 
 import { config } from "@/config";
+import { applyCoDriverLoadoutPatch } from "@/sim/coDriver";
 import type { Loadout } from "@/sim/factories";
 
 /** Quantity bought per store item id (kg for bulk, count otherwise). */
@@ -118,8 +119,9 @@ export function buildLoadout(
   cart: DepotState,
   upgrades: readonly string[] = [],
   scoreMultiplier = 1,
+  coDriverId?: string,
 ): Loadout {
-  return {
+  return applyCoDriverLoadoutPatch({
     oxygen: cart.oxygen ?? 0,
     water: cart.water ?? 0,
     rations: cart.rations ?? 0,
@@ -128,5 +130,6 @@ export function buildLoadout(
     rtg: Math.max(1, cart.rtg ?? 1),
     upgrades: [...upgrades],
     scoreMultiplier,
-  };
+    coDriverId,
+  });
 }

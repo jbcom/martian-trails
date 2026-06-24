@@ -9,7 +9,14 @@ function click(el: Element) {
   fireEvent.click(el);
 }
 
-// Real-browser tests of the M5 gameplay loop UI — the depot store + the travel HUD —
+function recruitDefaultCoDriver(
+  getByRole: (role: string, options: { name: RegExp }) => HTMLElement,
+) {
+  click(getByRole("button", { name: /recruit co-driver/i }));
+  click(getByRole("button", { name: /recruit okonkwo/i }));
+}
+
+// Real-browser tests of the M5 gameplay loop UI — the depot manifest terminal + the travel HUD —
 // over the live R3F canvas (WebGL needs a real browser; jsdom can't render Three).
 describe("M5 gameplay loop (real browser)", () => {
   let cleanup: (() => void) | undefined;
@@ -26,6 +33,11 @@ describe("M5 gameplay loop (real browser)", () => {
     expect(container.textContent).toContain("UNDERHILL DEPOT");
     // Missing-vitals warning shows on an empty cart.
     expect(container.textContent).toMatch(/will not survive/i);
+    expect(container.textContent).not.toContain("Liquid O2");
+
+    recruitDefaultCoDriver(getByRole);
+    click(getByRole("button", { name: /manifest terminal/i }));
+    expect(container.textContent).toContain("Liquid O2");
 
     // Buy each vital so the warning clears.
     click(getByRole("button", { name: /buy liquid o2/i }));
@@ -35,6 +47,12 @@ describe("M5 gameplay loop (real browser)", () => {
 
     // Credits readout reflects spend (no longer the full budget).
     expect(container.textContent).toContain("Payload");
+    // Touch targets: the ± buttons are >=44px square (h-11/w-11 = 44px).
+    const buyBtns = getAllByRole("button", { name: /^buy /i });
+    expect(buyBtns.length).toBeGreaterThan(0);
+
+    // Phone profile gives the open terminal the foreground; close it before departure.
+    click(getByRole("button", { name: /close manifest terminal/i }));
 
     // Depart builds the loadout, starts the run, and routes to travel.
     click(getByRole("button", { name: /clear airlock & depart/i }));
@@ -44,9 +62,6 @@ describe("M5 gameplay loop (real browser)", () => {
     expect(snap?.driving).toBe(true);
     // The bought bulk made it into the live sim.
     expect((snap?.resources as { oxygen: number }).oxygen).toBeGreaterThan(0);
-    // Touch targets: the ± buttons are ≥44px square (h-11/w-11 = 44px).
-    const buyBtns = getAllByRole("button", { name: /^buy /i });
-    expect(buyBtns.length).toBeGreaterThan(0);
   });
 
   it("travel HUD shows progress, vitals, and the drive control", async () => {
@@ -59,6 +74,7 @@ describe("M5 gameplay loop (real browser)", () => {
       medkits: 3,
       rtg: 2,
       upgrades: [],
+      coDriverId: "codriver:reyes",
     });
     run.setDriving(true);
     useGameStore.setState({ screen: "travel" });
@@ -78,6 +94,8 @@ describe("M5 gameplay loop (real browser)", () => {
     // Pace + ration dials.
     expect(container.textContent).toContain("Steady");
     expect(container.textContent).toContain("Bare Bones");
+    expect(container.textContent).toContain("Co-driver");
+    expect(container.textContent).toContain("Reyes");
 
     // The drive control halts the rover.
     const halt = getByRole("button", { name: /halt rover/i });
@@ -122,6 +140,9 @@ describe("M5 gameplay loop (real browser)", () => {
 
     // The sponsor budget is shown, not the default 25000.
     expect(container.textContent).toContain("18,000");
+    recruitDefaultCoDriver(getByRole);
+    click(getByRole("button", { name: /manifest terminal/i }));
+    click(getByRole("button", { name: /^upgrades$/i }));
     expect(container.textContent).toContain("Rover Upgrades");
 
     // Install an upgrade — its button flips to "Installed".

@@ -1,36 +1,10 @@
-import { useState } from "react";
 import { getNpc } from "@/content/encounters";
 import { tapLight } from "@/platform/haptics";
 import { run } from "@/sim/run";
 import { useGameStore } from "@/state/store";
 import { GlassPanel } from "@/ui/components/GlassPanel";
+import { NpcPortrait } from "@/ui/components/NpcPortrait";
 import { useRun } from "@/ui/useRun";
-
-/** Portrait URL for an NPC (same BASE_URL pattern as CrewPortrait). */
-function npcPortraitUrl(portrait: string): string {
-  return `${import.meta.env.BASE_URL}assets/generated/portraits/npc-${portrait}.png`;
-}
-
-/** NPC portrait with silhouette fallback — mirrors CrewPortrait in TravelScreen. */
-function NpcPortrait({ portrait, name }: { portrait: string; name: string }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-full border border-[var(--color-ui-border)] bg-black/40">
-      {failed ? (
-        <span className="font-display text-xl text-mars-sand/60" aria-hidden>
-          ◓
-        </span>
-      ) : (
-        <img
-          src={npcPortraitUrl(portrait)}
-          alt={name}
-          className="h-full w-full object-cover"
-          onError={() => setFailed(true)}
-        />
-      )}
-    </div>
-  );
-}
 
 /**
  * The encounter dialogue panel — surfaces the NPC's hail lines and the player's

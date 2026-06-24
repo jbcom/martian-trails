@@ -5,6 +5,7 @@ import {
   encounterBanksFileSchema,
   type MartianNpc,
   martianNpcsFileSchema,
+  type NpcLocation,
 } from "@/schemas/encounter";
 
 /**
@@ -44,4 +45,9 @@ export function getEncounterBank(id: string): EncounterBank | undefined {
 /** NPCs of a given archetype (e.g. all traders). */
 export function npcsByArchetype(archetype: MartianNpc["archetype"]): MartianNpc[] {
   return npcs.filter((n) => n.archetype === archetype);
+}
+
+/** NPCs surfaced at a named presentation location, such as the launch depot social hub. */
+export function npcsAtLocation(location: NpcLocation): MartianNpc[] {
+  return npcs.filter((n) => n.locations.includes(location));
 }

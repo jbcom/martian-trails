@@ -65,8 +65,28 @@ describe("Outpost Dock (real browser)", () => {
 
     expect(container.textContent).toContain(stop?.name ?? "");
     expect(container.textContent).toContain("Colonist News");
+    expect(container.textContent).toContain("Route Council");
+    expect(container.textContent).toContain("Veteran");
+    expect(container.textContent).toContain("Corporate Liaison");
     expect(container.textContent).toContain("Rest in Habitat");
     expect(container.textContent).toContain("Local Exchange");
+  });
+
+  it("lets the player adjudicate the veteran/liaison advice pair once", () => {
+    run.start("op-browser", LOADOUT);
+    const stop = driveToOutpost();
+    expect(stop).not.toBeNull();
+    useGameStore.setState({ screen: "outpost" });
+
+    const { container, getByRole, unmount } = render(<App />);
+    cleanup = unmount;
+
+    fireEvent.click(getByRole("button", { name: /follow veteran/i }));
+    expect(container.textContent).toContain("Advice logged");
+    expect(run.snapshot()?.encounterFlags).toContain("flag:advice:tharsis:veteran");
+    expect((getByRole("button", { name: /follow liaison/i }) as HTMLButtonElement).disabled).toBe(
+      true,
+    );
   });
 
   it("Back on the Trail leaves the outpost and resumes travel", async () => {

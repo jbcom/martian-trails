@@ -20,7 +20,11 @@ export const npcArchetypeSchema = z.enum([
   "roadwarden", // gatekeeper — checkpoint levy (Yukon NWMP)
   "liaison", // corporate advisor (Amazon Westerner)
   "veteran", // colonist advisor (Amazon native guide)
+  "rival", // another expedition — race/cooperate/rebuff
 ]);
+
+/** Where an NPC can be surfaced. Trail NPCs are encounter-roll candidates; depot NPCs are hub cast. */
+export const npcLocationSchema = z.enum(["depot", "trail", "outpost"]);
 
 /**
  * A Martian NPC definition — the identity + how it looks (feeds the Imagen portrait prompt) +
@@ -36,6 +40,8 @@ export const martianNpcSchema = z.object({
   portrait: z.string().optional(),
   /** Which encounter bank drives this NPC's conversation. */
   bank: z.string().regex(/^encbank:[a-z0-9-]+$/),
+  /** Presentation surfaces this NPC belongs to (content selects cast; UI only renders it). */
+  locations: z.array(npcLocationSchema).default(["trail"]),
   /** Approach speed (sim units/sec) the Vehicle steers at toward the rover dock. */
   approachSpeed: z.number().min(0.1).max(20).default(4),
   /** Range (sim units) at which the NPC notices the rover and begins its hail. */
@@ -104,6 +110,7 @@ export const martianNpcsFileSchema = z.array(martianNpcSchema);
 export const encounterBanksFileSchema = z.array(encounterBankSchema);
 
 export type NpcArchetype = z.infer<typeof npcArchetypeSchema>;
+export type NpcLocation = z.infer<typeof npcLocationSchema>;
 export type MartianNpc = z.infer<typeof martianNpcSchema>;
 export type EncounterWhen = z.infer<typeof encounterWhenSchema>;
 export type EncounterChoice = z.infer<typeof encounterChoiceSchema>;

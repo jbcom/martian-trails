@@ -108,6 +108,8 @@ export const runSaveSchema = z.object({
       .default(null),
     /** Run flags set by encounter choices (drives slot resolution). `.default([])` back-fills. */
     encounterFlags: z.array(z.string()).default([]),
+    /** Recruited co-driver id, selected before provisioning. `.default(null)` back-fills. */
+    coDriverId: z.string().nullable().default(null),
   }),
 });
 
