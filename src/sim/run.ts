@@ -27,9 +27,15 @@ import {
   type ScanHeat,
 } from "@/sim/eva";
 import { applyEffects } from "@/sim/event";
+import {
+  type DirectorResource,
+  type EventDirectorState,
+  pickDirectedEvent,
+} from "@/sim/eventDirector";
 import type { Loadout } from "@/sim/factories";
 import { spawnExpedition } from "@/sim/factories";
 import { type HazardResult, resolveHazard } from "@/sim/hazard";
+import { type NpcMoodState, pickMoodedNpc } from "@/sim/npcMood";
 import {
   type OutpostStop,
   resolveOutpostAdviceChoice,
@@ -839,7 +845,7 @@ class Run {
   private pickEvent(rng: Rng): TrailEvent | null {
     const pool = allEvents().filter((ev) => !this.seenEvents.has(ev.id));
     if (pool.length === 0) return null;
-    return rng.pick(pool);
+    return pickDirectedEvent(pool, this.buildEventDirectorState(), rng);
   }
 
   /**
@@ -864,7 +870,8 @@ class Run {
       if (solRng.chance(config.travel.encounterChance ?? 0.15)) {
         const trailNpcs = npcsAtLocation("trail");
         if (trailNpcs.length === 0) break;
-        const npc = solRng.pick(trailNpcs);
+        const npc = pickMoodedNpc(trailNpcs, this.buildNpcMoodState(s), solRng);
+        if (!npc) break;
         e.set(Encounter, { active: true, npcId: npc.id, npcX: 12, npcY: 0, npcZ: 0 });
         this.encounterHalted = true;
         this.driving = false;
@@ -935,6 +942,46 @@ class Run {
       if (res.hull < max.hull * LOW) lowResources.add("hull");
     }
     return { sol, flags: this.runFlags as ReadonlySet<string>, lowResources };
+  }
+
+  private buildDirectorResources() {
+    const e = this.entity;
+    const res = e?.get(Resources);
+    const max = e?.get(MaxResources);
+    const configMax = config.resources.max;
+    const resourceRatios: Partial<Record<DirectorResource, number>> = {};
+    const lowResources = new Set<DirectorResource>();
+    const add = (resource: DirectorResource, value: number, cap: number, low = 0.25) => {
+      const ratio = cap > 0 ? Math.max(0, value / cap) : 0;
+      resourceRatios[resource] = ratio;
+      if (ratio < low) lowResources.add(resource);
+    };
+
+    if (res) {
+      add("oxygen", res.oxygen, max?.oxygen ?? configMax.oxygen);
+      add("water", res.water, max?.water ?? configMax.water);
+      add("rations", res.rations, max?.rations ?? configMax.rations);
+      add("power", res.power, max?.power ?? configMax.power);
+      add("morale", res.morale, max?.morale ?? configMax.morale);
+      add("hull", res.hull, max?.hull ?? configMax.hull);
+      add("parts", res.parts, 12, 0.3);
+      add("medkits", res.medkits, 4, 0.25);
+    }
+
+    return { lowResources, resourceRatios };
+  }
+
+  private buildEventDirectorState(): EventDirectorState {
+    const sol = this.entity?.get(Position)?.sol ?? this.lastEventSol;
+    return {
+      ...this.buildDirectorResources(),
+      sol,
+      daysSinceEvent: Math.max(1, sol - this.lastEventSol),
+    };
+  }
+
+  private buildNpcMoodState(sol: number): NpcMoodState {
+    return { ...this.buildDirectorResources(), sol };
   }
 
   /** Mirror the entity's authoritative state into the frame-cadence bridge. */

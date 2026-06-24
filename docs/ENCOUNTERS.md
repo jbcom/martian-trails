@@ -87,10 +87,10 @@ Copy `a-good-old-fashioned-adventure/src/sim/systems/unitAI.ts` into a new
 `src/sim/systems/encounterAI.ts`. Per-NPC brain cached in `WeakMap<World, Map<Entity, NpcBrain>>`,
 ticked at `FIXED_DT`:
 
-- **Goal arbitration** — yuka `Think` + `GoalEvaluator[]`; each archetype intent
-  (Trade / Beg / Warn / Raid) is an evaluator scoring `calculateDesirability(runState, npc)` from
-  sim traits + a forked seeded stream (`rng.fork('encounter:'+sol)`). Optional fuzzy mood (#5)
-  smooths the scores later.
+- **Goal arbitration** — each archetype intent (Trade / Beg / Warn / Raid) is scored from
+  sim traits + a forked seeded stream (`rng.fork('encounter:'+sol)`). M8-7's fuzzy mood
+  variables now feed roadside NPC selection before the yuka steering brain presents the chosen
+  NPC in scene.
 - **Steering** — yuka `Vehicle` + `ArriveBehavior` (clean decel at the dock offset),
   `SeekBehavior`/`OffsetPursuit` (approach), `FleeBehavior`/`EvadeBehavior` (depart/flee-if-rebuffed),
   `SeparationBehavior` (packs don't overlap). **Only these pure behaviors — never `WanderBehavior`.**
@@ -244,10 +244,13 @@ slice reuses. Order:
 5. **m8-5 Mid-trail roadside encounters** — stranded crew / scavenger / rival spawn during travel, halt the rover,
    `EncounterPanel` over `TravelScene`, choices apply effects, then `run.setDriving(true)` resumes.
    Implemented as additional trail-located NPC content plus a location-based encounter pool.
-6. **m8-6 GOAP event director** *(optional, gated behind playtests)* — replace the uniform random event roll with
-   `Think`+`GoalEvaluator` desirability scoring for dramatically-shaped pacing; pure logic, seeded tie-break.
-7. **m8-7 Fuzzy NPC mood** *(polish)* — trader greed / beggar desperation / raider aggression as fuzzy variables
-   feeding the goal scores. Only after m8-1 lands.
+6. **m8-6 Event director** — replace the uniform "which event?" pick with pure desirability
+   scoring (`src/sim/eventDirector.ts`). Frequency still comes from the seeded pace chance, but
+   the selected event now follows live run pressure: supply caches when vitals are thin,
+   mechanical beats when hull/parts are poor, crew conflict when morale is brittle, and so on.
+7. **m8-7 Fuzzy NPC mood** — trader greed / stranded desperation / scavenger aggression now
+   feed the roadside NPC score (`src/sim/npcMood.ts`) using the authored `goalWeights` in
+   NPC content. Same seed + same run state still selects the same NPC.
 
 Each slice: Docs→Tests→Code, determinism test, browser-visible screenshot review, forward commit,
 pipelined review. Prefer Vitest browser / Playwright / integrated browser artifacts; use an external

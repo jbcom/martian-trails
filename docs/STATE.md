@@ -40,20 +40,14 @@ Traverse → EVA Prospecting → outpost stops → terminus / game-over.**
 - **M7 — Production hardening** (#7): all four generated crew portraits, save/continue with
   Hall of Records, expanded 24-event pool, richer music context, visual-sweep e2e, and
   browser-visible save/resume proof.
-
-## In progress — Milestone 8 diegetic encounters
-Local branch: `feat/m8-encounters`.
-
-- **M8 research**: `docs/ENCOUNTERS.md` synthesizes yuka, sibling dialogue/NPC architecture,
-  and MECC Trail lineage into the build spec.
-- **M8-1 Encounter engine + Trader slice**: content-driven encounter banks, pure resolver,
-  yuka `Vehicle`/`Arrive` NPC brain, encounter trait/save data, EncounterScene/Panel, and
-  seeded trail trader encounters.
-- **M8-2 Depot social hub**: Underhill now renders as an enclosed 3DPSX modular base, not a
-  panel-first depot. The reusable `BaseInteriorScene` shell slots rover, terminal, NPC, and cargo
-  placements for Underhill, outpost forts, and the Korolev finale. Okonkwo/Reyes resolve encounter
-  banks from station interactions before departure; choices set encounter flags and can focus the
-  provisioning manifest. Flags carry into the run controller on departure.
+- **M8 — Diegetic encounters + NPCs** (#8): reusable slotted 3DPSX `BaseInteriorScene`,
+  encounter engine + yuka steering slice, Underhill depot social hub, recruitable fallible
+  co-driver, outpost veteran/liaison advice pairs, and roadside trader/stranded/scavenger/rival
+  encounters. Squash-merged into `main` as `3706474`.
+- **M9 — Final closeout** (#9): post-M8 Release/CD proof for `main@3706474`; M8-6 event
+  director (`src/sim/eventDirector.ts`) replacing uniform event selection with live-pressure
+  desirability scoring; M8-7 NPC mood (`src/sim/npcMood.ts`) adding bounded greed, desperation,
+  and aggression to roadside NPC selection while preserving same-seed determinism.
 
 ### Art / content
 3D-PSX side-view (Kenney/pixel rejected). Real curated PSX assets (astronaut, machinery, rocks,
@@ -61,8 +55,9 @@ modular base kit) + the meshy rover; **zero procedural/placeholder geometry**. G
 events, crew portraits, NPC portraits, outpost lore — all real, validated content.
 
 ## Verification
-Current local M8 proof: `pnpm check`, `pnpm lint`, `pnpm test` (295), `pnpm test:browser` (36),
-`pnpm build`, `pnpm e2e`, `pnpm e2e:visual`. Vitest browser captures the isolated
+Current local proof: `pnpm check`, `pnpm lint`, `pnpm test` (302), `pnpm test:browser` (36),
+`pnpm build`, `pnpm e2e`, `pnpm e2e:visual`; M9 adds focused unit proof for
+`eventDirector` and `npcMood`. Vitest browser captures the isolated
 `BaseInteriorScene` matrix to `artifacts/base-interior/*.png`; Playwright visual sweep captures
 app-flow frames under `artifacts/sweep/*.png`, including `depot-codriver-*` and
 `travel-codriver-*` for phone/tablet/foldable profiles. Screenshot review read the final
@@ -74,6 +69,5 @@ expands the seeded trail encounter pool from trader-only to trader, stranded hau
 and rival expedition roadside NPCs; each new bank has effect-bearing choices and decline paths,
 and the existing in-scene Encounter trait still handles halt/respond/resume.
 
-## Next
-M8 final review/PR. M8-6 GOAP event director and M8-7 fuzzy NPC mood remain gated polish unless
-playtesting shows the current seeded encounter/event pacing is too flat.
+## Queue
+The continuous directive queue is closed through M9.
