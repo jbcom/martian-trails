@@ -1,40 +1,52 @@
 ---
 title: State
-updated: 2026-06-23
+updated: 2026-06-24
 status: current
 domain: context
 ---
 
 # Martian Trail — Current State
 
-Round-by-round reality of what's shipped. (The plan/queue is `.agent-state/directive.md`.)
+What's shipped. (The plan/queue is `.agent-state/directive.md`.)
 
-## Shipped
-- **Foundation (M1):** Martian Trail branding; Vite `base` handling (Pages/Capacitor);
-  Capacitor 8 Android platform (committed `android/`, `cap:sync` green); three-workflow CI
-  (`ci`→`release`→`cd`, SHA-pinned, Node 22, real Pages deploy); full doc set.
-- **Stack pivot:** dropped Svelte + PixiJS for the house dialect — **React 19 +
-  @react-three/fiber + drei + @react-three/postprocessing + framer-motion + Three.js
-  (ortho side-view 3D) + Tailwind v4**, all on latest (Vite 8, Vitest 4, Cap 8, TS 6, Biome 2).
-  Dead POC source removed; a minimal R3F boot shell renders (verified in Safari). All gates
-  green: check (tsc), lint, test, build.
-- **Docs:** `README`, `AGENTS`, `STANDARDS`, `CHANGELOG`, `docs/{ARCHITECTURE,GAME-DESIGN,
-  ART-DIRECTION,STATE,TESTING,DEPLOYMENT}`.
+## Shipped — Martian Trail is a complete, playable game, live on the web
+**https://jonbogaty.com/martian-trails/** (auto-deployed from `main` via `cd.yml`).
 
-## Decisions locked
-- Render: Three.js ortho side-view 3D GLB (not Pixi/2D). Art: 3DLowPoly Kenney "Space" family.
-- UI: React + full R3F ecosystem (not Svelte). State: zustand (UI) + plain-object frame bridge.
+The full Oregon-Trail-equivalent loop plays end to end, with Martian equivalents:
+**boot → sponsor/difficulty select → provisioning depot → travel → trail events → Hazard
+Traverse → EVA Prospecting → outpost stops → terminus / game-over.**
 
-## In flight
-- M2 (design system/tokens) then M3 (architecture decomposition): build out
-  `src/{core,engine,sim,render,state,content,config,…}` with koota + the production libs, on
-  the R3F shell. The POC mechanics are ported from the frozen `red_mars_the_ares_trail.html`
-  + git history into the new pure `src/sim`.
+### Milestones (all merged to main)
+- **M1 — Foundation** (#1): Martian Trail branding; Vite `base` (Pages/Capacitor); Capacitor 8
+  Android; three-workflow CI (`ci`→`release`→`cd`, SHA-pinned, real Pages deploy); full doc set.
+  Stack pivot to the house dialect: **React 19 + R3F + drei + @react-three/postprocessing +
+  framer-motion + Three.js (ortho side-3D) + Tailwind v4**, all latest (Vite 8, Vitest 4, Cap 8,
+  TS 6, Biome 2).
+- **M2 — Design system** (#3): Mars-palette tokens (`tokens.{css,ts}` + sync test), self-hosted
+  Rajdhani/Inter/JetBrains Mono fonts, `docs/DESIGN-SYSTEM.md`.
+- **M3 — Architecture** (#4): `src/{core,engine,sim,render,state,content,config,audio,platform,
+  schemas,ui}`. Pure seeded sim (koota traits/systems/tick, config-as-data + zod), fixed-timestep
+  engine, zustand store + frame-cadence diagnostics bridge, howler audio, R3F PSX scenes. Real
+  itch PSX pipeline + GenAI (Gemini events/portraits) + a **meshy-generated Mars rover**.
+- **M5 — The playable loop** (#5): sponsor select (budget+score multiplier), provisioning store
+  (budget hard-gated), travel HUD (pace/rations/crew abilities), GenAI trail events, **Hazard
+  Traverse** (river-crossing analog: 5 hazards, read gauge, seeded outcomes), **EVA Prospecting**
+  (hunting analog: O₂-clock scan/drill minigame), outpost dock (GenAI colonist news, rest,
+  resupply), terminus (UNOMA score) + typed game-over.
+- **M6 — Polish** (this branch, `feat/m6-polish`): state-reactive howler audio; **responsive
+  phone/tablet/unfolded-foldable** (verified all 3 in Safari); juice (screen transitions, camera
+  shake, critical-alarm overlay, dust-storm VFX, haptics, preload); the POC's dust-storm weather
+  gap finally wired.
 
-## Known gaps (the build backlog, per directive)
-- No gameplay yet beyond the boot shell — depot/travel/hazard/eva/outpost/terminus, sponsor
-  select, save, typed illness, Hazard Traverse, EVA Prospecting all built in M5 on the M3
-  structure. Real art replaces the placeholder scene in M6.
+### Art / content
+3D-PSX side-view (Kenney/pixel rejected). Real curated PSX assets (astronaut, machinery, rocks,
+hangar) + the meshy rover; **zero procedural/placeholder geometry**. GenAI: 12 trail events,
+crew portraits, outpost lore — all real, validated content.
+
+## Verification
+Gates green: `check` (tsc), `lint`, `test` 238, `test:browser` 23, `build`, `cap:sync`. The full
+loop + every screen verified in Safari at phone/tablet/foldable.
 
 ## Next
-M2 design system/tokens → M3 decomposition (the foundation for the loop).
+M6 PR → merge → live. Remaining: definition-of-done (APK build verification), then the game is
+fully shipped. Future polish rides on the same structure.

@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import { audio } from "@/audio/engine";
 import { config } from "@/config";
 import { getSponsor } from "@/content/sponsors";
+import { tapLight } from "@/platform/haptics";
 import {
   adjust,
   buildLoadout,
@@ -162,6 +163,7 @@ export function DepotScreen() {
 
   function depart() {
     if (!canDepart) return;
+    void tapLight();
     audio.unlock();
     run.start(
       seed ?? `ares-${Date.now().toString(36)}`,
@@ -172,9 +174,9 @@ export function DepotScreen() {
   }
 
   return (
-    <div className="grid h-full grid-cols-1 md:grid-cols-[minmax(0,460px)_1fr]">
+    <div className="grid h-full grid-cols-1 tablet:grid-cols-[minmax(0,520px)_1fr] foldable:grid-cols-[minmax(0,620px)_1fr]">
       <GlassPanel
-        className="pointer-events-auto m-3 flex flex-col p-5 pt-[max(1.25rem,env(safe-area-inset-top))] pb-[max(1.25rem,env(safe-area-inset-bottom))]"
+        className="pointer-events-auto m-3 flex flex-col p-5 pt-[max(1.25rem,env(safe-area-inset-top))] pr-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pl-[max(1.25rem,env(safe-area-inset-left))]"
         motionProps={{
           initial: { x: -24, opacity: 0 },
           animate: { x: 0, opacity: 1 },
@@ -214,31 +216,39 @@ export function DepotScreen() {
           </div>
         </div>
 
-        {/* The store + rover upgrades — driven entirely by config. */}
+        {/* The store + rover upgrades — driven entirely by config. Two-column store on
+            tablet/foldable (the panel is wide enough there); single-column on phone. */}
         <div className="mt-4 flex-1 overflow-y-auto">
-          {config.store.items.map((item) => (
-            <StoreRow
-              key={item.id}
-              itemId={item.id}
-              cart={cart}
-              budget={budget}
-              onAdjust={(dir) => setCart((c) => adjust(c, item.id, dir, budget))}
-            />
-          ))}
+          <div className="grid grid-cols-1 gap-x-5 foldable:grid-cols-2">
+            {config.store.items.map((item) => (
+              <StoreRow
+                key={item.id}
+                itemId={item.id}
+                cart={cart}
+                budget={budget}
+                onAdjust={(dir) => {
+                  if (dir === 1) void tapLight();
+                  setCart((c) => adjust(c, item.id, dir, budget));
+                }}
+              />
+            ))}
+          </div>
 
           <p className="mt-4 mb-1 font-display text-[0.6rem] uppercase tracking-[0.25em] text-mars-dust">
             Rover Upgrades
           </p>
-          {config.upgrades.catalog.map((upg) => (
-            <UpgradeRow
-              key={upg.id}
-              upgradeId={upg.id}
-              cart={cart}
-              selected={upgrades}
-              budget={budget}
-              onToggle={() => toggleUpgrade(upg.id)}
-            />
-          ))}
+          <div className="grid grid-cols-1 gap-x-5 foldable:grid-cols-2">
+            {config.upgrades.catalog.map((upg) => (
+              <UpgradeRow
+                key={upg.id}
+                upgradeId={upg.id}
+                cart={cart}
+                selected={upgrades}
+                budget={budget}
+                onToggle={() => toggleUpgrade(upg.id)}
+              />
+            ))}
+          </div>
         </div>
 
         {missing.length > 0 && (

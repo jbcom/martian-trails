@@ -1,5 +1,7 @@
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import { config } from "@/config";
+import { tapHeavy } from "@/platform/haptics";
 import { run } from "@/sim/run";
 import { useGameStore } from "@/state/store";
 import { GlassPanel } from "@/ui/components/GlassPanel";
@@ -21,8 +23,13 @@ export function GameOverScreen() {
   const lost = snap?.crew.filter((c) => !c.alive) ?? [];
   const survivors = snap?.crew.filter((c) => c.alive) ?? [];
 
+  // The heavy "death" buzz on landing here (settings-gated; no-op on web).
+  useEffect(() => {
+    void tapHeavy();
+  }, []);
+
   return (
-    <div className="grid h-full place-items-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
+    <div className="grid h-full place-items-center p-4 pt-[max(1rem,env(safe-area-inset-top))] pr-[max(1rem,env(safe-area-inset-right))] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[max(1rem,env(safe-area-inset-left))]">
       <GlassPanel
         className="w-full max-w-md p-6"
         motionProps={{

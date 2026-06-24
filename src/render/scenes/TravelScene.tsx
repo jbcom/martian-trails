@@ -1,6 +1,7 @@
 import { useFrame } from "@react-three/fiber";
 import { Suspense, useRef } from "react";
 import type { Group } from "three";
+import { DustStorm } from "@/render/assets/DustStorm";
 import { Ground } from "@/render/assets/Ground";
 import { Model } from "@/render/assets/Model";
 import { MODELS } from "@/render/assets/models";
@@ -50,6 +51,8 @@ export function TravelScene() {
       <Sky />
       <Ground scroll />
       <DrivingRover />
+      {/* Dust-storm weather VFX — self-gates on diagnostics.weather; idle when clear. */}
+      <DustStorm />
     </Suspense>
   );
 }

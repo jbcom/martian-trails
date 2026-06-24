@@ -75,6 +75,22 @@ export const travelSchema = z.object({
 });
 export type TravelConfig = z.infer<typeof travelSchema>;
 
+/**
+ * weather.json — the dust-storm state machine (the POC's storm the scaffold never wired).
+ * A clear Sol can KICK UP a storm; an active storm can BLOW OVER — both as per-Sol seeded
+ * rolls past a minimum distance. The storm drives the power cold-snap + reduced recharge
+ * (src/sim/systems/power.ts) and the render dust overlay (via the diagnostics bridge).
+ */
+export const weatherSchema = z.object({
+  /** Distance below which the weather never changes (parallels terrain.zoneChangeMinDistance). */
+  onsetMinDistance: nonNegative,
+  /** Per-Sol chance a clear Sol turns into a dust storm. */
+  stormChance: z.number().min(0).max(1),
+  /** Per-Sol chance an active dust storm blows over and clears. */
+  clearChance: z.number().min(0).max(1),
+});
+export type WeatherConfig = z.infer<typeof weatherSchema>;
+
 /** crew.json — the four named colonists + their passive trait modifiers. */
 export const crewMemberSchema = z.object({
   id: z.string().min(1),

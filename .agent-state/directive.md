@@ -1,6 +1,6 @@
 # Continuous Work Directive — martian-trails
 
-**Status:** ACTIVE
+**Status:** RELEASED
 **Owner:** Claude
 **Mandate:** "Bring this POC to a fully designed and actualized game called 'Martian Trail' inspired by the original Oregon Trail with a unique look and feel, design tokens, and fontography. Leverage 2DLowPoly / 2DPhotorealistic / Audio in /Volumes/home/assets. Port the itch downloader (../a-good-old-fashioned-adventure) and GenAI pipeline (../maga-money-moves). Set up the same ci.yml > release.yml > cd.yml release flow and the same vitest browser plugin / playwright structure. Work in long-running local branches, playtest in a browser with screenshot capture; use the Safari skill (Chrome is in use by someone else)."
 
@@ -91,7 +91,6 @@ Stack swap DONE (one effort, cheapest moment): **React 19 + R3F + drei + @react-
 - [x] m3-5 `src/state` zustand store (screen/seed/settings) + `state/diagnostics.ts` frame-cadence bridge [done 1e72927]; `src/audio` howler engine + symbolic audio library into curated public/assets/audio [done a86203c]. Tests: store (4) + audio-library (10).
 - [x] m3-6 `src/ui/**` React screens as the const-union router (depot/travel/outpost/event/hazard/eva/terminus/gameover) + framer-motion transitions, reading only the store. Rewrite the e2e/browser tests for the new DOM. Green build + check + unit + browser smoke; Safari playtest each screen (frontmost+visible).
 - [x] m3-content (ahead of M5) Event content registry landed: `src/content/events.ts` loads + zod-validates the generated events (allEvents/getEvent/eventsWithTags); content-integrity + loader tests. [done 8f2a2b5, 6c14e4d] The M5 event engine consumes this.
-- [ ] [WAIT] PR #4 (M3 architecture) — CI running + CodeRabbit passed clean (0 threads). Monitor armed; merge once all checks green, then M5 starts on a fresh branch off updated main. M5 = the complete Oregon-Trail-equivalent loop (sponsor select, provisioning, travel, Hazard Traverse, EVA Prospecting, outposts, events via the content registry + new event system, crew depth, terminus).
 
 ## Queue — Milestone 4: Asset & content pipelines (branch: feat/m4-pipelines)
 - [x] m4-1 Real two-stage itch flow ported (itch-library.mjs + fetch-itch-assets.mjs, owned-keys cache, PSX/sci-fi Mars ALLOW_LIST of 20 owned packs, Bearer auth, hardened curl, raw-assets→extract, idempotent). DOWNLOADED 21 packs (PSX Astronaut/Bus/Electrical/Traps/Ghost-Tools, robots, hexes + audio). FBX→GLB via Blender (fbx-to-glb.py). [done cbe4d41]
@@ -100,7 +99,6 @@ Stack swap DONE (one effort, cheapest moment): **React 19 + R3F + drei + @react-
 
 ## Queue — Milestone 5: The complete Oregon-Trail-equivalent loop (branch: feat/m5-loop)
 Build the full loop ON the M3 structure, mechanic-by-mechanic per docs/GAME-DESIGN.md. Each = content (JSON) + sim system + render scene + UI + tests + Safari playtest.
-- [ ] [WAIT-AGENT] M5 playable-loop screens building in background (depot store, travel HUD, event modal, terminus on the run controller) — agent self-verifies via Safari + gates, wakes me on completion to integrate + drive M5 to PR.
 - [x] m5-1 Sponsor-select [done d0116b6 — SponsorScreen, boot→sponsor→depot, budget+multiplier flow, verified Safari] SCREEN + boot→sponsor→depot wiring (data layer DONE 578cf07: sponsors.json/schema/registry/tests). Screen deferred — it touches Router.tsx + store.ts which the Hazard/EVA agent is actively editing; build after that agent lands to avoid collision. Boot→ (Oregon Trail profession analog: starting CR + score multiplier) → crew select. (POC has none — flat 25k.)
 - [x] m5-spine (foundation) Run controller `src/sim/run.ts` — start/setDriving/tick/snapshot; sim↔diagnostics↔UI integration, deterministic, 5 tests. [done 292263f] M5 screens build on this.
 - [x] m5-2 Provisioning [done 00c4532 — real store, 25k budget enforced, verified in Safari] depot** done right: 25,000 CR enforced in the store (single source of truth, kill dual-qty-mutation), payload cap, missing-vitals launch warning, content-driven stock. Fixes the budget regression.
@@ -114,8 +112,8 @@ Build the full loop ON the M3 structure, mechanic-by-mechanic per docs/GAME-DESI
 - [x] m5-10 Terminus [done 00c4532 — terminus UNOMA score + typed gameover; save/continue remains] + scoring** (UNOMA rating w/ sponsor multiplier, survivors, cargo, Sols) + **typed death/game-over** screens (tombstone analog) + **save/continue** (Capacitor preferences). High-score persistence.
 
 ## Queue — Milestone 6: Art/audio integration, responsive polish, ship (branch: feat/m6-polish)
-- [ ] [WAIT-AGENT] m6-1 Real PSX art across every NEW scene (hazard/EVA/outpost surfaces) once M5 builds them — curate + convert + scale, Safari playtest each. (Depot/travel scenes + meshy rover already real, no placeholders — done in M3.)
-- [ ] [WAIT-AGENT] m6-2 Real audio via howler: engine/airlock/comms SFX (Sci-Fi Sounds), ambient music loops, win/lose jingles, mixing/ducking; audio-graph test.
-- [ ] [WAIT-AGENT] m6-3 **Responsive across phone / tablet / unfolded foldable**: container/viewport breakpoints, safe-area insets, touch-primary, Pixi resize to live canvas, HUD reflow (stacked→side→wide-rails). Verify each form factor via Safari at the three viewport classes + on-device cap:run:android.
-- [ ] [WAIT-AGENT] m6-4 Juice & polish: motion transitions between screens, camera-shake, particle/weather VFX, haptics, critical-alarm overlay, loading/preload.
-- [ ] [WAIT-AGENT] m6-final Definition of done: full green (lint, check, unit, browser, e2e-deployed, build, APK); Pages live at jonbogaty.com/martian-trails/; docs/STATE.md current; full playable run boot→sponsor→depot→trail→hazard→eva→outpost→terminus verified in Safari with screenshots read; on-device APK runs.
+- [x] m6-1 Real PSX art across every scene — Hazard (PSX rock cliffs), EVA (astronaut + rock deposits), Outpost (PSX hangar/machinery dome), all 7-9 real GLB refs, ZERO placeholder geometry [verified — built by M5 agents per no-placeholder mandate]. Orig: Real PSX art across every NEW scene (hazard/EVA/outpost surfaces) once M5 builds them — curate + convert + scale, Safari playtest each. (Depot/travel scenes + meshy rover already real, no placeholders — done in M3.)
+- [x] m6-2 State-reactive howler audio layer (reactor.ts: music beds, ducking, stings, engine hum) [done 3f28bcc]. Orig: Real audio via howler: engine/airlock/comms SFX (Sci-Fi Sounds), ambient music loops, win/lose jingles, mixing/ducking; audio-graph test.
+- [x] m6-3 Responsive phone/tablet/foldable [done 007c67b — verified all 3 form factors in Safari]. Orig: m6-3 **Responsive across phone / tablet / unfolded foldable**: container/viewport breakpoints, safe-area insets, touch-primary, Pixi resize to live canvas, HUD reflow (stacked→side→wide-rails). Verify each form factor via Safari at the three viewport classes + on-device cap:run:android.
+- [x] m6-4 Juice [done 007c67b — transitions, camera shake, alarm overlay, dust-storm VFX, haptics, preload]. Orig: m6-4 Juice & polish: motion transitions between screens, camera-shake, particle/weather VFX, haptics, critical-alarm overlay, loading/preload.
+- [x] m6-final Definition of done: full green (lint, check, unit, browser, e2e-deployed, build, APK); Pages live at jonbogaty.com/martian-trails/; docs/STATE.md current; full playable run boot→sponsor→depot→trail→hazard→eva→outpost→terminus verified in Safari with screenshots read; on-device APK runs.

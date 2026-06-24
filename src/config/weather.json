@@ -1,0 +1,5 @@
+{
+  "onsetMinDistance": 100,
+  "stormChance": 0.12,
+  "clearChance": 0.45
+}

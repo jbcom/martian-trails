@@ -142,7 +142,7 @@ export function OutpostScreen() {
   }
 
   return (
-    <div className="pointer-events-none flex h-full items-end justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-[max(0.75rem,env(safe-area-inset-top))] sm:items-center">
+    <div className="pointer-events-none flex h-full items-end justify-center p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pr-[max(0.75rem,env(safe-area-inset-right))] pb-[max(0.75rem,env(safe-area-inset-bottom))] pl-[max(0.75rem,env(safe-area-inset-left))] sm:items-center">
       <GlassPanel
         className="pointer-events-auto flex w-full max-w-lg flex-col gap-3 p-5"
         motionProps={{

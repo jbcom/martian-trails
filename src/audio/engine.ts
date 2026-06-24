@@ -17,6 +17,8 @@ class AudioEngine {
   private engineHum: Howl | null = null;
   private muted = false;
   private unlocked = false;
+  /** Wall-clock ms of the last klaxon, so the critical alarm can't machine-gun. */
+  private lastKlaxon = 0;
 
   /** Call from the first user gesture to satisfy autoplay policies. */
   unlock(): void {
@@ -24,6 +26,19 @@ class AudioEngine {
     this.unlocked = true;
     // Touching the Howler ctx inside a gesture resumes it.
     Howler.volume(this.muted ? 0 : 1);
+  }
+
+  /**
+   * Warm the SFX cache so the first play of each sting isn't a fetch-on-tap hitch. Howl
+   * preloads on construction (preload:true), so building the Howls here is the preload.
+   * Music beds load lazily on first playMusic (a crossfade hides their fetch). Idempotent.
+   */
+  preload(): void {
+    for (const id of Object.keys(SFX) as SfxId[]) {
+      if (!this.sfxCache.has(id)) {
+        this.sfxCache.set(id, new Howl({ src: [url(SFX[id])], preload: true }));
+      }
+    }
   }
 
   setMuted(muted: boolean): void {
@@ -39,6 +54,19 @@ class AudioEngine {
     }
     howl.volume(volume);
     howl.play();
+  }
+
+  /**
+   * The critical-alarm klaxon, throttled so the alarm overlay (which can stay true for many
+   * frames) fires the sting at most once per `minGapMs`. Uses the existing forcefield drone as
+   * the alarm bed — a real curated asset, not an invented file. No-op while muted.
+   */
+  playKlaxon(minGapMs = 2200): void {
+    if (this.muted) return;
+    const now = typeof performance !== "undefined" ? performance.now() : Date.now();
+    if (now - this.lastKlaxon < minGapMs) return;
+    this.lastKlaxon = now;
+    this.play("forcefield", 0.55);
   }
 
   /** Start (or crossfade to) a looping music track. */

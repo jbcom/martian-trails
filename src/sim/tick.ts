@@ -18,6 +18,7 @@ import { powerSystem } from "./systems/power";
 import { scoringSystem } from "./systems/scoring";
 import { terrainSystem } from "./systems/terrain";
 import { travelSystem } from "./systems/travel";
+import { weatherSystem } from "./systems/weather";
 import { Outcome, Position, RngSource, SolClock } from "./traits";
 
 /** Wall-clock seconds that make up one Sol of in-game time. */
@@ -25,7 +26,9 @@ export const SECONDS_PER_SOL = 3.5;
 
 /**
  * Advance one expedition entity by exactly one Sol. Runs the systems in dependency order:
- * move → reterrain → wear → power → consume → morale → illness → resolve → score.
+ * move → weather → reterrain → wear → power → consume → morale → illness → resolve → score.
+ * Weather runs before power so a storm that kicks up THIS Sol drives the same Sol's cold-snap
+ * surcharge + reduced recharge (the POC rolled weather at the head of the driving pass).
  */
 export function advanceSol(expedition: Entity): void {
   if (expedition.get(Outcome)?.status !== "running") return;
@@ -34,6 +37,7 @@ export function advanceSol(expedition: Entity): void {
   if (pos) expedition.set(Position, { sol: pos.sol + 1 });
 
   travelSystem(expedition);
+  weatherSystem(expedition);
   terrainSystem(expedition);
   hullSystem(expedition);
   powerSystem(expedition);

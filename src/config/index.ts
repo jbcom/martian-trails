@@ -23,6 +23,8 @@ import {
   travelSchema,
   type UpgradesConfig,
   upgradesSchema,
+  type WeatherConfig,
+  weatherSchema,
 } from "@/schemas/config";
 import { type EvaConfig, evaSchema } from "@/schemas/eva";
 import { type HazardsConfig, hazardsFileSchema } from "@/schemas/hazard";
@@ -40,6 +42,7 @@ import storeJson from "./store.json";
 import terrainJson from "./terrain.json";
 import travelJson from "./travel.json";
 import upgradesJson from "./upgrades.json";
+import weatherJson from "./weather.json";
 
 /** Parse `data` against `schema`, throwing a labeled error on failure (fail-fast). */
 function load<T>(label: string, schema: z.ZodType<T>, data: unknown): T {
@@ -54,6 +57,7 @@ export const resources: ResourcesConfig = load("resources", resourcesSchema, res
 export const travel: TravelConfig = load("travel", travelSchema, travelJson);
 export const crew: CrewConfig = load("crew", crewSchema, crewJson);
 export const terrain: TerrainConfig = load("terrain", terrainSchema, terrainJson);
+export const weather: WeatherConfig = load("weather", weatherSchema, weatherJson);
 export const upgrades: UpgradesConfig = load("upgrades", upgradesSchema, upgradesJson);
 export const store: StoreConfig = load("store", storeSchema, storeJson);
 export const scoring: ScoringConfig = load("scoring", scoringSchema, scoringJson);
@@ -69,6 +73,7 @@ export const config = {
   travel,
   crew,
   terrain,
+  weather,
   upgrades,
   store,
   scoring,

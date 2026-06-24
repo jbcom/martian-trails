@@ -20,7 +20,7 @@ import type { Loadout } from "@/sim/factories";
 import { spawnExpedition } from "@/sim/factories";
 import { type HazardResult, resolveHazard } from "@/sim/hazard";
 import { type OutpostStop, resolveRest, resolveTrade, serviceForOutpost } from "@/sim/outpost";
-import { step } from "@/sim/tick";
+import { SECONDS_PER_SOL, step } from "@/sim/tick";
 import {
   AbilityCooldowns,
   Crew,
@@ -29,10 +29,12 @@ import {
   Position,
   Resources,
   RngSource,
+  SolClock,
   Sponsor,
   Travel,
+  Weather,
 } from "@/sim/traits";
-import { getDiagnostics, resetDiagnostics } from "@/state/diagnostics";
+import { bumpShake, getDiagnostics, resetDiagnostics } from "@/state/diagnostics";
 
 /**
  * Run controller — owns the koota world + the expedition entity for one run, ticks
@@ -114,6 +116,8 @@ class Run {
   private resolvedHazards = new Set<string>();
   /** The most recent traverse outcome, surfaced for the consequence beat. */
   private lastHazardResult: HazardResult | null = null;
+  /** Was the hull in the critical band on the previous publish? (edge-detect for shake.) */
+  private hullWasCritical = false;
   /** Dedicated hazard outcome stream, forked once at start. */
   private hazardRng: Rng | null = null;
 
@@ -157,6 +161,7 @@ class Run {
     this.evaYieldPrimed = false;
     this.pendingOutpost = null;
     this.dockedOutposts.clear();
+    this.hullWasCritical = false;
     resetDiagnostics();
     this.publish();
   }
@@ -253,6 +258,9 @@ class Run {
     this.resolvedHazards.add(hazard.id);
     this.lastHazardResult = result;
     this.pendingHazard = null;
+    // A failed traverse is an impactful beat — knock the camera (render reads + decays it).
+    if (result.tier === "fail") bumpShake(1);
+    else if (result.tier === "partial") bumpShake(0.45);
     this.publish();
     return result;
   }
@@ -577,10 +585,20 @@ class Run {
     d.distance = pos?.distance ?? 0;
     d.sol = pos?.sol ?? 1;
     d.driving = this.driving && this.active && !this.halted;
+    // Day phase 0..1 rides the Sol-clock accumulator so the sky lerps over each Sol.
+    const acc = e.get(SolClock)?.accumulator ?? 0;
+    d.dayCycle = Math.min(1, Math.max(0, acc / SECONDS_PER_SOL));
+    // Weather drives the dust-storm overlay; the storm state is the sim's authority.
+    d.weather = e.get(Weather)?.kind === "dust_storm" ? "dust_storm" : "clear";
     const maxRes = e.get(MaxResources);
     d.hull = res ? res.hull / (maxRes?.hull ?? max.hull) : 1;
     d.power = res ? res.power / Math.max(1, maxRes?.power ?? max.power) : 1;
     d.critical = res ? res.oxygen <= 0 || res.hull <= 0 || res.morale <= 10 : false;
+    // Hull entering the critical band is an impactful beat — bump the camera shake once on the
+    // edge (not every frame it stays low). 15% of max hull is the "structural failure" line.
+    const hullCritical = d.hull <= 0.15;
+    if (hullCritical && !this.hullWasCritical) bumpShake(0.7);
+    this.hullWasCritical = hullCritical;
   }
 
   /** A UI-cadence snapshot of the run (call from React effects/handlers, not per-frame). */
