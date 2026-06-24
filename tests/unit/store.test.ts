@@ -17,11 +17,11 @@ describe("game store (UI cadence)", () => {
     expect(useGameStore.getState().screen).toBe("depot");
   });
 
-  it("startRun stores the seed and moves to sponsor", () => {
+  it("startRun stores the seed and moves to the depot", () => {
     useGameStore.getState().startRun("ares-7");
     const s = useGameStore.getState();
     expect(s.seed).toBe("ares-7");
-    expect(s.screen).toBe("sponsor");
+    expect(s.screen).toBe("depot");
   });
 
   it("setSetting updates a single setting immutably", () => {

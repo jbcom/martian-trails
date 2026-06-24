@@ -26,7 +26,7 @@ describe("screen router (real browser)", () => {
     );
     const state = useGameStore.getState();
     expect(state.seed).not.toBeNull();
-    expect(state.screen).toBe("sponsor");
+    expect(state.screen).toBe("depot");
   });
 
   it("renders the depot panel on the depot screen", () => {

@@ -19,6 +19,7 @@ import { colors } from "@/styles/tokens";
 function SceneForScreen({ screen }: { screen: Screen }) {
   switch (screen) {
     case "travel":
+    case "event":
       return <TravelScene />;
     default:
       return <DepotScene />;

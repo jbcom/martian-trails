@@ -30,6 +30,8 @@ test-results/
 playwright-report/
 blob-report/
 playwright/.local-browsers/
+.vitest-attachments/
+tests/browser/__screenshots__/
 
 # Itch assets cache + raw downloads (only curated keepers under public/assets/ ship)
 .itch-cache/

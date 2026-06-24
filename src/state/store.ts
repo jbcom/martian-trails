@@ -36,6 +36,6 @@ export const useGameStore = create<GameStore>((set) => ({
   settings: { ...DEFAULT_SETTINGS },
 
   goTo: (screen) => set({ screen }),
-  startRun: (seed) => set({ seed, screen: "sponsor" }),
+  startRun: (seed) => set({ seed, screen: "depot" }),
   setSetting: (key, value) => set((s) => ({ settings: { ...s.settings, [key]: value } })),
 }));

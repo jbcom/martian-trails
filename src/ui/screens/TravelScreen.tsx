@@ -1,0 +1,207 @@
+import { config } from "@/config";
+import { type RunSnapshot, run } from "@/sim/run";
+import { Gauge } from "@/ui/components/Gauge";
+import { GlassPanel } from "@/ui/components/GlassPanel";
+import { useRun } from "@/ui/useRun";
+
+/** Human-facing labels for the pace dial, with the design's Δ readout. */
+const PACE_OPTIONS = [
+  { key: "steady", label: "Steady" },
+  { key: "strenuous", label: "Strenuous" },
+  { key: "grueling", label: "Grueling" },
+] as const;
+
+/** Human-facing labels for the ration dial. */
+const RATION_OPTIONS = [
+  { key: "filling", label: "Filling" },
+  { key: "meager", label: "Meager" },
+  { key: "bareBones", label: "Bare Bones" },
+] as const;
+
+/** A segmented toggle group (pace / rations) — touch targets ≥44px. */
+function Segmented({
+  options,
+  active,
+  onPick,
+  hint,
+}: {
+  options: readonly { key: string; label: string }[];
+  active: string;
+  onPick: (key: string) => void;
+  hint?: (key: string) => string;
+}) {
+  return (
+    <div className="flex gap-1.5">
+      {options.map((opt) => {
+        const on = opt.key === active;
+        return (
+          <button
+            key={opt.key}
+            type="button"
+            title={hint?.(opt.key)}
+            onClick={() => onPick(opt.key)}
+            className="min-h-[44px] flex-1 rounded border px-2 py-1.5 font-display text-[0.7rem] uppercase tracking-[0.12em] transition-colors"
+            style={{
+              borderColor: on ? "var(--color-mars-dust)" : "var(--color-ui-border)",
+              color: on ? "var(--color-mars-dust)" : "var(--color-mars-sand)",
+              background: on ? "rgba(204,112,82,0.16)" : "transparent",
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+/** The top progress bar with outpost tick marks (km-based, from terrain config). */
+function ProgressBar({ distance, goal }: { distance: number; goal: number }) {
+  const pct = Math.max(0, Math.min(100, (distance / goal) * 100));
+  return (
+    <div className="relative">
+      <div className="flex items-baseline justify-between font-mono text-[0.65rem] text-mars-sand/70">
+        <span>UNDERHILL</span>
+        <span className="tabular-nums text-mars-sand">
+          {Math.round(distance)} / {goal} km
+        </span>
+        <span>KOROLEV</span>
+      </div>
+      <div className="relative mt-1 h-2.5 overflow-hidden rounded-full bg-black/50 ring-1 ring-[var(--color-ui-border)]">
+        <div
+          className="h-full rounded-full transition-[width] duration-300"
+          style={{ width: `${pct}%`, backgroundColor: "var(--color-mars-dust)" }}
+        />
+      </div>
+      {/* Outpost ticks sit above the rail at their km fraction. */}
+      {config.terrain.outposts.map((o) => (
+        <div
+          key={o.name}
+          className="absolute top-[1.05rem] h-2.5 w-px bg-mars-sand/70"
+          style={{ left: `${(o.distance / goal) * 100}%` }}
+          title={`${o.name} · ${o.distance} km`}
+        />
+      ))}
+    </div>
+  );
+}
+
+/** Power gauge max comes from the RTG-derived ceiling carried in resources.rtg. */
+function powerMax(res: RunSnapshot["resources"]): number {
+  const rtg = (res as { rtg?: number })?.rtg ?? 1;
+  return Math.max(1, rtg) * config.resources.maxPowerPerRtg;
+}
+
+/**
+ * Travel HUD over the TravelScene. Reads the run snapshot at UI cadence via useRun
+ * (the 3D scene reads the diagnostics bridge directly). Top progress bar with
+ * outpost ticks; vitals gauges; Sol counter; pace + ration dials wired through the
+ * run controller; a log line; and the drive/halt control. Trail events pause
+ * driving and surface the EventModal.
+ */
+export function TravelScreen() {
+  const snap = useRun();
+  if (!snap?.resources) {
+    return (
+      <div className="grid h-full place-items-center">
+        <p className="font-display text-sm uppercase tracking-[0.3em] text-mars-sand/60">
+          Initializing rover…
+        </p>
+      </div>
+    );
+  }
+
+  const res = snap.resources as {
+    oxygen: number;
+    water: number;
+    rations: number;
+    power: number;
+    morale: number;
+    hull: number;
+    rtg: number;
+  };
+  const max = config.resources.max;
+  const log = snap.driving
+    ? `Sol ${snap.sol} — rover underway, ${Math.round(snap.goal - snap.distance)} km to Korolev.`
+    : `Sol ${snap.sol} — rover halted at ${Math.round(snap.distance)} km. Awaiting orders.`;
+
+  return (
+    <div className="pointer-events-none flex h-full flex-col justify-between gap-3 p-3 pt-[max(0.75rem,env(safe-area-inset-top))] pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+      {/* Top: progress + Sol counter. */}
+      <GlassPanel
+        className="pointer-events-auto p-3"
+        motionProps={{ initial: { y: -16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}
+      >
+        <div className="mb-2 flex items-center justify-between">
+          <span className="font-display text-xs uppercase tracking-[0.25em] text-mars-dust">
+            Expedition Telemetry
+          </span>
+          <span className="font-mono text-xs tabular-nums text-mars-sand">SOL {snap.sol}</span>
+        </div>
+        <ProgressBar distance={snap.distance} goal={snap.goal} />
+      </GlassPanel>
+
+      {/* Bottom cluster: vitals, controls, log. */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-end">
+        <GlassPanel
+          className="pointer-events-auto grid flex-1 grid-cols-2 gap-x-4 gap-y-2 p-3 sm:grid-cols-3"
+          motionProps={{ initial: { y: 16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}
+        >
+          <Gauge label="O₂" value={res.oxygen} max={max.oxygen} />
+          <Gauge label="Water" value={res.water} max={max.water} />
+          <Gauge label="Rations" value={res.rations} max={max.rations} />
+          <Gauge label="Power" value={res.power} max={powerMax(snap.resources)} />
+          <Gauge label="Morale" value={res.morale} max={max.morale} />
+          <Gauge label="Hull" value={res.hull} max={max.hull} />
+        </GlassPanel>
+
+        <GlassPanel
+          className="pointer-events-auto flex w-full flex-col gap-2 p-3 md:w-72"
+          motionProps={{ initial: { y: 16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}
+        >
+          <div>
+            <p className="mb-1 font-display text-[0.6rem] uppercase tracking-[0.2em] text-mars-sand/60">
+              Pace
+            </p>
+            <Segmented
+              options={PACE_OPTIONS}
+              active={snap.pace}
+              onPick={(k) => run.setPace(k)}
+              hint={(k) => {
+                const p = config.travel.pace[k];
+                return p ? `×${p.speedMult} km · event ${Math.round(p.eventChance * 100)}%` : "";
+              }}
+            />
+          </div>
+          <div>
+            <p className="mb-1 font-display text-[0.6rem] uppercase tracking-[0.2em] text-mars-sand/60">
+              Rations
+            </p>
+            <Segmented
+              options={RATION_OPTIONS}
+              active={snap.rationLevel}
+              onPick={(k) => run.setRations(k)}
+              hint={(k) => {
+                const r = config.travel.rations[k];
+                return r ? `×${r.consumptionMult} food · −${r.moralePenalty} morale` : "";
+              }}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={() => run.setDriving(!snap.driving)}
+            className="mt-1 min-h-[44px] rounded border font-display text-sm uppercase tracking-[0.18em] transition-colors"
+            style={{
+              borderColor: snap.driving ? "var(--color-alert)" : "var(--color-ok)",
+              color: snap.driving ? "var(--color-alert)" : "var(--color-ok)",
+              background: snap.driving ? "rgba(255,90,60,0.1)" : "rgba(68,255,170,0.08)",
+            }}
+          >
+            {snap.driving ? "Halt Rover" : "Drive"}
+          </button>
+          <p className="font-mono text-[0.65rem] leading-snug text-mars-sand/70">{log}</p>
+        </GlassPanel>
+      </div>
+    </div>
+  );
+}

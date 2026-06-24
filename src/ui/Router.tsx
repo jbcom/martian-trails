@@ -3,6 +3,10 @@ import type { Screen } from "@/core/screens";
 import { useGameStore } from "@/state/store";
 import { BootScreen } from "@/ui/screens/BootScreen";
 import { DepotScreen } from "@/ui/screens/DepotScreen";
+import { EventModal } from "@/ui/screens/EventModal";
+import { GameOverScreen } from "@/ui/screens/GameOverScreen";
+import { TerminusScreen } from "@/ui/screens/TerminusScreen";
+import { TravelScreen } from "@/ui/screens/TravelScreen";
 
 /**
  * The DOM/UI screen router. Reads the active screen from the store (human cadence)
@@ -17,6 +21,19 @@ function ScreenForScreen({ screen }: { screen: Screen }) {
       return <BootScreen />;
     case "depot":
       return <DepotScreen />;
+    case "travel":
+      return <TravelScreen />;
+    case "event":
+      return (
+        <>
+          <TravelScreen />
+          <EventModal />
+        </>
+      );
+    case "terminus":
+      return <TerminusScreen />;
+    case "gameover":
+      return <GameOverScreen />;
     default:
       return (
         <div className="pointer-events-none grid h-full place-items-center">
