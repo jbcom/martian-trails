@@ -1,0 +1,127 @@
+{
+  "$comment": "Declarative curation manifest: which library assets get copied into public/assets/, organized by logical domain. Run `pnpm assets:curate` to materialize. Source root is LOCAL_ASSET_DIR (default /Volumes/home/assets). All entries are CC0 Kenney unless noted; see docs/ART-DIRECTION.md.",
+  "sourceRoot": "/Volumes/home/assets",
+  "license": "CC0-1.0 (Kenney)",
+  "models": {
+    "rover": [
+      { "from": "3DLowPoly/Environment/Space/Space Kit/rover.glb", "to": "rover/rover.glb" },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/craft_cargoA.glb",
+        "to": "rover/craft_cargoA.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/craft_miner.glb",
+        "to": "rover/craft_miner.glb"
+      }
+    ],
+    "crew": [
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/astronautA.glb",
+        "to": "crew/astronautA.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/astronautB.glb",
+        "to": "crew/astronautB.glb"
+      }
+    ],
+    "terrain": [
+      { "from": "3DLowPoly/Environment/Space/Space Kit/terrain.glb", "to": "terrain/terrain.glb" },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/terrain_side.glb",
+        "to": "terrain/terrain_side.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/terrain_sideCliff.glb",
+        "to": "terrain/terrain_sideCliff.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/terrain_sideCorner.glb",
+        "to": "terrain/terrain_sideCorner.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/terrain_ramp.glb",
+        "to": "terrain/terrain_ramp.glb"
+      },
+      { "from": "3DLowPoly/Environment/Space/Space Kit/crater.glb", "to": "terrain/crater.glb" },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/craterLarge.glb",
+        "to": "terrain/craterLarge.glb"
+      }
+    ],
+    "rocks": [
+      { "from": "3DLowPoly/Environment/Space/Space Kit/rock.glb", "to": "rocks/rock.glb" },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/rock_largeA.glb",
+        "to": "rocks/rock_largeA.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/rock_largeB.glb",
+        "to": "rocks/rock_largeB.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/rock_crystalsLargeA.glb",
+        "to": "rocks/rock_crystalsLargeA.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/rock_crystalsLargeB.glb",
+        "to": "rocks/rock_crystalsLargeB.glb"
+      },
+      { "from": "3DLowPoly/Environment/Space/Space Kit/meteor.glb", "to": "rocks/meteor.glb" }
+    ],
+    "outpost": [
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/hangar_roundGlass.glb",
+        "to": "outpost/hangar_roundGlass.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/hangar_roundA.glb",
+        "to": "outpost/hangar_roundA.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/hangar_largeA.glb",
+        "to": "outpost/hangar_largeA.glb"
+      }
+    ],
+    "props": [
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/machine_generator.glb",
+        "to": "props/machine_generator.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/machine_wireless.glb",
+        "to": "props/machine_wireless.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/satelliteDish.glb",
+        "to": "props/satelliteDish.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/platform_large.glb",
+        "to": "props/platform_large.glb"
+      },
+      {
+        "from": "3DLowPoly/Environment/Space/Space Kit/supports_high.glb",
+        "to": "props/supports_high.glb"
+      }
+    ]
+  },
+  "audio": {
+    "sfx": [
+      { "from": "Audio/Sci-Fi Sounds/Audio/doorOpen_000.ogg", "to": "sfx/airlock_open.ogg" },
+      { "from": "Audio/Sci-Fi Sounds/Audio/doorClose_000.ogg", "to": "sfx/airlock_close.ogg" },
+      { "from": "Audio/Sci-Fi Sounds/Audio/forceField_000.ogg", "to": "sfx/forcefield.ogg" },
+      { "from": "Audio/Sci-Fi Sounds/Audio/computerNoise_000.ogg", "to": "sfx/computer.ogg" },
+      { "from": "Audio/Sci-Fi Sounds/Audio/engineCircular_000.ogg", "to": "sfx/engine_loop.ogg" },
+      { "from": "Audio/Sci-Fi Sounds/Audio/thrusterFire_000.ogg", "to": "sfx/thruster.ogg" },
+      { "from": "Audio/Sci-Fi Sounds/Audio/impactMetal_000.ogg", "to": "sfx/impact_metal.ogg" },
+      {
+        "from": "Audio/Sci-Fi Sounds/Audio/lowFrequency_explosion_000.ogg",
+        "to": "sfx/hazard_sting.ogg"
+      }
+    ],
+    "music": [
+      { "from": "Audio/Music Loops/Loops/Space Cadet.ogg", "to": "music/menu.ogg" },
+      { "from": "Audio/Music Loops/Loops/Mission Plausible.ogg", "to": "music/trail.ogg" }
+    ]
+  }
+}
