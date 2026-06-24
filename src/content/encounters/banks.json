@@ -1,0 +1,70 @@
+[
+  {
+    "id": "encbank:vasquez",
+    "npc": "npc:depot-trader-vasquez",
+    "slots": [
+      { "when": { "resourceLow": "water" }, "node": "hard-up" },
+      { "when": { "flagSet": "flag:vasquez-traded" }, "node": "return-greeting" },
+      { "default": true, "node": "first-meeting" }
+    ],
+    "nodes": {
+      "first-meeting": {
+        "lines": [
+          "Vasquez. I run the long crawl between depots — and I've got what the long crawl takes.",
+          "Water for parts. Fair rate, for a face that hasn't crossed the Tharsis shelf yet."
+        ],
+        "choices": [
+          {
+            "id": "trade-water",
+            "text": "Trade 30 parts for water",
+            "effects": [{ "target": "parts", "delta": -30 }, { "target": "water", "delta": 120 }],
+            "setsFlag": "flag:vasquez-traded"
+          },
+          {
+            "id": "open-trade",
+            "text": "See the full manifest",
+            "opensTrade": "trade:vasquez-crawler"
+          },
+          { "id": "decline", "text": "Not today", "goto": "parting" }
+        ],
+        "emits": "enc:vasquez.first-meeting"
+      },
+      "hard-up": {
+        "lines": [
+          "You're running your tanks dry — I can smell it on your rig.",
+          "I'll cut you a hauler's rate on water. Pride's heavy out here; leave some behind."
+        ],
+        "choices": [
+          {
+            "id": "trade-water-cheap",
+            "text": "Trade 18 parts for water (hauler's rate)",
+            "effects": [{ "target": "parts", "delta": -18 }, { "target": "water", "delta": 140 }],
+            "setsFlag": "flag:vasquez-traded"
+          },
+          { "id": "decline", "text": "We'll manage", "goto": "parting" }
+        ],
+        "emits": "enc:vasquez.hard-up"
+      },
+      "return-greeting": {
+        "lines": [
+          "Back again. Good — means you're still breathing.",
+          "Same deal stands while my tanks hold."
+        ],
+        "choices": [
+          {
+            "id": "trade-water",
+            "text": "Trade 30 parts for water",
+            "effects": [{ "target": "parts", "delta": -30 }, { "target": "water", "delta": 120 }]
+          },
+          { "id": "decline", "text": "Just passing", "goto": "parting" }
+        ],
+        "emits": "enc:vasquez.return-greeting"
+      },
+      "parting": {
+        "lines": ["Keep your visor clean and your reactor warm. Korolev's a long way yet."],
+        "choices": [],
+        "emits": "enc:vasquez.parting"
+      }
+    }
+  }
+]

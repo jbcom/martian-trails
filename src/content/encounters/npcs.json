@@ -1,0 +1,13 @@
+[
+  {
+    "id": "npc:depot-trader-vasquez",
+    "name": "Vasquez",
+    "archetype": "trader",
+    "look": "a sun-weathered crawler-trader in a patched amber pressure suit, a cracked visor pushed up over a wry grin, dust ground into every seam",
+    "portrait": "vasquez",
+    "bank": "encbank:vasquez",
+    "approachSpeed": 5,
+    "hailRange": 48,
+    "goalWeights": { "trade": 1 }
+  }
+]
