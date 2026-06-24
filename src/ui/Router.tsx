@@ -7,6 +7,8 @@ import { EvaScreen } from "@/ui/screens/EvaScreen";
 import { EventModal } from "@/ui/screens/EventModal";
 import { GameOverScreen } from "@/ui/screens/GameOverScreen";
 import { HazardScreen } from "@/ui/screens/HazardScreen";
+import { OutpostScreen } from "@/ui/screens/OutpostScreen";
+import { SponsorScreen } from "@/ui/screens/SponsorScreen";
 import { TerminusScreen } from "@/ui/screens/TerminusScreen";
 import { TravelScreen } from "@/ui/screens/TravelScreen";
 
@@ -21,10 +23,14 @@ function ScreenForScreen({ screen }: { screen: Screen }) {
   switch (screen) {
     case "boot":
       return <BootScreen />;
+    case "sponsor":
+      return <SponsorScreen />;
     case "depot":
       return <DepotScreen />;
     case "travel":
       return <TravelScreen />;
+    case "outpost":
+      return <OutpostScreen />;
     case "event":
       return (
         <>

@@ -4,6 +4,8 @@ import { allEvents } from "@/content/events";
 import type { Rng } from "@/core/rng";
 import type { Effect, TrailEvent } from "@/schemas/event";
 import type { Hazard } from "@/schemas/hazard";
+import type { TradeOffer } from "@/schemas/outpost";
+import { abilityBlock, abilityForCrew, cooldownRemaining, resolveAbility } from "@/sim/abilities";
 import {
   applyInjury,
   type EvaSession,
@@ -17,8 +19,19 @@ import { applyEffects } from "@/sim/event";
 import type { Loadout } from "@/sim/factories";
 import { spawnExpedition } from "@/sim/factories";
 import { type HazardResult, resolveHazard } from "@/sim/hazard";
+import { type OutpostStop, resolveRest, resolveTrade, serviceForOutpost } from "@/sim/outpost";
 import { step } from "@/sim/tick";
-import { Crew, MaxResources, Outcome, Position, Resources, RngSource, Travel } from "@/sim/traits";
+import {
+  AbilityCooldowns,
+  Crew,
+  MaxResources,
+  Outcome,
+  Position,
+  Resources,
+  RngSource,
+  Sponsor,
+  Travel,
+} from "@/sim/traits";
 import { getDiagnostics, resetDiagnostics } from "@/state/diagnostics";
 
 /**
@@ -32,7 +45,25 @@ export interface RunSnapshot {
   distance: number;
   goal: number;
   resources: ReturnType<Entity["get"]>;
-  crew: { id: string; alive: boolean; condition: string }[];
+  crew: {
+    id: string;
+    alive: boolean;
+    condition: string;
+    /** Display name from the crew config. */
+    name: string;
+    /** Role from the crew config (Commander / Engineer / Geologist / Botanist). */
+    role: string;
+    /** This member's active ability + whether it's currently usable. */
+    ability: {
+      id: string;
+      name: string;
+      desc: string;
+      /** null = usable; otherwise why it's blocked (dead/cooldown/afford). */
+      blocked: "dead" | "cooldown" | "afford" | null;
+      /** Sols left on the cooldown (0 = ready). */
+      cooldown: number;
+    } | null;
+  }[];
   outcome: "running" | "won" | "lost";
   reason: string;
   score: number;
@@ -49,6 +80,10 @@ export interface RunSnapshot {
   lastHazardResult: HazardResult | null;
   /** The active EVA session, or null when not on an EVA. */
   eva: EvaSession | null;
+  /** The mission sponsor's terminus score multiplier (drives the UNOMA rating breakdown). */
+  scoreMultiplier: number;
+  /** The outpost the rover is docked at, or null. While set, the rover is halted. */
+  pendingOutpost: OutpostStop | null;
 }
 
 /** Clamp huge frame gaps (tab backgrounded) so one slow frame can't skip Sols. */
@@ -88,6 +123,16 @@ class Run {
   private evaRng: Rng | null = null;
   /** Count of EVAs run, so each forks a distinct sub-stream (eva:0, eva:1, …). */
   private evaCount = 0;
+  /**
+   * Whether the geologist's "Deep Prospect" ability has primed the NEXT EVA's yield. Drained
+   * the moment that EVA's haul is banked (endEva), so it boosts exactly one EVA.
+   */
+  private evaYieldPrimed = false;
+
+  /** The outpost the rover is currently docked at, or null. While set, the rover is halted. */
+  private pendingOutpost: OutpostStop | null = null;
+  /** Names of outposts already docked at this run, so each triggers exactly once. */
+  private dockedOutposts = new Set<string>();
 
   /** Begin a fresh run. Resets the diagnostics bridge + spawns the expedition. */
   start(seed: string, loadout?: Loadout): void {
@@ -109,6 +154,9 @@ class Run {
     this.eva = null;
     this.evaRng = this.entity.get(RngSource)?.fork("eva") ?? null;
     this.evaCount = 0;
+    this.evaYieldPrimed = false;
+    this.pendingOutpost = null;
+    this.dockedOutposts.clear();
     resetDiagnostics();
     this.publish();
   }
@@ -118,9 +166,9 @@ class Run {
     return this.entity != null && this.entity.get(Outcome)?.status === "running";
   }
 
-  /** A decision is pending (event or hazard) — the rover can't drive. */
+  /** A decision is pending (event, hazard, or outpost dock) — the rover can't drive. */
   private get halted(): boolean {
-    return this.pendingEvent != null || this.pendingHazard != null;
+    return this.pendingEvent != null || this.pendingHazard != null || this.pendingOutpost != null;
   }
 
   setDriving(on: boolean): void {
@@ -239,6 +287,127 @@ class Run {
     }
   }
 
+  /** The outpost the rover is docked at, or null. */
+  get currentOutpost(): OutpostStop | null {
+    return this.pendingOutpost;
+  }
+
+  /**
+   * Per-tick check: has the rover reached an un-docked outpost's distance (within the trigger
+   * window)? If so, dock — bind the waypoint to its services + lore and halt. Parallels
+   * rollHazard. An outpost without configured services is skipped (never blocks the trail).
+   */
+  rollOutpost(): void {
+    const e = this.entity;
+    if (!e || this.halted) return;
+    const distance = e.get(Position)?.distance ?? 0;
+    const window = config.outposts.triggerWindow;
+    for (const wp of config.terrain.outposts) {
+      if (this.dockedOutposts.has(wp.name)) continue;
+      if (distance >= wp.distance && distance <= wp.distance + window) {
+        const service = serviceForOutpost(wp.name);
+        if (!service) {
+          // No services configured — mark it docked so it doesn't re-check, but don't halt.
+          this.dockedOutposts.add(wp.name);
+          continue;
+        }
+        this.pendingOutpost = { name: wp.name, distance: wp.distance, service };
+        this.driving = false;
+        getDiagnostics().driving = false;
+        return;
+      }
+    }
+  }
+
+  /**
+   * Rest in the habitat: apply the rest effects (heal morale/hull/power, pay vitals upkeep),
+   * charge the Sols the stay consumes, and heal non-fatal crew conditions back to healthy.
+   * Stays docked afterward (the player still has trade/lore + a "Back on the Trail" action).
+   */
+  restAtOutpost(): void {
+    const e = this.entity;
+    const stop = this.pendingOutpost;
+    if (!e || !stop) return;
+    const res = e.get(Resources);
+    if (res) {
+      const maxPower = e.get(MaxResources)?.power ?? config.resources.max.power;
+      e.set(Resources, resolveRest(stop, res, maxPower));
+    }
+    const pos = e.get(Position);
+    if (pos) {
+      e.set(Position, { sol: pos.sol + stop.service.rest.sols });
+      // Bank the elapsed Sols against the event clock so the rest doesn't back-fire events.
+      this.lastEventSol = pos.sol + stop.service.rest.sols;
+    }
+    if (stop.service.rest.healsConditions) {
+      const crew = e.get(Crew);
+      if (crew) {
+        for (const c of crew) {
+          if (c.alive && c.condition !== "healthy") {
+            c.condition = "healthy";
+            c.severity = 0;
+          }
+        }
+        e.set(Crew, crew);
+      }
+    }
+    this.publish();
+  }
+
+  /** Resolve a resupply trade at the docked outpost, if affordable. No-op otherwise. */
+  tradeAtOutpost(offer: TradeOffer): boolean {
+    const e = this.entity;
+    if (!e || !this.pendingOutpost) return false;
+    const res = e.get(Resources);
+    if (!res) return false;
+    const maxPower = e.get(MaxResources)?.power ?? config.resources.max.power;
+    const patch = resolveTrade(offer, res, maxPower);
+    if (!patch) return false;
+    e.set(Resources, patch);
+    this.publish();
+    return true;
+  }
+
+  /** Undock and let the player resume driving (the "Back on the Trail" action). */
+  leaveOutpost(): void {
+    if (this.pendingOutpost) this.dockedOutposts.add(this.pendingOutpost.name);
+    this.pendingOutpost = null;
+    this.publish();
+  }
+
+  /**
+   * Use a crew member's active ability (M10). Validates alive + off-cooldown + affordable
+   * against the live state, applies the resource effects, charges any Sols, stamps the
+   * cooldown, and arms the one-shot EVA-yield buff for the geologist's "Deep Prospect".
+   * Returns whether the ability fired.
+   */
+  useAbility(crewId: string): boolean {
+    const e = this.entity;
+    if (!e) return false;
+    const ability = abilityForCrew(crewId);
+    if (!ability) return false;
+    const res = e.get(Resources);
+    if (!res) return false;
+    const sol = e.get(Position)?.sol ?? 1;
+    const cooldowns = e.get(AbilityCooldowns) ?? {};
+    const crew = e.get(Crew)?.find((c) => c.id === crewId);
+    if (abilityBlock(ability, crew, res, sol, cooldowns[ability.id]) !== null) return false;
+
+    const maxPower = e.get(MaxResources)?.power ?? config.resources.max.power;
+    e.set(Resources, resolveAbility(ability, res, maxPower));
+    if (ability.sols > 0) {
+      const pos = e.get(Position);
+      if (pos) {
+        e.set(Position, { sol: pos.sol + ability.sols });
+        this.lastEventSol = pos.sol + ability.sols;
+      }
+    }
+    e.set(AbilityCooldowns, { ...cooldowns, [ability.id]: sol });
+    if (ability.sets === "evaYieldBonus") this.evaYieldPrimed = true;
+    this.publish();
+    return true;
+  }
+
   /**
    * Begin an EVA from the halted rover. Forks a fresh seeded sub-stream (so each EVA lays its
    * own deposit field deterministically) and caps the O₂ budget at the rover's O₂. Returns
@@ -304,6 +473,13 @@ class Run {
     const e = this.entity;
     if (!e || !this.eva) return null;
     const ended = evaEnd(this.eva);
+    // The geologist's "Deep Prospect" ability primes ONE EVA for a richer haul — scale the
+    // banked water/parts/score by the configured bonus, then drain the buff (one EVA only).
+    const bonus = this.evaYieldPrimed ? config.abilities.evaYieldBonusMult : 1;
+    this.evaYieldPrimed = false;
+    const haulWater = Math.round(ended.haul.water * bonus);
+    const haulParts = Math.round(ended.haul.parts * bonus);
+    const haulScore = Math.round(ended.haul.score * bonus);
     const res = e.get(Resources);
     if (res) {
       const max = config.resources.max;
@@ -313,8 +489,8 @@ class Run {
         res,
         [
           { target: "oxygen", delta: ended.o2 },
-          { target: "water", delta: ended.haul.water },
-          { target: "parts", delta: ended.haul.parts },
+          { target: "water", delta: haulWater },
+          { target: "parts", delta: haulParts },
           {
             target: "morale",
             delta: ended.haul.drills > 0 ? config.eva.haulMoraleBonus : 0,
@@ -326,7 +502,7 @@ class Run {
     }
     // Bank the prospecting score onto the run's score tally.
     const outcome = e.get(Outcome);
-    if (outcome) e.set(Outcome, { score: outcome.score + ended.haul.score });
+    if (outcome) e.set(Outcome, { score: outcome.score + haulScore });
     this.eva = null;
     this.publish();
     return ended;
@@ -342,8 +518,10 @@ class Run {
     if (!this.world || !this.entity) return;
     if (this.driving && this.active && !this.halted) {
       step(this.world, Math.min(Math.max(0, dt), MAX_TICK_DT));
-      // A hazard on the road takes precedence over a random event the same tick.
+      // A hazard on the road takes precedence over an outpost dock and a random event the
+      // same tick; an outpost dock takes precedence over a random event.
       this.rollHazard();
+      if (!this.halted) this.rollOutpost();
       if (!this.halted) this.rollEvent();
     }
     this.publish();
@@ -412,16 +590,37 @@ class Run {
     const pos = e.get(Position);
     const travel = e.get(Travel);
     const outcome = e.get(Outcome);
-    const crew = (e.get(Crew) ?? []).map((c) => ({
-      id: c.id,
-      alive: c.alive,
-      condition: c.condition,
-    }));
+    const res = e.get(Resources);
+    const sol = pos?.sol ?? 1;
+    const cooldowns = e.get(AbilityCooldowns) ?? {};
+    const roster = config.crew.roster;
+    const crew = (e.get(Crew) ?? []).map((c) => {
+      const member = roster.find((m) => m.id === c.id);
+      const ability = abilityForCrew(c.id);
+      const lastUsed = ability ? cooldowns[ability.id] : undefined;
+      return {
+        id: c.id,
+        alive: c.alive,
+        condition: c.condition,
+        name: member?.name ?? c.id,
+        role: member?.role ?? "",
+        ability:
+          ability && res
+            ? {
+                id: ability.id,
+                name: ability.name,
+                desc: ability.desc,
+                blocked: abilityBlock(ability, c, res, sol, lastUsed),
+                cooldown: cooldownRemaining(ability, sol, lastUsed),
+              }
+            : null,
+      };
+    });
     return {
       sol: pos?.sol ?? 1,
       distance: pos?.distance ?? 0,
       goal: config.travel.totalDistance,
-      resources: e.get(Resources),
+      resources: res,
       crew,
       outcome: (outcome?.status ?? "running") as RunSnapshot["outcome"],
       reason: outcome?.reason ?? "",
@@ -434,6 +633,8 @@ class Run {
       hazardRead: this.hazardRead,
       lastHazardResult: this.lastHazardResult,
       eva: this.eva,
+      scoreMultiplier: e.get(Sponsor)?.scoreMultiplier ?? 1,
+      pendingOutpost: this.pendingOutpost,
     };
   }
 }

@@ -1,0 +1,99 @@
+{
+  "$comment": "Outpost / habitat services — the Oregon Trail fort analog (M8). Waypoint km lives in terrain.json; this is the rest cost/effect + the resupply exchange. Interpreted by src/sim/outpost.ts + the outpost screen.",
+  "triggerWindow": 40,
+  "services": [
+    {
+      "outpost": "Tharsis Outpost",
+      "rest": {
+        "sols": 3,
+        "healsConditions": true,
+        "effects": [
+          { "target": "morale", "delta": 40 },
+          { "target": "hull", "delta": 20 },
+          { "target": "power", "delta": 25 },
+          { "target": "water", "delta": -30 },
+          { "target": "rations", "delta": -30 }
+        ]
+      },
+      "trades": [
+        {
+          "id": "parts-water",
+          "label": "Trade 2 Parts → 150 Water",
+          "effects": [{ "target": "parts", "delta": -2 }, { "target": "water", "delta": 150 }]
+        },
+        {
+          "id": "rations-oxygen",
+          "label": "Trade 80 Rations → 120 O₂",
+          "effects": [{ "target": "rations", "delta": -80 }, { "target": "oxygen", "delta": 120 }]
+        },
+        {
+          "id": "buy-medkit",
+          "label": "Barter 3 Parts → 1 Medkit",
+          "effects": [{ "target": "parts", "delta": -3 }, { "target": "medkits", "delta": 1 }]
+        }
+      ]
+    },
+    {
+      "outpost": "Pavonis Mons Base",
+      "rest": {
+        "sols": 3,
+        "healsConditions": true,
+        "effects": [
+          { "target": "morale", "delta": 45 },
+          { "target": "hull", "delta": 25 },
+          { "target": "power", "delta": 30 },
+          { "target": "water", "delta": -40 },
+          { "target": "rations", "delta": -40 }
+        ]
+      },
+      "trades": [
+        {
+          "id": "water-parts",
+          "label": "Trade 200 Water → 2 Parts",
+          "effects": [{ "target": "water", "delta": -200 }, { "target": "parts", "delta": 2 }]
+        },
+        {
+          "id": "oxygen-rations",
+          "label": "Trade 100 O₂ → 100 Rations",
+          "effects": [{ "target": "oxygen", "delta": -100 }, { "target": "rations", "delta": 100 }]
+        },
+        {
+          "id": "morale-supplies",
+          "label": "Host a feast: −1 Medkit → +30 Morale",
+          "effects": [{ "target": "medkits", "delta": -1 }, { "target": "morale", "delta": 30 }]
+        }
+      ]
+    },
+    {
+      "outpost": "Noctis Labyrinthus",
+      "rest": {
+        "sols": 4,
+        "healsConditions": true,
+        "effects": [
+          { "target": "morale", "delta": 50 },
+          { "target": "hull", "delta": 30 },
+          { "target": "power", "delta": 35 },
+          { "target": "water", "delta": -45 },
+          { "target": "rations", "delta": -45 }
+        ]
+      },
+      "trades": [
+        {
+          "id": "parts-oxygen",
+          "label": "Trade 2 Parts → 180 O₂",
+          "effects": [{ "target": "parts", "delta": -2 }, { "target": "oxygen", "delta": 180 }]
+        },
+        {
+          "id": "rations-water",
+          "label": "Trade 100 Rations → 200 Water",
+          "effects": [{ "target": "rations", "delta": -100 }, { "target": "water", "delta": 200 }]
+        },
+        {
+          "id": "medkit-parts",
+          "label": "Trade 2 Medkits → 3 Parts",
+          "effects": [{ "target": "medkits", "delta": -2 }, { "target": "parts", "delta": 3 }]
+        }
+      ]
+    }
+  ]
+}

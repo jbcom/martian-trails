@@ -4,31 +4,36 @@
       "id": "scrubbers",
       "name": "Carbon Scrubbers",
       "desc": "Cuts daily Oxygen consumption by 25%",
-      "cost": 3
+      "cost": 3,
+      "creditCost": 2200
     },
     {
       "id": "suspension",
       "name": "Active Suspension",
       "desc": "Reduces terrain damage by 30% and event rate",
-      "cost": 4
+      "cost": 4,
+      "creditCost": 2800
     },
     {
       "id": "solar",
       "name": "High-Yield Solar",
       "desc": "Boosts daily power recharge by 40% on clear sols",
-      "cost": 3
+      "cost": 3,
+      "creditCost": 2400
     },
     {
       "id": "aerogel",
       "name": "Aerogel Insulation",
       "desc": "Thermal insulation cuts cold-snap power drain by 50%",
-      "cost": 3
+      "cost": 3,
+      "creditCost": 2000
     },
     {
       "id": "microHydroponics",
       "name": "Micro-Hydroponics",
       "desc": "Cultivates +2 rations each Sol",
-      "cost": 4
+      "cost": 4,
+      "creditCost": 3000
     }
   ],
   "effects": {

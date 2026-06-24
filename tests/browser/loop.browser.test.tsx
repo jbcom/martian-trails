@@ -96,4 +96,37 @@ describe("M5 gameplay loop (real browser)", () => {
     click(getByRole("button", { name: "Meager" }));
     expect(run.snapshot()?.rationLevel).toBe("meager");
   });
+
+  it("the crew panel surfaces each member + fires their active ability", () => {
+    run.start("loop-test");
+    useGameStore.setState({ screen: "travel" });
+    const { container, getByRole, unmount } = render(<App />);
+    cleanup = unmount;
+
+    // Crew names + roles render in the panel.
+    expect(container.textContent).toContain("Crew");
+    expect(container.textContent).toContain("John");
+    expect(container.textContent).toContain("Commander");
+
+    // Rally Crew fires and goes on cooldown (the button label flips to show the cooldown).
+    click(getByRole("button", { name: /rally crew/i }));
+    const john = run.snapshot()?.crew.find((c) => c.id === "john");
+    expect(john?.ability?.blocked).toBe("cooldown");
+  });
+
+  it("the depot installs a rover upgrade with the sponsor budget", () => {
+    // The consortium sponsor (×1.5, 18000 CR) is selected; its budget gates upgrade buys.
+    useGameStore.setState({ screen: "depot", sponsorId: "consortium" });
+    const { container, getByRole, unmount } = render(<App />);
+    cleanup = unmount;
+
+    // The sponsor budget is shown, not the default 25000.
+    expect(container.textContent).toContain("18,000");
+    expect(container.textContent).toContain("Rover Upgrades");
+
+    // Install an upgrade — its button flips to "Installed".
+    const install = getByRole("button", { name: /install carbon scrubbers/i });
+    click(install);
+    expect(getByRole("button", { name: /remove carbon scrubbers/i })).toBeTruthy();
+  });
 });

@@ -1,9 +1,118 @@
+import { useState } from "react";
 import { config } from "@/config";
 import { type RunSnapshot, run } from "@/sim/run";
 import { useGameStore } from "@/state/store";
 import { Gauge } from "@/ui/components/Gauge";
 import { GlassPanel } from "@/ui/components/GlassPanel";
 import { useRun } from "@/ui/useRun";
+
+/** Portrait URL for a crew id (BASE_URL-aware so it resolves under Pages/Capacitor). */
+function portraitUrl(id: string): string {
+  return `${import.meta.env.BASE_URL}assets/generated/portraits/${id}.png`;
+}
+
+/** A crew portrait that falls back to a silhouette glyph if no generated PNG exists. */
+function CrewPortrait({ id, alive }: { id: string; alive: boolean }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div
+      className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-full border border-[var(--color-ui-border)] bg-black/40"
+      style={{ filter: alive ? "none" : "grayscale(1) brightness(0.5)" }}
+    >
+      {failed ? (
+        <span className="font-display text-base text-mars-sand/60" aria-hidden>
+          ◓
+        </span>
+      ) : (
+        <img
+          src={portraitUrl(id)}
+          alt=""
+          className="h-full w-full object-cover"
+          onError={() => setFailed(true)}
+        />
+      )}
+    </div>
+  );
+}
+
+/**
+ * Bound handle to the run controller's active-ability action. `run.useAbility` is a plain
+ * method on the singleton run controller (not a React hook), but its name matches the linter's
+ * hook-naming heuristic — the ignore is a true false-positive, not a rules-of-hooks violation.
+ */
+// biome-ignore lint/correctness/useHookAtTopLevel: run.useAbility is a controller method, not a React hook.
+const activateAbility = (crewId: string): boolean => run.useAbility(crewId);
+
+/** Human label for an ability block reason. */
+function blockLabel(blocked: "dead" | "cooldown" | "afford" | null, cooldown: number): string {
+  if (blocked === "dead") return "Incapacitated";
+  if (blocked === "cooldown") return `${cooldown} Sols`;
+  if (blocked === "afford") return "Short on resources";
+  return "Ready";
+}
+
+/**
+ * The crew panel — each colonist's portrait + name/role/condition and their active-ability
+ * button (M10). The button is disabled if the member is dead, the ability is on cooldown, or
+ * the crew can't afford the cost; using it fires run.useAbility. Content-driven from the
+ * snapshot's per-crew ability state.
+ */
+function CrewPanel({ crew }: { crew: RunSnapshot["crew"] }) {
+  return (
+    <GlassPanel
+      className="pointer-events-auto flex w-full flex-col gap-2 p-3 md:w-72"
+      motionProps={{ initial: { y: 16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}
+    >
+      <p className="font-display text-[0.6rem] uppercase tracking-[0.2em] text-mars-sand/60">
+        Crew
+      </p>
+      {crew.map((c) => {
+        const ability = c.ability;
+        const usable = ability?.blocked === null;
+        return (
+          <div key={c.id} className="flex items-center gap-2.5">
+            <CrewPortrait id={c.id} alive={c.alive} />
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-display text-[0.75rem] tracking-wide text-mars-sand">
+                {c.name}
+                <span className="text-mars-sand/45"> · {c.role}</span>
+              </p>
+              <p
+                className="truncate font-mono text-[0.6rem]"
+                style={{
+                  color:
+                    !c.alive || c.condition !== "healthy"
+                      ? "var(--color-alert)"
+                      : "var(--color-ok)",
+                }}
+              >
+                {!c.alive ? "Lost" : c.condition === "healthy" ? "Healthy" : c.condition}
+              </p>
+            </div>
+            {ability && (
+              <button
+                type="button"
+                title={ability.desc}
+                aria-label={`${ability.name}: ${blockLabel(ability.blocked, ability.cooldown)}`}
+                disabled={!usable}
+                onClick={() => activateAbility(c.id)}
+                className="min-h-[44px] shrink-0 rounded border px-2.5 font-display text-[0.62rem] uppercase tracking-[0.08em] transition-colors disabled:opacity-30"
+                style={{
+                  borderColor: usable ? "var(--color-mars-dust)" : "var(--color-ui-border)",
+                  color: usable ? "var(--color-mars-dust)" : "var(--color-mars-sand)",
+                  background: usable ? "rgba(204,112,82,0.12)" : "transparent",
+                }}
+              >
+                {ability.name}
+                {ability.blocked === "cooldown" ? ` · ${ability.cooldown}` : ""}
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </GlassPanel>
+  );
+}
 
 /** Human-facing labels for the pace dial, with the design's Δ readout. */
 const PACE_OPTIONS = [
@@ -143,8 +252,9 @@ export function TravelScreen() {
         <ProgressBar distance={snap.distance} goal={snap.goal} />
       </GlassPanel>
 
-      {/* Bottom cluster: vitals, controls, log. */}
+      {/* Bottom cluster: vitals, crew, controls, log. */}
       <div className="flex flex-col gap-3 md:flex-row md:items-end">
+        <CrewPanel crew={snap.crew} />
         <GlassPanel
           className="pointer-events-auto grid flex-1 grid-cols-2 gap-x-4 gap-y-2 p-3 sm:grid-cols-3"
           motionProps={{ initial: { y: 16, opacity: 0 }, animate: { y: 0, opacity: 1 } }}

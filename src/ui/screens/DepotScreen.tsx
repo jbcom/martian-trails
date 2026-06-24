@@ -2,16 +2,19 @@ import { motion } from "framer-motion";
 import { useMemo, useState } from "react";
 import { audio } from "@/audio/engine";
 import { config } from "@/config";
+import { getSponsor } from "@/content/sponsors";
 import {
   adjust,
   buildLoadout,
   canBuy,
+  canBuyUpgrade,
   canSell,
+  cartCost,
   cartPayload,
-  creditsLeft,
   type DepotState,
   initialDepot,
   missingVitals,
+  upgradesCreditCost,
 } from "@/sim/loadout";
 import { run } from "@/sim/run";
 import { useGameStore } from "@/state/store";
@@ -35,10 +38,12 @@ function lastsForSols(itemId: string, qty: number): number | null {
 function StoreRow({
   itemId,
   cart,
+  budget,
   onAdjust,
 }: {
   itemId: string;
   cart: DepotState;
+  budget: number;
   onAdjust: (dir: 1 | -1) => void;
 }) {
   const item = config.store.items.find((i) => i.id === itemId);
@@ -68,11 +73,57 @@ function StoreRow({
       <button
         type="button"
         aria-label={`Buy ${item.name}`}
-        disabled={!canBuy(cart, item.id)}
+        disabled={!canBuy(cart, item.id, budget)}
         onClick={() => onAdjust(1)}
         className="grid h-11 w-11 place-items-center rounded border border-[var(--color-ui-border)] font-display text-lg text-mars-sand transition-colors enabled:hover:text-mars-dust disabled:opacity-30"
       >
         +
+      </button>
+    </div>
+  );
+}
+
+/** An upgrade row: name, effect, Credit price, and a buy/installed toggle. */
+function UpgradeRow({
+  upgradeId,
+  cart,
+  selected,
+  budget,
+  onToggle,
+}: {
+  upgradeId: string;
+  cart: DepotState;
+  selected: string[];
+  budget: number;
+  onToggle: () => void;
+}) {
+  const upg = config.upgrades.catalog.find((u) => u.id === upgradeId);
+  if (!upg) return null;
+  const installed = selected.includes(upg.id);
+  const affordable = installed || canBuyUpgrade(cart, selected, upg.id, budget);
+
+  return (
+    <div className="flex items-center gap-3 border-b border-[var(--color-ui-border)]/40 py-2">
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-display text-sm tracking-wide text-mars-sand">{upg.name}</p>
+        <p className="font-mono text-[0.6rem] text-mars-sand/55">{upg.desc}</p>
+        <p className="font-mono text-[0.6rem] text-mars-sand/45">
+          {upg.creditCost.toLocaleString()} CR
+        </p>
+      </div>
+      <button
+        type="button"
+        aria-label={`${installed ? "Remove" : "Install"} ${upg.name}`}
+        disabled={!affordable}
+        onClick={onToggle}
+        className="min-h-[44px] min-w-[5.5rem] rounded border px-3 font-display text-[0.7rem] uppercase tracking-[0.12em] transition-colors disabled:opacity-30"
+        style={{
+          borderColor: installed ? "var(--color-ok)" : "var(--color-ui-border)",
+          color: installed ? "var(--color-ok)" : "var(--color-mars-sand)",
+          background: installed ? "rgba(68,255,170,0.1)" : "transparent",
+        }}
+      >
+        {installed ? "Installed" : "Install"}
       </button>
     </div>
   );
@@ -88,17 +139,30 @@ function StoreRow({
 export function DepotScreen() {
   const goTo = useGameStore((s) => s.goTo);
   const seed = useGameStore((s) => s.seed);
+  const sponsorId = useGameStore((s) => s.sponsorId);
+  const sponsor = getSponsor(sponsorId);
+  const budget = sponsor?.budget ?? config.store.budget;
+  const scoreMultiplier = sponsor?.scoreMultiplier ?? 1;
+
   const [cart, setCart] = useState<DepotState>(() => initialDepot());
+  const [upgrades, setUpgrades] = useState<string[]>([]);
 
   const payload = useMemo(() => cartPayload(cart), [cart]);
-  const credits = creditsLeft(cart);
+  // Credits remaining = budget − cart cost − the selected upgrades' Credit cost.
+  const credits = budget - cartCost(cart) - upgradesCreditCost(upgrades);
   const missing = useMemo(() => missingVitals(cart), [cart]);
-  const budget = config.store.budget;
   const cap = config.store.payloadCap;
+
+  function toggleUpgrade(id: string) {
+    setUpgrades((prev) => (prev.includes(id) ? prev.filter((u) => u !== id) : [...prev, id]));
+  }
 
   function depart() {
     audio.unlock();
-    run.start(seed ?? `ares-${Date.now().toString(36)}`, buildLoadout(cart));
+    run.start(
+      seed ?? `ares-${Date.now().toString(36)}`,
+      buildLoadout(cart, upgrades, scoreMultiplier),
+    );
     run.setDriving(true);
     goTo("travel");
   }
@@ -118,7 +182,7 @@ export function DepotScreen() {
           UNDERHILL DEPOT
         </h2>
         <p className="text-xs uppercase tracking-widest text-mars-sand/60">
-          UNOMA Quartermaster Interface
+          {sponsor ? `${sponsor.name} · ×${sponsor.scoreMultiplier} score` : "UNOMA Quartermaster"}
         </p>
 
         {/* Budget + payload meters — both enforced constraints, shown live. */}
@@ -146,14 +210,29 @@ export function DepotScreen() {
           </div>
         </div>
 
-        {/* The store — driven entirely by config.store.items. */}
+        {/* The store + rover upgrades — driven entirely by config. */}
         <div className="mt-4 flex-1 overflow-y-auto">
           {config.store.items.map((item) => (
             <StoreRow
               key={item.id}
               itemId={item.id}
               cart={cart}
-              onAdjust={(dir) => setCart((c) => adjust(c, item.id, dir))}
+              budget={budget}
+              onAdjust={(dir) => setCart((c) => adjust(c, item.id, dir, budget))}
+            />
+          ))}
+
+          <p className="mt-4 mb-1 font-display text-[0.6rem] uppercase tracking-[0.25em] text-mars-dust">
+            Rover Upgrades
+          </p>
+          {config.upgrades.catalog.map((upg) => (
+            <UpgradeRow
+              key={upg.id}
+              upgradeId={upg.id}
+              cart={cart}
+              selected={upgrades}
+              budget={budget}
+              onToggle={() => toggleUpgrade(upg.id)}
             />
           ))}
         </div>

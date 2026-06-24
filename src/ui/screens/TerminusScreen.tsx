@@ -41,6 +41,7 @@ export function TerminusScreen() {
   } | null;
   const survivors = snap?.crew.filter((c) => c.alive).length ?? 0;
   const sol = snap?.sol ?? 0;
+  const scoreMultiplier = snap?.scoreMultiplier ?? 1;
   const score =
     snap?.score ||
     (res
@@ -50,6 +51,7 @@ export function TerminusScreen() {
           water: res.water,
           rations: res.rations,
           sol,
+          scoreMultiplier,
         })
       : 0);
   const s = config.scoring;
@@ -99,6 +101,7 @@ export function TerminusScreen() {
         />
         <Row label={`Hoarded resources ÷${s.resourceDivisor}`} value={`+${resourceBank}`} />
         <Row label={`Sol penalty ×${s.perSol}`} value={`Sol ${sol} → −${sol * s.perSol}`} />
+        <Row label="Sponsor multiplier" value={`×${scoreMultiplier}`} />
 
         <button
           type="button"

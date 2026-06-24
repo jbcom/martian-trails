@@ -8,6 +8,7 @@ import type { Entity, World } from "koota";
 import { config } from "@/config";
 import { createRng } from "@/core/rng";
 import {
+  AbilityCooldowns,
   Crew,
   type CrewState,
   MaxResources,
@@ -16,6 +17,7 @@ import {
   Resources,
   RngSource,
   SolClock,
+  Sponsor,
   Terrain,
   Travel,
   Upgrades,
@@ -33,6 +35,8 @@ export interface Loadout {
   rtg: number;
   /** Upgrade ids that were purchased and installed. */
   upgrades: string[];
+  /** The chosen sponsor's terminus score multiplier (UNOMA=×1, leaner sponsors more). */
+  scoreMultiplier?: number;
   pace?: string;
   rationLevel?: string;
 }
@@ -111,6 +115,8 @@ export function spawnExpedition(
     Outcome({ status: "running", reason: "", score: 0 }),
     Crew(spawnCrewState()),
     Upgrades(spawnUpgrades(loadout.upgrades)),
+    Sponsor({ scoreMultiplier: loadout.scoreMultiplier ?? 1 }),
+    AbilityCooldowns({}),
     RngSource(rng),
   );
 }

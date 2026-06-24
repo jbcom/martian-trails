@@ -28,9 +28,13 @@ export function cartPayload(cart: DepotState): number {
   return config.store.items.reduce((sum, item) => sum + (cart[item.id] ?? 0), 0);
 }
 
-/** Credits remaining against the budget. */
-export function creditsLeft(cart: DepotState): number {
-  return config.store.budget - cartCost(cart);
+/**
+ * Credits remaining against the budget. The budget is the chosen sponsor's funding (the
+ * Oregon Trail profession analog) — it defaults to the depot's base budget so pure
+ * callers/tests that don't pick a sponsor still work.
+ */
+export function creditsLeft(cart: DepotState, budget: number = config.store.budget): number {
+  return budget - cartCost(cart);
 }
 
 /** Payload capacity remaining against the cap. */
@@ -39,12 +43,16 @@ export function payloadLeft(cart: DepotState): number {
 }
 
 /** Whether buying `step` more of `itemId` fits both budget and payload. */
-export function canBuy(cart: DepotState, itemId: string): boolean {
+export function canBuy(
+  cart: DepotState,
+  itemId: string,
+  budget: number = config.store.budget,
+): boolean {
   const item = config.store.items.find((i) => i.id === itemId);
   if (!item) return false;
   const next = (cart[itemId] ?? 0) + item.step;
   if (next > item.max) return false;
-  if (cartCost(cart) + item.step * item.price > config.store.budget) return false;
+  if (cartCost(cart) + item.step * item.price > budget) return false;
   if (cartPayload(cart) + item.step > config.store.payloadCap) return false;
   return true;
 }
@@ -57,10 +65,15 @@ export function canSell(cart: DepotState, itemId: string): boolean {
 }
 
 /** Apply a buy/sell of one step, returning a new cart (clamped to [0, max]). */
-export function adjust(cart: DepotState, itemId: string, dir: 1 | -1): DepotState {
+export function adjust(
+  cart: DepotState,
+  itemId: string,
+  dir: 1 | -1,
+  budget: number = config.store.budget,
+): DepotState {
   const item = config.store.items.find((i) => i.id === itemId);
   if (!item) return cart;
-  if (dir === 1 && !canBuy(cart, itemId)) return cart;
+  if (dir === 1 && !canBuy(cart, itemId, budget)) return cart;
   if (dir === -1 && !canSell(cart, itemId)) return cart;
   const next = Math.max(0, Math.min(item.max, (cart[itemId] ?? 0) + dir * item.step));
   return { ...cart, [itemId]: next };
@@ -74,8 +87,38 @@ export function missingVitals(cart: DepotState): string[] {
   return VITAL_ITEMS.filter((id) => (cart[id] ?? 0) <= 0);
 }
 
-/** Translate the cart into the sim's spawn Loadout. */
-export function buildLoadout(cart: DepotState): Loadout {
+/** Total Credit cost of a set of selected upgrade ids (the depot factory-fit price). */
+export function upgradesCreditCost(upgradeIds: readonly string[]): number {
+  return config.upgrades.catalog
+    .filter((u) => upgradeIds.includes(u.id))
+    .reduce((sum, u) => sum + u.creditCost, 0);
+}
+
+/**
+ * Whether buying `upgradeId` (not already owned) still fits the remaining budget after the
+ * cart cost + the already-selected upgrades' Credit cost.
+ */
+export function canBuyUpgrade(
+  cart: DepotState,
+  selected: readonly string[],
+  upgradeId: string,
+  budget: number = config.store.budget,
+): boolean {
+  const upg = config.upgrades.catalog.find((u) => u.id === upgradeId);
+  if (!upg || selected.includes(upgradeId)) return false;
+  const spent = cartCost(cart) + upgradesCreditCost(selected);
+  return spent + upg.creditCost <= budget;
+}
+
+/**
+ * Translate the cart + chosen upgrades + sponsor multiplier into the sim's spawn Loadout.
+ * Upgrades and the sponsor's score multiplier flow through here into the run.
+ */
+export function buildLoadout(
+  cart: DepotState,
+  upgrades: readonly string[] = [],
+  scoreMultiplier = 1,
+): Loadout {
   return {
     oxygen: cart.oxygen ?? 0,
     water: cart.water ?? 0,
@@ -83,6 +126,7 @@ export function buildLoadout(cart: DepotState): Loadout {
     parts: cart.parts ?? 0,
     medkits: cart.medkits ?? 0,
     rtg: Math.max(1, cart.rtg ?? 1),
-    upgrades: [],
+    upgrades: [...upgrades],
+    scoreMultiplier,
   };
 }

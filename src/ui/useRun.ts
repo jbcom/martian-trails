@@ -96,6 +96,11 @@ function routeFromSnapshot(s: RunSnapshot, current: Screen, goTo: (screen: Scree
     goTo("hazard");
     return;
   }
+  // An outpost dock interrupts the drive next — route to the dock screen.
+  if (s.pendingOutpost && current === "travel") {
+    goTo("outpost");
+    return;
+  }
   if (s.pendingEvent && current === "travel") {
     goTo("event");
   }

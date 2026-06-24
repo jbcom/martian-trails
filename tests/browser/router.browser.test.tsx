@@ -18,7 +18,7 @@ describe("screen router (real browser)", () => {
     expect(getByRole("button", { name: /begin expedition/i })).toBeTruthy();
   });
 
-  it("begin advances the screen and seeds a run", () => {
+  it("begin advances to sponsor select and seeds a run", () => {
     const { getByRole, unmount } = render(<App />);
     cleanup = unmount;
     getByRole("button", { name: /begin expedition/i }).dispatchEvent(
@@ -26,7 +26,7 @@ describe("screen router (real browser)", () => {
     );
     const state = useGameStore.getState();
     expect(state.seed).not.toBeNull();
-    expect(state.screen).toBe("depot");
+    expect(state.screen).toBe("sponsor");
   });
 
   it("renders the depot panel on the depot screen", () => {

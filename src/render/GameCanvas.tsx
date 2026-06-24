@@ -7,6 +7,7 @@ import { SideCamera } from "@/render/camera";
 import { DepotScene } from "@/render/scenes/DepotScene";
 import { EvaScene } from "@/render/scenes/EvaScene";
 import { HazardScene } from "@/render/scenes/HazardScene";
+import { OutpostScene } from "@/render/scenes/OutpostScene";
 import { TravelScene } from "@/render/scenes/TravelScene";
 import { useGameStore } from "@/state/store";
 import { colors } from "@/styles/tokens";
@@ -27,6 +28,8 @@ function SceneForScreen({ screen }: { screen: Screen }) {
       return <HazardScene />;
     case "eva":
       return <EvaScene />;
+    case "outpost":
+      return <OutpostScene />;
     default:
       return <DepotScene />;
   }

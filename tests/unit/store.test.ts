@@ -17,10 +17,17 @@ describe("game store (UI cadence)", () => {
     expect(useGameStore.getState().screen).toBe("depot");
   });
 
-  it("startRun stores the seed and moves to the depot", () => {
+  it("startRun stores the seed and moves to sponsor select", () => {
     useGameStore.getState().startRun("ares-7");
     const s = useGameStore.getState();
     expect(s.seed).toBe("ares-7");
+    expect(s.screen).toBe("sponsor");
+  });
+
+  it("chooseSponsor locks in the sponsor and moves to the depot", () => {
+    useGameStore.getState().chooseSponsor("consortium");
+    const s = useGameStore.getState();
+    expect(s.sponsorId).toBe("consortium");
     expect(s.screen).toBe("depot");
   });
 
