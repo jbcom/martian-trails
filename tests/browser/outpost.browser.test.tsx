@@ -25,6 +25,10 @@ function driveToOutpost(maxSols = 800) {
     i++
   ) {
     for (let t = 0; t < SECONDS_PER_SOL; t += frame) run.tick(frame);
+    if (run.currentEncounter) {
+      run.respondEncounter("decline");
+      run.setDriving(true);
+    }
     if (run.currentHazard) {
       run.resolveHazard(run.currentHazard.options[0].id);
       run.resumeFromHazard();

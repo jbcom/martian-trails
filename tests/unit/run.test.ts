@@ -28,6 +28,10 @@ function driveToHazard(maxSols = 400) {
   run.setDriving(true);
   for (let i = 0; i < maxSols && !run.currentHazard && run.snapshot()?.outcome === "running"; i++) {
     tickFrames(SECONDS_PER_SOL);
+    if (run.currentEncounter) {
+      run.respondEncounter("decline");
+      run.setDriving(true);
+    }
     if (run.currentEvent) {
       run.applyEventChoice([]);
       run.setDriving(true);
@@ -109,6 +113,10 @@ describe("run controller — sim ↔ diagnostics integration", () => {
     let event = null;
     for (let i = 0; i < 30 && !event && run.snapshot()?.outcome === "running"; i++) {
       tickFrames(SECONDS_PER_SOL);
+      if (run.currentEncounter) {
+        run.respondEncounter("decline");
+        run.setDriving(true);
+      }
       event = run.currentEvent;
     }
     expect(event).not.toBeNull();
@@ -123,6 +131,10 @@ describe("run controller — sim ↔ diagnostics integration", () => {
     run.setDriving(true);
     for (let i = 0; i < 30 && !run.currentEvent && run.snapshot()?.outcome === "running"; i++) {
       tickFrames(SECONDS_PER_SOL);
+      if (run.currentEncounter) {
+        run.respondEncounter("decline");
+        run.setDriving(true);
+      }
     }
     const event = run.currentEvent;
     expect(event).not.toBeNull();
@@ -192,6 +204,10 @@ function driveToOutpost(maxSols = 800) {
     i++
   ) {
     tickFrames(SECONDS_PER_SOL);
+    if (run.currentEncounter) {
+      run.respondEncounter("decline");
+      run.setDriving(true);
+    }
     if (run.currentHazard) {
       run.resolveHazard(run.currentHazard.options[0].id);
       run.resumeFromHazard();

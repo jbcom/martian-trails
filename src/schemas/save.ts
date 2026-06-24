@@ -93,6 +93,21 @@ export const runSaveSchema = z.object({
      * paid-for 1.5× haul. `.default(false)` back-fills older saves cleanly.
      */
     evaYieldPrimed: z.boolean().default(false),
+    /** Sol of the last encounter roll cursor (mirrors lastEventSol). `.default(1)` back-fills. */
+    lastEncounterSol: z.number().default(1),
+    /** Active encounter NPC state so resume places the NPC correctly. `.default(null)` back-fills. */
+    encounter: z
+      .object({
+        active: z.boolean(),
+        npcId: z.string(),
+        npcX: z.number(),
+        npcY: z.number(),
+        npcZ: z.number(),
+      })
+      .nullable()
+      .default(null),
+    /** Run flags set by encounter choices (drives slot resolution). `.default([])` back-fills. */
+    encounterFlags: z.array(z.string()).default([]),
   }),
 });
 

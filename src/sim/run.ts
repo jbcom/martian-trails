@@ -1,5 +1,6 @@
 import { createWorld, type Entity, type World } from "koota";
 import { config } from "@/config";
+import { getEncounterBank, getNpc, npcsByArchetype } from "@/content/encounters";
 import { allEvents } from "@/content/events";
 import type { Rng } from "@/core/rng";
 import { createRng } from "@/core/rng";
@@ -8,6 +9,8 @@ import type { Hazard } from "@/schemas/hazard";
 import type { TradeOffer } from "@/schemas/outpost";
 import type { RunSave } from "@/schemas/save";
 import { abilityBlock, abilityForCrew, cooldownRemaining, resolveAbility } from "@/sim/abilities";
+import type { ResolvedEncounter } from "@/sim/encounters";
+import { resolveEncounter } from "@/sim/encounters";
 import {
   applyInjury,
   type EvaSession,
@@ -22,10 +25,12 @@ import type { Loadout } from "@/sim/factories";
 import { spawnExpedition } from "@/sim/factories";
 import { type HazardResult, resolveHazard } from "@/sim/hazard";
 import { type OutpostStop, resolveRest, resolveTrade, serviceForOutpost } from "@/sim/outpost";
+import { pruneEncounterBrains, tickEncounterBrain, triggerDepart } from "@/sim/systems/encounterAI";
 import { SECONDS_PER_SOL, step } from "@/sim/tick";
 import {
   AbilityCooldowns,
   Crew,
+  Encounter,
   MaxResources,
   Outcome,
   Position,
@@ -90,6 +95,8 @@ export interface RunSnapshot {
   scoreMultiplier: number;
   /** The outpost the rover is docked at, or null. While set, the rover is halted. */
   pendingOutpost: OutpostStop | null;
+  /** The encounter awaiting a player response (NPC in HAIL state), or null. */
+  pendingEncounter: { npcId: string; resolved: ResolvedEncounter } | null;
 }
 
 /** Clamp huge frame gaps (tab backgrounded) so one slow frame can't skip Sols. */
@@ -142,6 +149,17 @@ class Run {
   /** Names of outposts already docked at this run, so each triggers exactly once. */
   private dockedOutposts = new Set<string>();
 
+  /** The encounter the player must respond to (NPC in HAIL state). */
+  private pendingEncounter: { npcId: string; resolved: ResolvedEncounter } | null = null;
+  /** True from rollEncounter until respondEncounter — rover halted during APPROACH+HAIL. Cleared on respond so DEPART is cosmetic-only. */
+  private encounterHalted = false;
+  /** Dedicated encounter rng stream, forked once at start (isolated from events). */
+  private encounterRng: Rng | null = null;
+  /** Sol cursor for the encounter roll — same pattern as lastEventSol. */
+  private lastEncounterSol = 1;
+  /** Run flags set by encounter choices (drives slot resolution). */
+  private runFlags = new Set<string>();
+
   /** Begin a fresh run. Resets the diagnostics bridge + spawns the expedition. */
   start(seed: string, loadout?: Loadout): void {
     // koota caps live worlds at 16; destroy the prior run's world so repeated starts
@@ -166,6 +184,12 @@ class Run {
     this.pendingOutpost = null;
     this.dockedOutposts.clear();
     this.hullWasCritical = false;
+    this.pendingEncounter = null;
+    this.encounterHalted = false;
+    this.encounterRng = this.entity.get(RngSource)?.fork("encounters") ?? null;
+    this.lastEncounterSol = this.entity.get(Position)?.sol ?? 1;
+    this.runFlags = new Set();
+    this.entity.set(Encounter, { active: false, npcId: "", npcX: 12, npcY: 0, npcZ: 0 });
     resetDiagnostics();
     this.publish();
   }
@@ -239,6 +263,13 @@ class Run {
         dockedOutposts: [...this.dockedOutposts],
         evaCount: this.evaCount,
         evaYieldPrimed: this.evaYieldPrimed,
+        lastEncounterSol: this.lastEncounterSol,
+        encounter: (() => {
+          const enc = e.get(Encounter);
+          if (!enc?.active) return null;
+          return { active: true, npcId: enc.npcId, npcX: enc.npcX, npcY: enc.npcY, npcZ: enc.npcZ };
+        })(),
+        encounterFlags: [...this.runFlags],
       },
     };
   }
@@ -278,6 +309,7 @@ class Run {
     this.eventRng = rng.fork("events");
     this.hazardRng = rng.fork("hazards");
     this.evaRng = rng.fork("eva");
+    this.encounterRng = rng.fork("encounters");
 
     this.driving = false;
     this.lastEventSol = save.progress.lastEventSol;
@@ -288,6 +320,8 @@ class Run {
     // Banked (not pending) state: the Deep Prospect buff was paid for with a cooldown, so it
     // survives a refresh. Restored from the save, not reset.
     this.evaYieldPrimed = save.progress.evaYieldPrimed;
+    this.lastEncounterSol = save.progress.lastEncounterSol ?? 1;
+    this.runFlags = new Set(save.progress.encounterFlags ?? []);
 
     // A run resumes parked on the trail — any pending decision/EVA at save time is dropped.
     this.pendingEvent = null;
@@ -296,7 +330,18 @@ class Run {
     this.lastHazardResult = null;
     this.eva = null;
     this.pendingOutpost = null;
+    this.pendingEncounter = null;
     this.hullWasCritical = false;
+
+    // Restore encounter trait from save (NPC position), or reset to inactive.
+    if (save.progress.encounter) {
+      e.set(Encounter, { ...save.progress.encounter });
+      // Re-engage the halt so the rover waits for the NPC to arrive and be responded to.
+      this.encounterHalted = true;
+    } else {
+      e.set(Encounter, { active: false, npcId: "", npcX: 12, npcY: 0, npcZ: 0 });
+      this.encounterHalted = false;
+    }
 
     resetDiagnostics();
     this.publish();
@@ -307,9 +352,18 @@ class Run {
     return this.entity != null && this.entity.get(Outcome)?.status === "running";
   }
 
-  /** A decision is pending (event, hazard, or outpost dock) — the rover can't drive. */
+  /**
+   * A decision is pending (event, hazard, outpost dock, or encounter) — the rover can't drive.
+   * encounterHalted covers APPROACH→HAIL; cleared on respondEncounter so DEPART is cosmetic.
+   */
   private get halted(): boolean {
-    return this.pendingEvent != null || this.pendingHazard != null || this.pendingOutpost != null;
+    return (
+      this.pendingEvent != null ||
+      this.pendingHazard != null ||
+      this.pendingOutpost != null ||
+      this.pendingEncounter != null ||
+      this.encounterHalted
+    );
   }
 
   setDriving(on: boolean): void {
@@ -434,6 +488,16 @@ class Run {
   /** The outpost the rover is docked at, or null. */
   get currentOutpost(): OutpostStop | null {
     return this.pendingOutpost;
+  }
+
+  /** The encounter awaiting a player response (NPC in HAIL state), or null. */
+  get currentEncounter(): { npcId: string; resolved: ResolvedEncounter } | null {
+    return this.pendingEncounter;
+  }
+
+  /** True while the rover is halted by an encounter (APPROACH through player response). */
+  get isEncounterActive(): boolean {
+    return this.encounterHalted;
   }
 
   /**
@@ -667,6 +731,26 @@ class Run {
       this.rollHazard();
       if (!this.halted) this.rollOutpost();
       if (!this.halted) this.rollEvent();
+      if (!this.halted) this.rollEncounter();
+    }
+    // Tick the encounter AI while the NPC is en route (even while halted at HAIL state).
+    if (this.world && this.entity && this.active) {
+      const enc = this.entity.get(Encounter);
+      if (enc?.active) {
+        const npcState = tickEncounterBrain(this.world, this.entity, 12);
+        if (npcState === "HAIL" && !this.pendingEncounter) {
+          const npc = getNpc(enc.npcId);
+          const bank = npc ? getEncounterBank(npc.bank) : undefined;
+          if (npc && bank) {
+            const resolved = resolveEncounter(this.buildEncounterRunState(), bank);
+            this.pendingEncounter = { npcId: enc.npcId, resolved };
+          }
+        }
+        if (npcState === "DONE") {
+          this.entity.set(Encounter, { ...enc, active: false });
+          pruneEncounterBrains(this.world);
+        }
+      }
     }
     this.publish();
   }
@@ -710,6 +794,89 @@ class Run {
     return rng.pick(pool);
   }
 
+  /**
+   * Per fresh Sol, roll a seeded encounter chance (15%). On a hit, pick a trader NPC, activate
+   * the Encounter trait, and halt the rover. Mirrors rollEvent() — one draw per Sol, stream persists.
+   */
+  private rollEncounter(): void {
+    const e = this.entity;
+    const rng = this.encounterRng;
+    if (!e || !rng || this.halted) return;
+    // Don't spawn a new NPC while one is still visually present (DEPART phase); but DO
+    // advance the Sol cursor so departed Sols are not retried when the scene clears.
+    const sol = e.get(Position)?.sol ?? this.lastEncounterSol;
+    if (e.get(Encounter)?.active) {
+      this.lastEncounterSol = sol;
+      return;
+    }
+    if (sol <= this.lastEncounterSol) return;
+
+    for (let s = this.lastEncounterSol + 1; s <= sol; s++) {
+      const solRng = rng.fork(`encounter:${s}`);
+      if (solRng.chance(0.15)) {
+        const traders = npcsByArchetype("trader");
+        if (traders.length === 0) break;
+        const npc = solRng.pick(traders);
+        e.set(Encounter, { active: true, npcId: npc.id, npcX: 12, npcY: 0, npcZ: 0 });
+        this.encounterHalted = true;
+        this.driving = false;
+        getDiagnostics().driving = false;
+        this.lastEncounterSol = s;
+        return;
+      }
+    }
+    this.lastEncounterSol = sol;
+  }
+
+  /**
+   * Respond to the pending encounter — apply the chosen choice's effects + flags, trigger the
+   * NPC's DEPART, and clear the halt. No-op if nothing is pending.
+   */
+  respondEncounter(choiceId: string): void {
+    const e = this.entity;
+    const pending = this.pendingEncounter;
+    if (!e || !pending) return;
+
+    const node = pending.resolved.node;
+    const choice = node.choices.find((c) => c.id === choiceId) ?? node.choices[0];
+
+    if (choice) {
+      if (choice.effects.length > 0) {
+        const res = e.get(Resources);
+        if (res) {
+          const maxPower = e.get(MaxResources)?.power ?? config.resources.max.power;
+          e.set(Resources, applyEffects(res, choice.effects, maxPower));
+        }
+      }
+      if (choice.setsFlag) this.runFlags.add(choice.setsFlag);
+    }
+
+    if (this.world) triggerDepart(this.world, e);
+    this.pendingEncounter = null;
+    this.encounterHalted = false;
+    this.publish();
+  }
+
+  /** Build the minimal run-state view for encounter slot resolution. */
+  private buildEncounterRunState() {
+    const e = this.entity;
+    const sol = e?.get(Position)?.sol ?? 1;
+    const res = e?.get(Resources);
+    const max = config.resources.max;
+    const maxPower = e?.get(MaxResources)?.power ?? max.power;
+    const lowResources = new Set<string>();
+    if (res) {
+      const LOW = 0.25;
+      if (res.oxygen < max.oxygen * LOW) lowResources.add("oxygen");
+      if (res.water < max.water * LOW) lowResources.add("water");
+      if (res.rations < max.rations * LOW) lowResources.add("rations");
+      if (res.power < maxPower * LOW) lowResources.add("power");
+      if (res.morale < max.morale * LOW) lowResources.add("morale");
+      if (res.hull < max.hull * LOW) lowResources.add("hull");
+    }
+    return { sol, flags: this.runFlags as ReadonlySet<string>, lowResources };
+  }
+
   /** Mirror the entity's authoritative state into the frame-cadence bridge. */
   private publish(): void {
     const e = this.entity;
@@ -735,6 +902,10 @@ class Run {
     const hullCritical = d.hull <= 0.15;
     if (hullCritical && !this.hullWasCritical) bumpShake(0.7);
     this.hullWasCritical = hullCritical;
+    const enc = e.get(Encounter);
+    d.encounter = enc?.active
+      ? { active: true, npcId: enc.npcId, x: enc.npcX, y: enc.npcY, z: enc.npcZ }
+      : null;
   }
 
   /** A UI-cadence snapshot of the run (call from React effects/handlers, not per-frame). */
@@ -789,6 +960,7 @@ class Run {
       eva: this.eva,
       scoreMultiplier: e.get(Sponsor)?.scoreMultiplier ?? 1,
       pendingOutpost: this.pendingOutpost,
+      pendingEncounter: this.pendingEncounter,
     };
   }
 }

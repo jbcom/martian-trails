@@ -11,6 +11,7 @@ import {
   AbilityCooldowns,
   Crew,
   type CrewState,
+  Encounter,
   MaxResources,
   Outcome,
   Position,
@@ -117,6 +118,7 @@ export function spawnExpedition(
     Upgrades(spawnUpgrades(loadout.upgrades)),
     Sponsor({ scoreMultiplier: loadout.scoreMultiplier ?? 1 }),
     AbilityCooldowns({}),
+    Encounter(),
     RngSource(rng),
   );
 }

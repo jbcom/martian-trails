@@ -106,6 +106,28 @@ export const Sponsor = trait({ scoreMultiplier: 1 });
  */
 export const AbilityCooldowns = trait<() => Record<string, number>>(() => ({}));
 
+export interface EncounterState {
+  active: boolean;
+  npcId: string;
+  /** NPC position in scene space, written by encounterAI each tick. */
+  npcX: number;
+  npcY: number;
+  npcZ: number;
+}
+
+/**
+ * Active NPC encounter state. When active=true, the rover is halted and an NPC is steering
+ * toward it. npcX/npcY/npcZ track the NPC's sim position (written by encounterAI per tick).
+ * sim-owned, serialized for save/restore.
+ */
+export const Encounter = trait<() => EncounterState>(() => ({
+  active: false,
+  npcId: "",
+  npcX: 12,
+  npcY: 0,
+  npcZ: 0,
+}));
+
 /**
  * The expedition's seeded rng. AoS factory holds the live stream; never serialized.
  * The factory default is a placeholder stream — `spawnExpedition` always supplies the real
