@@ -1,20 +1,8 @@
 @import "tailwindcss";
+@import "./fonts.css";
+@import "./tokens.css";
 
-/*
- * Martian Trail design tokens (Tailwind v4 @theme).
- * The Mars palette is the seed brand identity — see docs/ART-DIRECTION.md and
- * STANDARDS.md. A typed mirror + sync test lands in Milestone 2 (m2-3).
- */
-@theme {
-  --color-mars-bg: #1a0b08;
-  --color-mars-red: #8a3324;
-  --color-mars-dust: #cc7052;
-  --color-mars-sand: #e89b71;
-
-  --font-display: "Rajdhani", system-ui, sans-serif;
-  --font-body: "Inter", system-ui, sans-serif;
-}
-
+/* Base document styling. Design tokens live in tokens.css; fonts in fonts.css. */
 html,
 body,
 #root {

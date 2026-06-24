@@ -1,0 +1,32 @@
+/*
+ * Martian Trail design tokens — the single source of truth (Tailwind v4 @theme).
+ * Mirrored in tokens.ts; kept in sync by tokens.test.ts. See docs/DESIGN-SYSTEM.md.
+ * Brand-hex drift is gated by .claude/gates.json.
+ */
+@theme {
+  /* Palette */
+  --color-mars-bg: #1a0b08;
+  --color-mars-red: #8a3324;
+  --color-mars-dust: #cc7052;
+  --color-mars-sand: #e89b71;
+  --color-ui-glass: rgba(20, 8, 6, 0.85);
+  --color-ui-border: rgba(204, 112, 82, 0.35);
+  --color-alert: #ff5a3c;
+  --color-ok: #44ffaa;
+
+  /* Type families */
+  --font-display: "Rajdhani", system-ui, sans-serif;
+  --font-body: "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Radius */
+  --radius-panel: 8px;
+  --radius-control: 4px;
+
+  /* Glass blur */
+  --blur-glass: 10px;
+
+  /* Responsive breakpoints (phone / tablet / unfolded foldable) */
+  --breakpoint-tablet: 48rem;
+  --breakpoint-foldable: 75rem;
+}
