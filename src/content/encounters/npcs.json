@@ -9,5 +9,27 @@
     "approachSpeed": 5,
     "hailRange": 48,
     "goalWeights": { "trade": 1 }
+  },
+  {
+    "id": "npc:depot-quartermaster-okonkwo",
+    "name": "Okonkwo",
+    "archetype": "liaison",
+    "look": "a crisp teal UNOMA pressure suit with a quartermaster's shoulder insignia, a clipboard-slate clipped at the hip, a comms headset over the helmet seal",
+    "portrait": "okonkwo",
+    "bank": "encbank:okonkwo",
+    "approachSpeed": 3,
+    "hailRange": 40,
+    "goalWeights": { "warn": 1 }
+  },
+  {
+    "id": "npc:depot-prospector-reyes",
+    "name": "Reyes",
+    "archetype": "veteran",
+    "look": "a grizzled ice-prospector in a rime-frosted rust-orange suit, regolith ground into the gauntlets, a chipped sample-corer slung across the chest",
+    "portrait": "reyes",
+    "bank": "encbank:reyes",
+    "approachSpeed": 4,
+    "hailRange": 44,
+    "goalWeights": { "warn": 1 }
   }
 ]
